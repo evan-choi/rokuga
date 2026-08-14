@@ -19,7 +19,7 @@ final class RegionSelectionController {
         self.completion = completion
 
         let saved = settings.selectedRegions[String(display.displayID)]
-        model = RegionSelectionModel(displaySize: display.frame.size, initialRegion: saved)
+        model = RegionSelectionModel(displaySize: display.frame.size, initialRegion: saved, displayID: display.displayID)
 
         panel = CapturePanel(contentRect: display.frame, level: .screenSaver)
         panel.isMovableByWindowBackground = false
@@ -86,11 +86,14 @@ final class WeakBox<T: AnyObject> {
 final class RegionSelectionModel: ObservableObject {
     @Published var region: CGRect?
     @Published var hoveredSnap: CGRect?
+    @Published var loupePoint: CGPoint?
     var snapCandidates: [CGRect] = []
     let displaySize: CGSize
+    let displayID: CGDirectDisplayID
 
-    init(displaySize: CGSize, initialRegion: CGRect?) {
+    init(displaySize: CGSize, initialRegion: CGRect?, displayID: CGDirectDisplayID = CGMainDisplayID()) {
         self.displaySize = displaySize
+        self.displayID = displayID
         region = initialRegion
     }
 
@@ -138,6 +141,9 @@ struct RegionSelectionView: View {
                 }
                 if let region = model.region {
                     selectionChrome(region)
+                }
+                if let loupePoint = model.loupePoint {
+                    PixelLoupeView(point: loupePoint, displayID: model.displayID, displaySize: model.displaySize)
                 }
                 instructionBadge
             }
@@ -252,11 +258,17 @@ struct RegionSelectionView: View {
                     beginDrag(at: value.startLocation)
                 }
                 updateDrag(to: value.location)
+                if case .creating = dragMode {
+                    model.loupePoint = value.location
+                } else if case .resizing = dragMode {
+                    model.loupePoint = value.location
+                }
             }
             .onEnded { _ in
                 dragOrigin = nil
                 regionAtDragStart = nil
                 dragMode = .none
+                model.loupePoint = nil
             }
     }
 
