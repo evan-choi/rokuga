@@ -7,12 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0412C0F401A129845DF1102F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACEF749566AC4C8D31AFFE /* SettingsView.swift */; };
 		0F9250DE141B6E3FE8BBAC2A /* EncoderKit in Frameworks */ = {isa = PBXBuildFile; productRef = EAA3266BA31A31CFEF23B6DD /* EncoderKit */; };
 		1B5390A7FE20273966EDE225 /* EffectsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9D6E3F4AB7FC7E69750DB290 /* EffectsKit */; };
 		39054F1AB3D206AB8D91E363 /* SettingsKit in Frameworks */ = {isa = PBXBuildFile; productRef = FEF4B8BCF7D0897F2ACF9193 /* SettingsKit */; };
 		417B48F5765C65ACAF3F1974 /* RokugaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4333162F241D181B98466D2E /* RokugaApp.swift */; };
 		51D79BC09766CBB6D5798C29 /* OptionsPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8363EACAA897E1BE0371FC61 /* OptionsPopoverView.swift */; };
 		5712F500502EC549E5B463BC /* RegionSelectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D42F45DB2E973748F86F890 /* RegionSelectionController.swift */; };
+		5D17B175367AE2ED862BFA25 /* Hotkeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = A23E6120208B1DF63AFF7F8A /* Hotkeys.swift */; };
 		65E195EE9291B849A4875FEA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A162BE4AB0CC49292478D1AC /* Assets.xcassets */; };
 		68768CEEFA0E47EE7CFDCE70 /* CapturePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B4579472853FA6D7E3849D /* CapturePanel.swift */; };
 		74D43A3B88D23FFB59E31B38 /* ToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 579D47990E188AF6216A548C /* ToolbarView.swift */; };
@@ -38,9 +40,11 @@
 		8363EACAA897E1BE0371FC61 /* OptionsPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsPopoverView.swift; sourceTree = "<group>"; };
 		83ADD69EF936A7768209CFEA /* Rokuga.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rokuga.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A162BE4AB0CC49292478D1AC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A23E6120208B1DF63AFF7F8A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
 		B2DAD524F5AAF1B230FEA8F5 /* RokugaCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = RokugaCore; path = RokugaCore; sourceTree = SOURCE_ROOT; };
 		C035550E70EC1750084E3C16 /* CountdownOverlayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownOverlayController.swift; sourceTree = "<group>"; };
 		DCE0BABF205AB3C7CA53BA50 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		E2ACEF749566AC4C8D31AFFE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F0CCD7F0B41B156B9CCCD698 /* OutputFolderStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputFolderStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -68,6 +72,14 @@
 				DEC706DFCAF89CD03B5E9329 /* Sources */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		17D4BA22E038BF78D47A613A /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				E2ACEF749566AC4C8D31AFFE /* SettingsView.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		2DFC6D9A05EC8CBA08EE7628 /* Resources */ = {
@@ -109,6 +121,7 @@
 				DCE0BABF205AB3C7CA53BA50 /* AppState.swift */,
 				4333162F241D181B98466D2E /* RokugaApp.swift */,
 				F4CEED7E172060B1168BF00E /* Overlays */,
+				17D4BA22E038BF78D47A613A /* Settings */,
 				FE9E5B990AE70EC59ADDCC49 /* Support */,
 				FEC5332EC22B1E818652CD0A /* Toolbar */,
 			);
@@ -129,6 +142,7 @@
 			children = (
 				14B4579472853FA6D7E3849D /* CapturePanel.swift */,
 				1CB554C599BD6B3D70D9A193 /* GlassBackground.swift */,
+				A23E6120208B1DF63AFF7F8A /* Hotkeys.swift */,
 				F0CCD7F0B41B156B9CCCD698 /* OutputFolderStore.swift */,
 			);
 			path = Support;
@@ -230,10 +244,12 @@
 				68768CEEFA0E47EE7CFDCE70 /* CapturePanel.swift in Sources */,
 				C523DA4D54A05B6F693D646B /* CountdownOverlayController.swift in Sources */,
 				F9A490C63F12EA1C7C2B1EC3 /* GlassBackground.swift in Sources */,
+				5D17B175367AE2ED862BFA25 /* Hotkeys.swift in Sources */,
 				51D79BC09766CBB6D5798C29 /* OptionsPopoverView.swift in Sources */,
 				7651654E709DF4674A02BCB0 /* OutputFolderStore.swift in Sources */,
 				5712F500502EC549E5B463BC /* RegionSelectionController.swift in Sources */,
 				417B48F5765C65ACAF3F1974 /* RokugaApp.swift in Sources */,
+				0412C0F401A129845DF1102F /* SettingsView.swift in Sources */,
 				EACF2958F8EF366CDBF97860 /* ToolbarPanelController.swift in Sources */,
 				74D43A3B88D23FFB59E31B38 /* ToolbarView.swift in Sources */,
 				E6B5D846D3C5279B5D05B433 /* WindowPickerView.swift in Sources */,

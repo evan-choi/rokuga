@@ -25,9 +25,16 @@ enum OutputFolderStore {
     static func newRecordingURL(settings: SettingsStore = .shared) -> URL {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH.mm.ss"
-        let name = "Rokuga \(formatter.string(from: Date()))"
-        return currentFolder(settings: settings)
-            .appendingPathComponent(name)
-            .appendingPathExtension(settings.containerFormat.fileExtension)
+        let baseName = "Rokuga \(formatter.string(from: Date()))"
+        let folder = currentFolder(settings: settings)
+        let ext = settings.containerFormat.fileExtension
+
+        var candidate = folder.appendingPathComponent(baseName).appendingPathExtension(ext)
+        var suffix = 2
+        while FileManager.default.fileExists(atPath: candidate.path) {
+            candidate = folder.appendingPathComponent("\(baseName) \(suffix)").appendingPathExtension(ext)
+            suffix += 1
+        }
+        return candidate
     }
 }

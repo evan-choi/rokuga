@@ -38,6 +38,12 @@ public final class SettingsStore: @unchecked Sendable {
         case launchAtLogin = "app.launchAtLogin"
         case theme = "app.theme"
         case onboardingCompleted = "app.onboardingCompleted"
+        case lastRecordingPath = "post.lastRecordingPath"
+    }
+
+    public var lastRecordingPath: String? {
+        get { lock.withLock { defaults.string(forKey: Key.lastRecordingPath.rawValue) } }
+        set { lock.withLock { defaults.set(newValue, forKey: Key.lastRecordingPath.rawValue) } }
     }
 
     // MARK: Typed accessors

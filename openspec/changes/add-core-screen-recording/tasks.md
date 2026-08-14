@@ -35,8 +35,8 @@
 
 ## 5. Recording controls & hotkeys
 
-- [ ] 5.1 Global shortcuts via KeyboardShortcuts: toolbar ⇧⌘6, start/stop ⇧⌘2, pause/resume ⇧⌘4 — reconfigurable, disableable, conflict-detected
-- [ ] 5.2 Wire all entry points (toolbar, menu bar, hotkeys) to the coordinator; concurrent-start prevention; quit-while-recording confirm + safe finalize
+- [x] 5.1 Global shortcuts via KeyboardShortcuts: toolbar ⇧⌘6, start/stop ⇧⌘2, pause/resume ⇧⌘4 — reconfigurable, disableable, conflict-detected
+- [x] 5.2 Wire all entry points (toolbar, menu bar, hotkeys) to the coordinator; concurrent-start prevention; quit-while-recording confirm + safe finalize
 
 ## 6. Mouse effects (EffectsKit)
 
@@ -45,7 +45,7 @@
 
 ## 7. Post-recording delivery
 
-- [ ] 7.1 Timestamped save-to-folder with collision suffixes; "last recording" tracking; security-scoped default `~/Movies/Rokuga`
+- [x] 7.1 Timestamped save-to-folder with collision suffixes; "last recording" tracking; security-scoped default `~/Movies/Rokuga`
 - [ ] 7.2 Floating thumbnail panel (bottom-right, click → preview panel, timeout/swipe dismiss, capture-excluded, settings toggle) + notification fallback
 - [ ] 7.3 Preview panel: in-place expand from thumbnail, AVPlayer + scrub bar, QuickTime-style two-finger horizontal scrub, 편집(→trim editor)/삭제(→Trash w/ confirm)/완료(close) actions, non-activating, Esc = Done
 - [ ] 7.4 Menu bar "Open Last Recording"(→preview) / "Open Output Folder" incl. deleted-file recovery path

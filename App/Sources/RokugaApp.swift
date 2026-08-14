@@ -6,7 +6,7 @@ import SwiftUI
 @main
 struct RokugaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @StateObject private var appState = AppState()
+    @ObservedObject private var appState = AppState.shared
 
     var body: some Scene {
         MenuBarExtra {
@@ -15,12 +15,37 @@ struct RokugaApp: App {
             MenuBarLabel(appState: appState)
         }
         .menuBarExtraStyle(.menu)
+
+        Settings {
+            SettingsView()
+        }
     }
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+    }
+
+    /// Quit-while-recording guard (task 5.2): confirm, then finalize safely before terminating.
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        let appState = AppState.shared
+        guard appState.recordingState.isActive else { return .terminateNow }
+
+        NSApp.activate(ignoringOtherApps: true)
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Stop recording and quit?")
+        alert.informativeText = String(localized: "The current recording will be saved before Rokuga quits.")
+        alert.addButton(withTitle: String(localized: "Save & Quit"))
+        alert.addButton(withTitle: String(localized: "Cancel"))
+
+        guard alert.runModal() == .alertFirstButtonReturn else { return .terminateCancel }
+
+        Task {
+            try? await appState.coordinator.stop()
+            NSApp.reply(toApplicationShouldTerminate: true)
+        }
+        return .terminateLater
     }
 }
 
@@ -61,9 +86,7 @@ struct MenuBarContentView: View {
         Divider()
 
         Button("Open Last Recording") {
-            if let url = appState.lastRecordingURL {
-                NSWorkspace.shared.open(url)
-            }
+            appState.openLastRecording()
         }
         .disabled(appState.lastRecordingURL == nil)
 
@@ -74,10 +97,9 @@ struct MenuBarContentView: View {
         Divider()
 
         Button("Settings…") {
-            // Settings window arrives in task 9.3.
+            SettingsOpener.open()
         }
         .keyboardShortcut(",", modifiers: .command)
-        .disabled(true)
 
         Divider()
 
