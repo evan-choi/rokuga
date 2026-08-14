@@ -7,6 +7,8 @@ import SwiftUI
 
 @MainActor
 final class AppState: ObservableObject {
+    static let shared = AppState()
+
     @Published private(set) var recordingState: RecordingState = .idle
     @Published private(set) var elapsedSeconds: Int = 0
     @Published private(set) var lastRecordingURL: URL?
@@ -31,8 +33,31 @@ final class AppState: ObservableObject {
             guard let plan = box.take() else { throw RecordingError.captureSourceLost }
             return plan.makeSession()
         }
+        if let path = settings.lastRecordingPath {
+            lastRecordingURL = URL(fileURLWithPath: path)
+        }
+        Hotkeys.bind(to: self)
         Task { await consumeEvents() }
         Task { @MainActor in summonToolbar() }
+    }
+
+    func toggleRecording() {
+        if recordingState.isActive {
+            stopRecording()
+        } else if recordingState.canStart {
+            requestRecord()
+        }
+    }
+
+    /// Deleted-file recovery (task 7.4): a stale last-recording entry falls back to the output folder.
+    func openLastRecording() {
+        guard let url = lastRecordingURL, FileManager.default.fileExists(atPath: url.path) else {
+            lastRecordingURL = nil
+            settings.lastRecordingPath = nil
+            NSWorkspace.shared.open(OutputFolderStore.currentFolder())
+            return
+        }
+        NSWorkspace.shared.open(url)
     }
 
     // MARK: Event pump
@@ -46,6 +71,7 @@ final class AppState: ObservableObject {
                 countdownController?.update(remaining: remaining)
             case let .finished(url):
                 lastRecordingURL = url
+                settings.lastRecordingPath = url.path
                 diskMonitor.stop()
             case .failed:
                 diskMonitor.stop()
