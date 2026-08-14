@@ -40,6 +40,10 @@ let package = Package(
             name: "SettingsKit"
         ),
         .testTarget(
+            name: "EncoderKitTests",
+            dependencies: ["EncoderKit"]
+        ),
+        .testTarget(
             name: "CaptureKitTests",
             dependencies: ["CaptureKit"]
         ),
