@@ -11,6 +11,7 @@
 		0A3E98251E975BA7D8F888B6 /* TrimEditorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D57C77A3D1B42911392F36AF /* TrimEditorModel.swift */; };
 		0F9250DE141B6E3FE8BBAC2A /* EncoderKit in Frameworks */ = {isa = PBXBuildFile; productRef = EAA3266BA31A31CFEF23B6DD /* EncoderKit */; };
 		1B5390A7FE20273966EDE225 /* EffectsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9D6E3F4AB7FC7E69750DB290 /* EffectsKit */; };
+		2EFA28938E011ABC169F5F35 /* PixelLoupeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E766F6B2874B70C5C7041DF /* PixelLoupeView.swift */; };
 		3555D528ED14585FD91F5858 /* ThumbnailPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5942994E90FE1451CCDE4 /* ThumbnailPanelController.swift */; };
 		39054F1AB3D206AB8D91E363 /* SettingsKit in Frameworks */ = {isa = PBXBuildFile; productRef = FEF4B8BCF7D0897F2ACF9193 /* SettingsKit */; };
 		417B48F5765C65ACAF3F1974 /* RokugaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4333162F241D181B98466D2E /* RokugaApp.swift */; };
@@ -41,6 +42,7 @@
 		1CB554C599BD6B3D70D9A193 /* GlassBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassBackground.swift; sourceTree = "<group>"; };
 		209F6E4825E2D2B4012A1650 /* ToolbarPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarPanelController.swift; sourceTree = "<group>"; };
 		4333162F241D181B98466D2E /* RokugaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RokugaApp.swift; sourceTree = "<group>"; };
+		4E766F6B2874B70C5C7041DF /* PixelLoupeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelLoupeView.swift; sourceTree = "<group>"; };
 		579D47990E188AF6216A548C /* ToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarView.swift; sourceTree = "<group>"; };
 		5DC9F65E55E649C93CCD296A /* PreviewPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPanelController.swift; sourceTree = "<group>"; };
 		63805146B27CDDE73095D42F /* TrimEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrimEditorView.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 			isa = PBXGroup;
 			children = (
 				C035550E70EC1750084E3C16 /* CountdownOverlayController.swift */,
+				4E766F6B2874B70C5C7041DF /* PixelLoupeView.swift */,
 				6D42F45DB2E973748F86F890 /* RegionSelectionController.swift */,
 			);
 			path = Overlays;
@@ -285,6 +288,7 @@
 				F0A29E7C0C1A4192C217804C /* NotificationFallback.swift in Sources */,
 				51D79BC09766CBB6D5798C29 /* OptionsPopoverView.swift in Sources */,
 				7651654E709DF4674A02BCB0 /* OutputFolderStore.swift in Sources */,
+				2EFA28938E011ABC169F5F35 /* PixelLoupeView.swift in Sources */,
 				AB89462EBDAD15F328A015C5 /* PreviewPanelController.swift in Sources */,
 				5712F500502EC549E5B463BC /* RegionSelectionController.swift in Sources */,
 				417B48F5765C65ACAF3F1974 /* RokugaApp.swift in Sources */,
