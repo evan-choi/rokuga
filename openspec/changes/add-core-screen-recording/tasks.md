@@ -68,10 +68,10 @@
 
 ## 9a. Localization
 
-- [ ] 9a.1 String Catalog (`.xcstrings`) setup, English as development language; CI lint: no user-facing literals outside the catalog
-- [ ] 9a.2 ko/ja/zh-Hans translations at 100% coverage + CI completeness gate
-- [ ] 9a.3 Locale-aware formatters for all UI dates/times/sizes; locale-neutral file naming verified
-- [ ] 9a.4 CJK layout QA: localized-screenshot pass (toolbar/popover/settings/editor ×4 languages), no truncation/overlap
+- [x] 9a.1 String Catalog (`.xcstrings`) setup, English as development language; CI lint: no user-facing literals outside the catalog
+- [x] 9a.2 ko/ja/zh-Hans translations at 100% coverage + CI completeness gate
+- [x] 9a.3 Locale-aware formatters for all UI dates/times/sizes; locale-neutral file naming verified
+- [x] 9a.4 CJK layout QA: localized-screenshot pass (toolbar/popover/settings/editor ×4 languages), no truncation/overlap
 
 ## 10. Performance & release gates
 

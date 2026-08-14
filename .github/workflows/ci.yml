@@ -58,6 +58,9 @@ jobs:
       - name: SwiftFormat (check only)
         run: swiftformat --lint .
 
+      - name: Localization gates (no literals outside catalog, ko/ja/zh-Hans completeness)
+        run: python3 scripts/lint-localization.py
+
   benchmarks:
     name: Benchmarks (scaffold)
     # Perf regression gates get wired in task 10.4 — until then this job only

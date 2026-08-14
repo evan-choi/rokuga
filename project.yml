@@ -1,6 +1,8 @@
 name: Rokuga
 options:
   bundleIdPrefix: io.rokuga
+  developmentLanguage: en
+  knownRegions: [en, ko, ja, zh-Hans]
   deploymentTarget:
     macOS: "13.3"
   createIntermediateGroups: true

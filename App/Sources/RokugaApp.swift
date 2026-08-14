@@ -27,6 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.accessory)
         Task { @MainActor in
             ThemeApplier.apply(SettingsStore.shared.theme)
+            _ = L10nScreenshotRunner.runIfRequested()
         }
     }
 
