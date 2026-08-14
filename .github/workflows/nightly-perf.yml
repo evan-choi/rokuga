@@ -1,0 +1,37 @@
+name: Nightly performance
+
+on:
+  schedule:
+    - cron: "17 17 * * *"
+  workflow_dispatch:
+    inputs:
+      soak_seconds:
+        description: "Soak duration in seconds (spec long-run: 28800 = 8 h)"
+        default: "600"
+
+jobs:
+  perf-4k60:
+    name: 4K60 long run + gates
+    runs-on: macos-15
+    timeout-minutes: 720
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | sort -V | tail -1)/Contents/Developer"
+
+      - name: 4K60 spec run (10 min) + latency
+        working-directory: RokugaCore
+        run: |
+          swift run -c release rokuga-bench throughput --width 3840 --height 2160 --fps 60 \
+            --seconds "${{ github.event.inputs.soak_seconds || 600 }}" > /tmp/tp.json
+          swift run -c release rokuga-bench latency > /tmp/lat.json
+
+      - name: Enforce gates
+        run: python3 scripts/bench-gate.py /tmp/tp.json /tmp/lat.json
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-results
+          path: /tmp/*.json
