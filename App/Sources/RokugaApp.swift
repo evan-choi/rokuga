@@ -42,7 +42,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard alert.runModal() == .alertFirstButtonReturn else { return .terminateCancel }
 
         Task {
-            try? await appState.coordinator.stop()
+            _ = try? await appState.coordinator.stop()
             NSApp.reply(toApplicationShouldTerminate: true)
         }
         return .terminateLater

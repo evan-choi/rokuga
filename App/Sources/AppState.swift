@@ -28,6 +28,8 @@ final class AppState: ObservableObject {
     private var regionController: RegionSelectionController?
     private var thumbnailController: ThumbnailPanelController?
     private var previewController: PreviewPanelController?
+    private var trimEditors: [TrimEditorController] = []
+    private(set) var activeRecordingURL: URL?
 
     init() {
         let box = targetBox
@@ -74,9 +76,11 @@ final class AppState: ObservableObject {
             case let .finished(url):
                 lastRecordingURL = url
                 settings.lastRecordingPath = url.path
+                activeRecordingURL = nil
                 diskMonitor.stop()
                 presentPostRecording(for: url)
             case .failed:
+                activeRecordingURL = nil
                 diskMonitor.stop()
             }
         }
@@ -149,6 +153,7 @@ final class AppState: ObservableObject {
     func startRecording(target: CaptureTarget) {
         dismissToolbar()
         let outputURL = OutputFolderStore.newRecordingURL(settings: settings)
+        activeRecordingURL = outputURL
         let encoderConfiguration = makeEncoderConfiguration(for: target)
         let captureConfiguration = CaptureConfiguration.fromSettings(settings)
         let coordinator = self.coordinator
@@ -218,8 +223,15 @@ final class AppState: ObservableObject {
     }
 
     func presentTrimEditor(for url: URL) {
-        // Trim editor window lands in group 8; interim: hand off to the system player.
-        NSWorkspace.shared.open(url)
+        guard url != activeRecordingURL else {
+            NSSound.beep()
+            return
+        }
+        let editor = TrimEditorController(url: url) { [weak self] in
+            self?.trimEditors.removeAll { $0.model.url == url }
+        }
+        trimEditors.append(editor)
+        editor.present()
     }
 
     func recordingWasDeleted(_ url: URL) {

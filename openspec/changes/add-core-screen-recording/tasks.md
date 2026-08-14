@@ -47,16 +47,16 @@
 
 - [x] 7.1 Timestamped save-to-folder with collision suffixes; "last recording" tracking; security-scoped default `~/Movies/Rokuga`
 - [x] 7.2 Floating thumbnail panel (bottom-right, click → preview panel, timeout/swipe dismiss, capture-excluded, settings toggle) + notification fallback
-- [ ] 7.3 Preview panel: in-place expand from thumbnail, AVPlayer + scrub bar, QuickTime-style two-finger horizontal scrub, 편집(→trim editor)/삭제(→Trash w/ confirm)/완료(close) actions, non-activating, Esc = Done
+- [x] 7.3 Preview panel: in-place expand from thumbnail, AVPlayer + scrub bar, QuickTime-style two-finger horizontal scrub, 편집(→trim editor)/삭제(→Trash w/ confirm)/완료(close) actions, non-activating, Esc = Done
 - [x] 7.4 Menu bar "Open Last Recording"(→preview) / "Open Output Folder" incl. deleted-file recovery path
 
 ## 8. Trim editor (TrimKit)
 
-- [ ] 8.1 Editor window: AVPlayer preview, thumbnail-strip timeline, draggable keep-range handles with keyframe snap display
-- [ ] 8.2 Passthrough export (`AVAssetExportPresetPassthrough` + `timeRange`) with re-encode fallback ("frame-exact") + progress UI
-- [ ] 8.3 Non-destructive save-as with name/destination; unsaved-changes guard; in-progress files excluded
-- [ ] 8.4 Export Audio Only → M4A (AAC) of selected range, disabled when no audio track
-- [ ] 8.5 Timeline zoom & gestures: pinch/⌘-scroll anchored zoom, NSScrollView horizontal pan with momentum, zoom slider + ⌘+/⌘−/⌘0, lazy thumbnail re-tiling per zoom band, frame-level handle placement, QuickTime-style horizontal-scroll scrub over the preview area (phase-aware, coalesced seeks)
+- [x] 8.1 Editor window: AVPlayer preview, thumbnail-strip timeline, draggable keep-range handles with keyframe snap display
+- [x] 8.2 Passthrough export (`AVAssetExportPresetPassthrough` + `timeRange`) with re-encode fallback ("frame-exact") + progress UI
+- [x] 8.3 Non-destructive save-as with name/destination; unsaved-changes guard; in-progress files excluded
+- [x] 8.4 Export Audio Only → M4A (AAC) of selected range, disabled when no audio track
+- [x] 8.5 Timeline zoom & gestures: pinch/⌘-scroll anchored zoom, NSScrollView horizontal pan with momentum, zoom slider + ⌘+/⌘−/⌘0, lazy thumbnail re-tiling per zoom band, frame-level handle placement, QuickTime-style horizontal-scroll scrub over the preview area (phase-aware, coalesced seeks)
 
 ## 9. Onboarding & preferences
 
