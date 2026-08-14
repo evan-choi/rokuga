@@ -30,7 +30,7 @@
 - [x] 4.2 Recording toolbar: non-activating `NSPanel` HUD at bottom-center of the mouse-pointer display; summon via menu bar / ⇧⌘6 / launch; Esc & record dismiss
 - [x] 4.3 Mode buttons ×3 (area/full screen/window) + options popover (⇧⌘5-style: save location, countdown, audio, mouse, thumbnail toggles) + 녹화 button
 - [x] 4.4 Liquid Glass materials with `NSVisualEffectView`/`.ultraThinMaterial` fallback (13.3–15) + reduce-transparency accessibility path
-- [ ] 4.5 Region selection overlay: drag-select, resizable edges/corners, magnifier with window snapping, per-display persistence
+- [x] 4.5 Region selection overlay: drag-select, resizable edges/corners, magnifier with window snapping, per-display persistence
 - [x] 4.6 Countdown overlay (1–10 s, Esc cancels, always capture-excluded)
 
 ## 5. Recording controls & hotkeys
@@ -40,8 +40,8 @@
 
 ## 6. Mouse effects (EffectsKit)
 
-- [ ] 6.1 Metal cursor compositor: cursor show/hide, system/dot pointer styles, highlight halo, click animations — recorded-only, invisible live
-- [ ] 6.2 Per-frame GPU budget monitor with automatic effect degradation ladder
+- [x] 6.1 Metal cursor compositor: cursor show/hide, system/dot pointer styles, highlight halo, click animations — recorded-only, invisible live
+- [x] 6.2 Per-frame GPU budget monitor with automatic effect degradation ladder
 
 ## 7. Post-recording delivery
 

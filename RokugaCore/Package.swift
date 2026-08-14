@@ -18,7 +18,7 @@ let package = Package(
         // MARK: Capture — ScreenCaptureKit session management, recording state machine
         .target(
             name: "CaptureKit",
-            dependencies: ["EncoderKit", "SettingsKit"]
+            dependencies: ["EncoderKit", "EffectsKit", "SettingsKit"]
         ),
         // MARK: Encode — AVAssetWriter/VideoToolbox pipeline, audio mixing
         .target(
@@ -54,6 +54,10 @@ let package = Package(
         .testTarget(
             name: "TrimKitTests",
             dependencies: ["TrimKit"]
+        ),
+        .testTarget(
+            name: "EffectsKitTests",
+            dependencies: ["EffectsKit"]
         ),
     ]
 )

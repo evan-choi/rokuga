@@ -52,6 +52,16 @@ public enum CaptureTarget: Equatable, Sendable {
     case display(DisplayTarget, crop: CGRect?)
     case window(WindowTarget)
 
+    /// Captured area in global CG (top-left) coordinates, before any crop.
+    public var globalFrame: CGRect {
+        switch self {
+        case let .display(display, _):
+            return display.frame
+        case let .window(window):
+            return window.frame
+        }
+    }
+
     /// Output pixel dimensions before the 5K clamp.
     public var sourcePixelSize: (width: Int, height: Int) {
         switch self {

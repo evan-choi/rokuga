@@ -1,4 +1,5 @@
 import CoreMedia
+import EffectsKit
 import EncoderKit
 import Foundation
 import ScreenCaptureKit
@@ -9,17 +10,22 @@ public struct CaptureConfiguration: Equatable, Sendable {
     public var showsCursor: Bool
     public var captureSystemAudio: Bool
     public var exclusion: ExclusionOptions
+    public var cursorEffects: CursorEffectOptions
 
     public init(
         frameRate: FrameRate,
         showsCursor: Bool,
         captureSystemAudio: Bool,
-        exclusion: ExclusionOptions
+        exclusion: ExclusionOptions,
+        cursorEffects: CursorEffectOptions = CursorEffectOptions(
+            showCursor: true, pointerStyle: .system, highlight: false, animateClicks: false
+        )
     ) {
         self.frameRate = frameRate
         self.showsCursor = showsCursor
         self.captureSystemAudio = captureSystemAudio
         self.exclusion = exclusion
+        self.cursorEffects = cursorEffects
     }
 
     public static func fromSettings(_ settings: SettingsStore) -> Self {
@@ -32,7 +38,8 @@ public struct CaptureConfiguration: Equatable, Sendable {
             exclusion: ExclusionOptions(
                 excludeOwnWindows: settings.excludeOwnWindows,
                 excludeDesktopIcons: settings.excludeDesktopIcons
-            )
+            ),
+            cursorEffects: CursorEffectOptions.fromSettings(settings)
         )
     }
 }
@@ -49,6 +56,8 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
     private var stream: SCStream?
     private var isPaused = false
     private var isStopping = false
+    private var compositor: CursorCompositor?
+    private var cursorSampler: CursorStateSampler?
 
     public init(
         target: CaptureTarget,
@@ -84,6 +93,57 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         try await sink.start()
         try await stream.startCapture()
         stateLock.withLock { self.stream = stream }
+
+        if !configuration.cursorEffects.isPassthrough {
+            let sampler = CursorStateSampler()
+            await sampler.start()
+            let compositor = CursorCompositor(
+                options: configuration.cursorEffects,
+                geometry: frameGeometry(configuration: streamConfiguration),
+                sampler: sampler
+            ) { [weak self] in
+                // GPU budget exhausted (task 6.2): fall back to the native cursor mid-stream.
+                self?.fallBackToNativeCursor()
+            }
+            stateLock.withLock {
+                self.cursorSampler = sampler
+                self.compositor = compositor
+            }
+        }
+    }
+
+    /// Global-CG-coordinate rect of the captured content, used to map cursor positions into frame pixels.
+    private func frameGeometry(configuration: SCStreamConfiguration) -> FrameGeometry {
+        var contentRect = target.globalFrame
+        if case let .display(display, crop) = target, let crop {
+            contentRect = CGRect(
+                x: display.frame.minX + crop.minX,
+                y: display.frame.minY + crop.minY,
+                width: crop.width,
+                height: crop.height
+            )
+        }
+        return FrameGeometry(
+            contentRect: contentRect,
+            pixelSize: CGSize(width: Int(configuration.width), height: Int(configuration.height))
+        )
+    }
+
+    private func fallBackToNativeCursor() {
+        guard let stream = stateLock.withLock({ self.stream }) else { return }
+        let config = makeStreamConfiguration()
+        config.showsCursor = true
+        Task {
+            try? await stream.updateConfiguration(config)
+            let sampler = self.stateLock.withLock { () -> CursorStateSampler? in
+                self.compositor = nil
+                defer { self.cursorSampler = nil }
+                return self.cursorSampler
+            }
+            if let sampler {
+                await sampler.stop()
+            }
+        }
     }
 
     public func pause() async throws {
@@ -106,6 +166,7 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
             // stopCapture throws if the stream already died (e.g. display unplug) — the sink still holds valid data, so finalize regardless.
             try? await stream.stopCapture()
         }
+        await stopCursorSampling()
         return try await sink.finish()
     }
 
@@ -118,7 +179,19 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         if let stream {
             try? await stream.stopCapture()
         }
+        await stopCursorSampling()
         await sink.cancel()
+    }
+
+    private func stopCursorSampling() async {
+        let sampler = stateLock.withLock { () -> CursorStateSampler? in
+            compositor = nil
+            defer { cursorSampler = nil }
+            return cursorSampler
+        }
+        if let sampler {
+            await sampler.stop()
+        }
     }
 
     /// Re-resolves the content filter so newly created windows (e.g. the floating thumbnail) honor the exclusion rules mid-recording (task 2.4).
@@ -176,7 +249,8 @@ extension SCCaptureSession: SCStreamOutput {
         switch type {
         case .screen:
             guard isCompleteVideoFrame(sampleBuffer) else { return }
-            sink.append(sampleBuffer, of: .video)
+            let compositor = stateLock.withLock { self.compositor }
+            sink.append(compositor?.composite(sampleBuffer) ?? sampleBuffer, of: .video)
         case .audio:
             sink.append(sampleBuffer, of: .systemAudio)
         default:
