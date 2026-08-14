@@ -2,10 +2,10 @@
 
 ## 1. Project scaffolding
 
-- [ ] 1.1 Create Xcode project: `Rokuga` app target (SwiftUI, macOS 13.3+, sandboxed, `LSUIElement` agent) + local SPM package `RokugaCore` (CaptureKit, EncoderKit, EffectsKit, TrimKit, SettingsKit)
-- [ ] 1.2 Entitlements & Info.plist: screen capture, microphone usage description, security-scoped bookmarks, login item helper; no Dock icon
-- [ ] 1.3 Add `KeyboardShortcuts` (MIT) as the sole third-party dependency
-- [ ] 1.4 CI pipeline: build + unit tests on macOS 13/14/15 runners, SwiftLint/SwiftFormat, benchmark job scaffold (perf gates wired in 13.4)
+- [x] 1.1 Create Xcode project: `Rokuga` app target (SwiftUI, macOS 13.3+, sandboxed, `LSUIElement` agent) + local SPM package `RokugaCore` (CaptureKit, EncoderKit, EffectsKit, TrimKit, SettingsKit)
+- [x] 1.2 Entitlements & Info.plist: screen capture, microphone usage description, security-scoped bookmarks, login item helper; no Dock icon
+- [x] 1.3 Add `KeyboardShortcuts` (MIT) as the sole third-party dependency
+- [x] 1.4 CI pipeline: build + unit tests on macOS 13/14/15 runners, SwiftLint/SwiftFormat, benchmark job scaffold (perf gates wired in 13.4)
 
 ## 2. Capture core (CaptureKit)
 

@@ -1,0 +1,13 @@
+# SwiftFormat configuration — matches .swiftlint.yml where they overlap.
+--swiftversion 5.9
+--indent 4
+--maxwidth 160
+--wraparguments before-first
+--wrapcollections before-first
+--stripunusedargs closure-only
+--self remove
+--importgrouping testable-bottom
+--commas inline
+--trimwhitespace always
+--disable wrapMultilineStatementBraces, andOperator
+--exclude .build, design, docs, openspec
