@@ -9,19 +9,19 @@
 
 ## 2. Capture core (CaptureKit)
 
-- [ ] 2.1 `RecordingCoordinator` actor with the state machine (idle → preparing → countdown → recording ⇄ paused → finishing → idle) and single-flight guarantees
-- [ ] 2.2 SCStream display capture with `sourceRect` cropping (Selected Area) and per-display selection (Full Screen)
-- [ ] 2.3 `desktopIndependentWindow` capture (Window mode) incl. target picker metadata (app icon, window title, live preview)
-- [ ] 2.4 Content-filter exclusion: own-PID windows toggle, desktop-icon exclusion at `kCGDesktopIconWindowLevel`; countdown/selection overlays always excluded
-- [ ] 2.5 Display/window disconnect handling → safe finalize + non-blocking toast
+- [x] 2.1 `RecordingCoordinator` actor with the state machine (idle → preparing → countdown → recording ⇄ paused → finishing → idle) and single-flight guarantees
+- [x] 2.2 SCStream display capture with `sourceRect` cropping (Selected Area) and per-display selection (Full Screen)
+- [x] 2.3 `desktopIndependentWindow` capture (Window mode) incl. target picker metadata (app icon, window title, live preview)
+- [x] 2.4 Content-filter exclusion: own-PID windows toggle, desktop-icon exclusion at `kCGDesktopIconWindowLevel`; countdown/selection overlays always excluded
+- [x] 2.5 Display/window disconnect handling → safe finalize + non-blocking toast
 
 ## 3. Encoding & audio (EncoderKit)
 
-- [ ] 3.1 AVAssetWriter pipeline: VideoToolbox H.264/HEVC, MP4/MOV, incremental writes, zero-copy IOSurface path
-- [ ] 3.2 Pause/resume splice clock (gapless PTS rewrite, A/V sync across splices)
-- [ ] 3.3 System audio via SCStream (`capturesAudio`, `excludeCurrentProcessAudio`) + mic via AVCaptureSession → 48 kHz lock-free mixer → single AAC track
-- [ ] 3.4 Rate control: VBR quality 0–100 mapping + capped-VBR "CBR" (`AVVideoDataRateLimitsKey` 1.1×/1 s); AAC 128–320 kbps
-- [ ] 3.5 Resolution cap (≤ 5K) & FPS cap (≤ 60) with automatic downscale of oversized sources
+- [x] 3.1 AVAssetWriter pipeline: VideoToolbox H.264/HEVC, MP4/MOV, incremental writes, zero-copy IOSurface path
+- [x] 3.2 Pause/resume splice clock (gapless PTS rewrite, A/V sync across splices)
+- [x] 3.3 System audio via SCStream (`capturesAudio`, `excludeCurrentProcessAudio`) + mic via AVCaptureSession → 48 kHz lock-free mixer → single AAC track
+- [x] 3.4 Rate control: VBR quality 0–100 mapping + capped-VBR "CBR" (`AVVideoDataRateLimitsKey` 1.1×/1 s); AAC 128–320 kbps
+- [x] 3.5 Resolution cap (≤ 5K) & FPS cap (≤ 60) with automatic downscale of oversized sources
 - [ ] 3.6 Failure-safe finalization: crash/power-loss recovery of playable partials, disk-full preflight + 30 s watermark + auto-stop < 500 MB free
 
 ## 4. UI shell (windowless, Liquid Glass)

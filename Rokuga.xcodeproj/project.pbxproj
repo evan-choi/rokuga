@@ -11,6 +11,7 @@
 		1B5390A7FE20273966EDE225 /* EffectsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9D6E3F4AB7FC7E69750DB290 /* EffectsKit */; };
 		39054F1AB3D206AB8D91E363 /* SettingsKit in Frameworks */ = {isa = PBXBuildFile; productRef = FEF4B8BCF7D0897F2ACF9193 /* SettingsKit */; };
 		417B48F5765C65ACAF3F1974 /* RokugaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4333162F241D181B98466D2E /* RokugaApp.swift */; };
+		65E195EE9291B849A4875FEA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A162BE4AB0CC49292478D1AC /* Assets.xcassets */; };
 		A0A4B5DE7B727756BFC46C5F /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = F57946511F3AD0E1DD96C78D /* KeyboardShortcuts */; };
 		B3A15BE4EE95F0BAA7B140C0 /* TrimKit in Frameworks */ = {isa = PBXBuildFile; productRef = 370EC52E590B15D13ED8CCF1 /* TrimKit */; };
 		C3438E64D2BCDE70E03BE995 /* CaptureKit in Frameworks */ = {isa = PBXBuildFile; productRef = 361978BC34CB105D30F7CD37 /* CaptureKit */; };
@@ -19,6 +20,7 @@
 /* Begin PBXFileReference section */
 		4333162F241D181B98466D2E /* RokugaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RokugaApp.swift; sourceTree = "<group>"; };
 		83ADD69EF936A7768209CFEA /* Rokuga.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rokuga.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A162BE4AB0CC49292478D1AC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B2DAD524F5AAF1B230FEA8F5 /* RokugaCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = RokugaCore; path = RokugaCore; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -51,6 +53,7 @@
 		2DFC6D9A05EC8CBA08EE7628 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A162BE4AB0CC49292478D1AC /* Assets.xcassets */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -96,6 +99,7 @@
 			buildConfigurationList = E98C0F8F50759731ABED03B0 /* Build configuration list for PBXNativeTarget "Rokuga" */;
 			buildPhases = (
 				F555FBE576C6573A5A91AF58 /* Sources */,
+				521A03F99E9A5BF1AB78F1F2 /* Resources */,
 				E170272B4AC8091483B559BF /* Frameworks */,
 			);
 			buildRules = (
@@ -151,6 +155,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		521A03F99E9A5BF1AB78F1F2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65E195EE9291B849A4875FEA /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F555FBE576C6573A5A91AF58 /* Sources */ = {

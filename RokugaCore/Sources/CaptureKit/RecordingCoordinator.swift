@@ -139,6 +139,19 @@ public actor RecordingCoordinator {
         }
     }
 
+    /// Source disconnect (display unplug, window closed) — finalize what was captured so far instead of losing it (task 2.5).
+    public func handleSessionInterruption() async {
+        guard state == .recording || state == .paused, let session else { return }
+        emit(.failed(.captureSourceLost))
+        try? transition(to: .finishing)
+        if let url = try? await session.finish() {
+            emit(.finished(outputURL: url))
+        }
+        self.session = nil
+        state = .idle
+        emit(.stateChanged(.idle))
+    }
+
     // MARK: Countdown
 
     private func runCountdown(seconds: Int) async throws {
