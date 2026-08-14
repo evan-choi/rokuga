@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Rokuga — Aurora Gradient</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',-apple-system,sans-serif; }
+  body { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px; background:#05060f; color:#eef0ff; overflow:hidden; }
+  .blob { position:fixed; border-radius:50%; filter:blur(90px); opacity:.55; z-index:0; animation:float 14s ease-in-out infinite alternate; }
+  .b1{width:520px;height:520px;background:#7c3aed;top:-140px;left:-100px}
+  .b2{width:460px;height:460px;background:#06b6d4;bottom:-120px;right:-80px;animation-delay:-4s}
+  .b3{width:380px;height:380px;background:#ec4899;bottom:-60px;left:30%;animation-delay:-8s}
+  @keyframes float{to{transform:translate(60px,-40px) scale(1.15)}}
+  .badge { position:fixed; top:16px; left:16px; z-index:2; font-size:13px; font-weight:600; background:#ffffff14; border:1px solid #ffffff2a; padding:6px 14px; border-radius:99px; backdrop-filter:blur(10px); }
+  .window { position:relative; z-index:1; width:760px; border-radius:22px; background:#0b0d1adf; border:1px solid #ffffff1f;
+    box-shadow:0 40px 100px rgba(0,0,0,.6); backdrop-filter:blur(30px); overflow:hidden; }
+  .window::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,#a78bfa,#22d3ee,#f472b6,transparent)}
+  .titlebar { display:flex; align-items:center; gap:8px; padding:15px 18px; }
+  .dot { width:12px; height:12px; border-radius:50%; }
+  .dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+  .title { flex:1; text-align:center; font-size:13px; font-weight:700; margin-right:56px;
+    background:linear-gradient(90deg,#a78bfa,#22d3ee,#f472b6); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .modes { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:10px 24px 4px; }
+  .mode { position:relative; border-radius:15px; padding:15px 8px; text-align:center; cursor:pointer; background:#ffffff09; border:1px solid #ffffff17; transition:.2s; }
+  .mode.active { background:linear-gradient(#12142a,#12142a) padding-box, linear-gradient(120deg,#a78bfa,#22d3ee,#f472b6) border-box; border:1.5px solid transparent;
+    box-shadow:0 0 30px #7c3aed44; }
+  .mode .icon{font-size:24px} .mode .label{font-size:12px; font-weight:600; margin-top:7px; color:#c7cbe8}
+  .mode.active .label{color:#fff}
+  .preview { margin:16px 24px; height:220px; border-radius:16px; position:relative; background:#05060fe0; border:1px solid #ffffff17;
+    display:flex; align-items:center; justify-content:center; }
+  .hint{font-size:13px; color:#8f95bd}
+  .marquee { position:absolute; inset:34px 64px; border-radius:8px; border:1.5px solid transparent;
+    background:linear-gradient(#0000,#0000) padding-box, linear-gradient(120deg,#a78bfa,#22d3ee,#f472b6) border-box;
+    box-shadow:0 0 40px #22d3ee33, 0 0 0 4000px #05060f66; }
+  .dims { position:absolute; top:10px; left:68px; font-size:11px; font-weight:600; background:#12142a; border:1px solid #ffffff22; padding:3px 9px; border-radius:99px; }
+  .timer { position:absolute; bottom:12px; right:14px; font-variant-numeric:tabular-nums; font-weight:800; font-size:15px; background:#12142a; border:1px solid #ffffff22; padding:5px 13px; border-radius:99px; }
+  .timer::before{content:'●'; color:#fb7185; margin-right:8px; animation:blink 1.2s infinite; text-shadow:0 0 12px #fb7185}
+  @keyframes blink{50%{opacity:.25}}
+  .controls { display:flex; align-items:center; gap:14px; padding:6px 24px; }
+  .rec { width:66px; height:66px; border-radius:50%; border:none; cursor:pointer; position:relative;
+    background:linear-gradient(135deg,#fb7185,#e11d48); box-shadow:0 0 40px #e11d4877, inset 0 1px 0 #ffffff88;
+    display:flex; align-items:center; justify-content:center; }
+  .rec::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:1.5px solid #fb718544;animation:pulse 2s infinite}
+  @keyframes pulse{to{transform:scale(1.25);opacity:0}}
+  .rec .inner{width:24px;height:24px;border-radius:50%;background:#fff}
+  .ctl { width:47px; height:47px; border-radius:50%; cursor:pointer; font-size:15px; color:#eef0ff; background:#ffffff0d; border:1px solid #ffffff22; }
+  .spacer{flex:1}
+  .toggle { display:flex; align-items:center; gap:9px; font-size:12.5px; font-weight:600; padding:10px 14px; border-radius:99px; cursor:pointer; background:#ffffff09; border:1px solid #ffffff1c; color:#c7cbe8; }
+  .toggle+.toggle{margin-left:8px}
+  .sw{width:30px;height:17px;border-radius:99px;background:#ffffff20;position:relative;transition:.2s}
+  .sw::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#aab;transition:.2s}
+  .toggle.on{color:#fff;border-color:#22d3ee55}
+  .toggle.on .sw{background:linear-gradient(90deg,#22d3ee,#a78bfa);box-shadow:0 0 14px #22d3ee66}
+  .toggle.on .sw::after{transform:translateX(13px);background:#fff}
+  .statusbar{display:flex;align-items:center;gap:12px;padding:16px 26px 20px;font-size:12px;color:#8f95bd}
+  .chip{background:#ffffff0b;border:1px solid #ffffff1a;padding:5px 12px;border-radius:99px;font-weight:600;color:#c7cbe8}
+  .path{margin-left:auto}
+</style>
+</head>
+<body>
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="badge">07 · Aurora Gradient</div>
+  <div class="window">
+    <div class="titlebar">
+      <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+      <div class="title">ROKUGA</div>
+    </div>
+    <div class="modes">
+      <div class="mode active"><div class="icon">⬚</div><div class="label">Selected Area</div></div>
+      <div class="mode"><div class="icon">🖥</div><div class="label">Full Screen</div></div>
+      <div class="mode"><div class="icon">🗔</div><div class="label">Window</div></div>
+      <div class="mode"><div class="icon">📷</div><div class="label">Camera</div></div>
+    </div>
+    <div class="preview">
+      <div class="marquee"></div>
+      <div class="dims">1280 × 720</div>
+      <div class="hint">Drag to select an area of the screen</div>
+      <div class="timer">00:01:24</div>
+    </div>
+    <div class="controls">
+      <button class="rec"><div class="inner"></div></button>
+      <button class="ctl">⏸</button>
+      <button class="ctl">⏹</button>
+      <div class="spacer"></div>
+      <div class="toggle on"><span>🔊 System Audio</span><div class="sw"></div></div>
+      <div class="toggle"><span>🎙 Microphone</span><div class="sw"></div></div>
+      <div class="toggle on"><span>🖱 Mouse FX</span><div class="sw"></div></div>
+    </div>
+    <div class="statusbar">
+      <span class="chip">MP4</span><span class="chip">H.264</span><span class="chip">60 FPS</span><span class="chip">VBR · High</span>
+      <span class="path">~/Movies/Rokuga</span>
+    </div>
+  </div>
+</body>
+</html>

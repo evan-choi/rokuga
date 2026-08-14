@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Rokuga — Dark Pro · 모드별 상태 플로우</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter','Apple SD Gothic Neo',-apple-system,sans-serif; }
+  :root { --bg:#101116; --panel:#17181e; --panel2:#1f2129; --line:#2b2e38; --txt:#e8eaed; --sub:#8b92a1; --accent:#e5484d; --ok:#3dd68c; --blue:#4f8ef7; }
+  body { background:linear-gradient(160deg,#37649e 0%,#3c7ec2 30%,#5a9fd4 60%,#2e5a8f 100%); min-height:100vh; padding:60px 0 100px; }
+  .section { max-width:900px; margin:0 auto 70px; padding:0 30px; }
+  .sec-label { display:inline-block; color:#fff; font-size:14px; font-weight:700; background:#00000055; backdrop-filter:blur(10px); padding:8px 18px; border-radius:99px; margin-bottom:22px; border:1px solid #ffffff2a; }
+  .stage { display:flex; justify-content:center; }
+
+  /* ── 공통 창 ───────────────────────── */
+  .bar { border-radius:14px; background:var(--bg); border:1px solid #00000066; box-shadow:0 24px 60px rgba(0,0,20,.45), inset 0 1px 0 #ffffff14; overflow:hidden; }
+  .titlebar { display:flex; align-items:center; gap:7px; padding:11px 14px 9px; }
+  .dot{width:11px;height:11px;border-radius:50%} .dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+  .app-title { flex:1; text-align:center; font-size:12px; font-weight:700; letter-spacing:.14em; color:var(--sub); }
+  .tb-right { display:flex; gap:12px; color:var(--sub); font-size:14px; }
+
+  /* ── A. 컴팩트 메인 바 ─────────────── */
+  .main-row { display:flex; align-items:center; gap:10px; padding:4px 16px 14px; }
+  .mode { width:104px; border-radius:11px; padding:14px 6px 11px; text-align:center; cursor:pointer; background:var(--panel2); border:1px solid var(--line); transition:.15s; }
+  .mode .icon{font-size:23px; color:#c9cdd8} .mode .label{font-size:11.5px; font-weight:600; margin-top:7px; color:var(--sub)}
+  .mode.active { border-color:var(--accent); background:#26191b; box-shadow:0 0 0 1px var(--accent), 0 4px 18px #e5484d33; }
+  .mode.active .label{color:var(--txt)}
+  .rec-big { width:78px; height:78px; margin-left:10px; border-radius:50%; border:4px solid var(--accent); background:transparent; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; color:var(--accent); font-family:'JetBrains Mono'; font-weight:700; font-size:15px; letter-spacing:.04em; transition:.15s; }
+  .rec-big:hover{background:#e5484d22}
+  .toolbar { display:flex; align-items:center; gap:6px; padding:9px 16px 12px; border-top:1px solid var(--line); background:var(--panel); }
+  .tool { width:34px; height:34px; border-radius:8px; border:none; cursor:pointer; background:transparent; color:#c9cdd8; font-size:15px; }
+  .tool.on { background:var(--panel2); box-shadow:inset 0 0 0 1px var(--line); }
+  .tool.off { color:#565d6e; position:relative; }
+  .tool.off::after{content:'';position:absolute;left:7px;right:7px;top:50%;height:1.5px;background:#565d6e;transform:rotate(-40deg)}
+  .tspacer{flex:1}
+  .fmt { font-family:'JetBrains Mono'; font-size:12.5px; font-weight:700; color:var(--txt); display:flex; align-items:center; gap:8px; }
+  .fmt .play{color:var(--sub); font-size:13px}
+  .gear{margin-left:10px; color:var(--sub); font-size:16px; background:none; border:none; cursor:pointer}
+
+  /* ── B. 영역 선택 오버레이 ─────────── */
+  .desktop { width:840px; height:430px; border-radius:16px; position:relative; overflow:hidden;
+    background:linear-gradient(150deg,#4a86c2,#7db4e0 45%,#3d6ea6); box-shadow:0 24px 60px rgba(0,0,20,.4); }
+  .dim { position:absolute; inset:0; background:#0009; }
+  .marquee { position:absolute; left:110px; top:52px; width:520px; height:280px; background:transparent; border:1.5px dashed #fff;
+    box-shadow:0 0 0 4000px #00000088; }
+  .handle{position:absolute;width:9px;height:9px;background:#fff;border-radius:50%;border:1px solid #0006}
+  .h-tl{top:-5px;left:-5px}.h-t{top:-5px;left:50%;margin-left:-5px}.h-tr{top:-5px;right:-5px}
+  .h-l{top:50%;left:-5px;margin-top:-5px}.h-r{top:50%;right:-5px;margin-top:-5px}
+  .h-bl{bottom:-5px;left:-5px}.h-b{bottom:-5px;left:50%;margin-left:-5px}.h-br{bottom:-5px;right:-5px}
+  .float-bar { position:absolute; left:50%; transform:translateX(-50%); bottom:38px;
+    display:flex; align-items:center; gap:5px; padding:8px 10px; border-radius:12px;
+    background:#101116f2; border:1px solid #ffffff1c; box-shadow:0 14px 40px #000a; }
+  .float-bar .tool{width:32px;height:32px}
+  .fdims { font-family:'JetBrains Mono'; font-size:12.5px; font-weight:700; color:var(--txt); background:var(--panel2); border:1px solid var(--line); padding:6px 11px; border-radius:8px; margin:0 4px; }
+  .frec { width:36px; height:36px; border-radius:50%; border:2.5px solid var(--accent); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; margin-left:2px; }
+  .frec .d{width:14px;height:14px;border-radius:50%;background:var(--accent)}
+  .fclose{color:#8b92a1}
+
+  /* ── C/D. 확장 피커 ────────────────── */
+  .picker-body { padding:18px 20px 22px; border-top:1px solid var(--line); background:#121319; }
+  .prompt { display:flex; align-items:center; gap:9px; width:fit-content; margin:0 auto 18px; font-size:12.5px; font-weight:600; color:var(--txt);
+    background:var(--panel2); border:1px solid var(--line); padding:8px 16px; border-radius:99px; }
+  .prompt .x{color:var(--sub)} .prompt .re{color:var(--sub); margin-left:2px}
+  .thumbs { display:flex; gap:22px; justify-content:center; }
+  .thumb { text-align:center; cursor:pointer; }
+  .shot { width:210px; height:130px; border-radius:10px; border:2px solid var(--line); position:relative; overflow:hidden;
+    background:linear-gradient(150deg,#5b8fc4,#8cbde5 50%,#46759f); }
+  .shot .win{position:absolute;background:#f5f6f8;border-radius:4px;box-shadow:0 4px 10px #0005}
+  .w1{left:14px;top:16px;width:110px;height:74px}
+  .w2{left:78px;top:44px;width:104px;height:64px;background:#e6e9f0}
+  .shot.sel { border-color:var(--blue); box-shadow:0 0 0 3px #4f8ef755, 0 10px 30px #0006; }
+  .check { position:absolute; top:8px; left:8px; width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 8px #0007; }
+  .tname { margin-top:10px; font-size:12px; font-weight:600; color:#e0e3ea; }
+  .tsub { font-size:11px; color:var(--sub); margin-top:2px; }
+  .group-label { font-size:11px; font-weight:700; letter-spacing:.1em; color:var(--sub); margin:0 0 12px 6px; text-transform:uppercase; }
+
+  /* ── E. 녹화 중 필 + 메뉴바 ────────── */
+  .menubar { position:absolute; top:0; left:0; right:0; height:30px; background:#f7f7f9e8; backdrop-filter:blur(20px); display:flex; align-items:center; padding:0 14px; gap:16px; font-size:12.5px; font-weight:600; color:#1d1d1f; }
+  .mb-right{margin-left:auto; display:flex; align-items:center; gap:12px; color:#1d1d1f}
+  .mb-timer { display:flex; align-items:center; gap:7px; background:#e5484d; color:#fff; border-radius:6px; padding:3px 9px; font-family:'JetBrains Mono'; font-size:11.5px; font-weight:700; }
+  .mb-timer .sq{width:8px;height:8px;background:#fff;border-radius:2px}
+  .pill { position:absolute; left:50%; top:54%; transform:translate(-50%,-50%);
+    display:flex; align-items:center; gap:14px; padding:12px 18px; border-radius:16px;
+    background:#101116f2; border:1px solid #ffffff1c; box-shadow:0 20px 50px #000a; }
+  .pill .mode-ic{width:34px;height:34px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:16px}
+  .pill .time{font-family:'JetBrains Mono';font-size:22px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums}
+  .pill .time::before{content:'●';color:var(--accent);font-size:13px;margin-right:10px;animation:blink 1.2s infinite;vertical-align:2px}
+  @keyframes blink{50%{opacity:.2}}
+  .pill .pctl{width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font-size:14px;cursor:pointer}
+  .pill .pctl.stop{color:var(--accent);border-color:#e5484d55}
+  .caption { text-align:center; color:#ffffffd0; font-size:12.5px; margin-top:16px; font-weight:500; }
+</style>
+</head>
+<body>
+
+  <!-- A. Idle 컴팩트 바 -->
+  <div class="section">
+    <div class="sec-label">A · Idle — 컴팩트 메인 바 (화면 영역 모드)</div>
+    <div class="stage">
+      <div class="bar" style="width:640px">
+        <div class="titlebar">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <div class="app-title">ROKUGA</div>
+          <div class="tb-right"><span>☰</span><span>🗂</span></div>
+        </div>
+        <div class="main-row">
+          <div class="mode active"><div class="icon">⛶</div><div class="label">화면 영역</div></div>
+          <div class="mode"><div class="icon">🖥</div><div class="label">전체 화면</div></div>
+          <div class="mode"><div class="icon">🗔</div><div class="label">창</div></div>
+          <div class="mode"><div class="icon">📷</div><div class="label">카메라</div></div>
+          <button class="rec-big">REC</button>
+        </div>
+        <div class="toolbar">
+          <button class="tool on">🖱</button>
+          <button class="tool on">🔊</button>
+          <button class="tool off">🎙</button>
+          <button class="tool on">✳︎</button>
+          <div class="tspacer"></div>
+          <div class="fmt"><span class="play">▶</span>5K · 60FPS</div>
+          <button class="gear">⚙</button>
+        </div>
+      </div>
+    </div>
+    <div class="caption">모드 선택 + REC. 하단 줄: 마우스FX / 시스템오디오 / 마이크(꺼짐) / 카운트다운 토글 · 우측: 출력 요약 + 설정</div>
+  </div>
+
+  <!-- B. 영역 선택 오버레이 -->
+  <div class="section">
+    <div class="sec-label">B · 화면 영역 — 선택 오버레이 + 플로팅 툴바</div>
+    <div class="stage">
+      <div class="desktop">
+        <div class="marquee">
+          <div class="handle h-tl"></div><div class="handle h-t"></div><div class="handle h-tr"></div>
+          <div class="handle h-l"></div><div class="handle h-r"></div>
+          <div class="handle h-bl"></div><div class="handle h-b"></div><div class="handle h-br"></div>
+        </div>
+        <div class="float-bar">
+          <button class="tool fclose">✕</button>
+          <button class="tool on">🖱</button>
+          <button class="tool on">🔊</button>
+          <button class="tool off">🎙</button>
+          <div class="fdims">1280 × 720</div>
+          <button class="frec"><div class="d"></div></button>
+        </div>
+      </div>
+    </div>
+    <div class="caption">메인 바는 숨고, 선택 영역 하단에 플로팅 툴바 — 치수 확인 후 바로 REC</div>
+  </div>
+
+  <!-- C. 전체 화면 피커 -->
+  <div class="section">
+    <div class="sec-label">C · 전체 화면 — 디스플레이 피커로 확장</div>
+    <div class="stage">
+      <div class="bar" style="width:640px">
+        <div class="titlebar">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <div class="app-title">ROKUGA</div>
+          <div class="tb-right"><span>☰</span><span>🗂</span></div>
+        </div>
+        <div class="main-row">
+          <div class="mode"><div class="icon">⛶</div><div class="label">화면 영역</div></div>
+          <div class="mode active"><div class="icon">🖥</div><div class="label">전체 화면</div></div>
+          <div class="mode"><div class="icon">🗔</div><div class="label">창</div></div>
+          <div class="mode"><div class="icon">📷</div><div class="label">카메라</div></div>
+          <button class="rec-big">REC</button>
+        </div>
+        <div class="picker-body">
+          <div class="prompt"><span class="x">ⓧ</span>녹화할 디스플레이를 선택하세요<span class="re">↻</span></div>
+          <div class="thumbs">
+            <div class="thumb">
+              <div class="shot sel"><div class="win w1"></div><div class="win w2"></div><div class="check">✓</div></div>
+              <div class="tname">Built-in Retina Display</div><div class="tsub">3456 × 2234</div>
+            </div>
+            <div class="thumb">
+              <div class="shot"><div class="win w2"></div></div>
+              <div class="tname">DELL U2723QE</div><div class="tsub">3840 × 2160</div>
+            </div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button class="tool on">🖱</button>
+          <button class="tool on">🔊</button>
+          <button class="tool off">🎙</button>
+          <div class="tspacer"></div>
+          <div class="fmt"><span class="play">▶</span>5K · 60FPS</div>
+          <button class="gear">⚙</button>
+        </div>
+      </div>
+    </div>
+    <div class="caption">같은 바가 아래로 확장 — 디스플레이 이름/해상도와 함께 썸네일 선택</div>
+  </div>
+
+  <!-- D. 창 피커 -->
+  <div class="section">
+    <div class="sec-label">D · 창 — 창 피커로 확장 (겹친 창 제외 격리 캡처)</div>
+    <div class="stage">
+      <div class="bar" style="width:640px">
+        <div class="titlebar">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <div class="app-title">ROKUGA</div>
+          <div class="tb-right"><span>☰</span><span>🗂</span></div>
+        </div>
+        <div class="main-row">
+          <div class="mode"><div class="icon">⛶</div><div class="label">화면 영역</div></div>
+          <div class="mode"><div class="icon">🖥</div><div class="label">전체 화면</div></div>
+          <div class="mode active"><div class="icon">🗔</div><div class="label">창</div></div>
+          <div class="mode"><div class="icon">📷</div><div class="label">카메라</div></div>
+          <button class="rec-big">REC</button>
+        </div>
+        <div class="picker-body">
+          <div class="prompt"><span class="x">ⓧ</span>녹화할 창을 선택하세요<span class="re">↻</span></div>
+          <div class="group-label">Built-in Retina Display</div>
+          <div class="thumbs" style="justify-content:flex-start; padding-left:6px">
+            <div class="thumb">
+              <div class="shot sel" style="width:172px;height:108px"><div class="win w1"></div><div class="check">✓</div></div>
+              <div class="tname">Safari — 문서</div>
+            </div>
+            <div class="thumb">
+              <div class="shot" style="width:172px;height:108px"><div class="win w2"></div></div>
+              <div class="tname">Finder</div>
+            </div>
+            <div class="thumb">
+              <div class="shot" style="width:172px;height:108px"><div class="win w1" style="left:40px;top:24px"></div></div>
+              <div class="tname">Keynote — 발표</div>
+            </div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button class="tool on">🖱</button>
+          <button class="tool on">🔊</button>
+          <button class="tool off">🎙</button>
+          <div class="tspacer"></div>
+          <div class="fmt"><span class="play">▶</span>5K · 60FPS</div>
+          <button class="gear">⚙</button>
+        </div>
+      </div>
+    </div>
+    <div class="caption">앱별 창 썸네일 — 선택한 창만 격리 녹화 (겹치는 창 미포함)</div>
+  </div>
+
+  <!-- E. 녹화 중 -->
+  <div class="section">
+    <div class="sec-label">E · 녹화 중 — 타이머 필 + 메뉴바 컨트롤</div>
+    <div class="stage">
+      <div class="desktop" style="height:330px">
+        <div class="menubar">
+          <span></span><span style="font-weight:800">Keynote</span><span>파일</span><span>편집</span><span>보기</span><span>재생</span>
+          <div class="mb-right">
+            <div class="mb-timer"><span>00:04:52</span><span>❚❚</span><span class="sq"></span></div>
+            <span>📶</span><span>🔋</span><span>8월 15일 (토) 오후 2:41</span>
+          </div>
+        </div>
+        <div class="pill">
+          <div class="mode-ic">🖥</div>
+          <div class="time">00:04:52</div>
+          <button class="pctl">❚❚</button>
+          <button class="pctl stop">■</button>
+        </div>
+      </div>
+    </div>
+    <div class="caption">메인 바는 타이머 필로 축소, 메뉴바에도 미니 타이머 — 어디서든 일시정지/정지</div>
+  </div>
+
+</body>
+</html>
