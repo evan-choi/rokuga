@@ -107,6 +107,8 @@ struct ThumbnailView: View {
                 .onEnded { value in
                     if value.translation.width > 60 {
                         onSwipeDismiss()
+                    } else if NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
+                        dragOffset = 0
                     } else {
                         withAnimation(.snappy) { dragOffset = 0 }
                     }

@@ -22,6 +22,14 @@ enum OutputFolderStore {
         return folder
     }
 
+    static func setFolder(_ url: URL, settings: SettingsStore = .shared) {
+        settings.outputFolderBookmark = try? url.bookmarkData(
+            options: [.withSecurityScope],
+            includingResourceValuesForKeys: nil,
+            relativeTo: nil
+        )
+    }
+
     static func newRecordingURL(settings: SettingsStore = .shared) -> URL {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH.mm.ss"

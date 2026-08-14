@@ -129,6 +129,16 @@ public final class SettingsStore: @unchecked Sendable {
         set { set(newValue, for: .showFloatingThumbnail) }
     }
 
+    public var theme: Theme {
+        get { rawRepresentable(.theme) ?? .auto }
+        set { set(newValue.rawValue, for: .theme) }
+    }
+
+    public var launchAtLogin: Bool {
+        get { bool(.launchAtLogin, default: false) }
+        set { set(newValue, for: .launchAtLogin) }
+    }
+
     public var onboardingCompleted: Bool {
         get { bool(.onboardingCompleted, default: false) }
         set { set(newValue, for: .onboardingCompleted) }
