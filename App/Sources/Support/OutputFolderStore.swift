@@ -32,6 +32,9 @@ enum OutputFolderStore {
 
     static func newRecordingURL(settings: SettingsStore = .shared) -> URL {
         let formatter = DateFormatter()
+        // Locale-neutral file naming (task 9a.3): identical on every system locale/calendar.
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
         formatter.dateFormat = "yyyy-MM-dd HH.mm.ss"
         let baseName = "Rokuga \(formatter.string(from: Date()))"
         let folder = currentFolder(settings: settings)
