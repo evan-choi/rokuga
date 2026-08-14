@@ -78,7 +78,7 @@ Rokuga is being built **spec-first** with [OpenSpec](https://github.com/Fission-
 ## Development
 
 ```bash
-git clone https://github.com/<org>/rokuga.git
+git clone https://github.com/evan-choi/rokuga.git
 cd rokuga
 
 # Explore the specs
