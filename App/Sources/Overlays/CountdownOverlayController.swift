@@ -49,7 +49,10 @@ struct CountdownOverlayView: View {
                 .font(.system(size: 110, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 .contentTransition(.numericText(countsDown: true))
-                .animation(.snappy, value: model.remaining)
+                .animation(
+                    NSWorkspace.shared.accessibilityDisplayShouldReduceMotion ? nil : .snappy,
+                    value: model.remaining
+                )
             VStack {
                 Spacer()
                 Text("Esc to cancel")

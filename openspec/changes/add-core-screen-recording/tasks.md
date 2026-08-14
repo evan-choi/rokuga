@@ -60,11 +60,11 @@
 
 ## 9. Onboarding & preferences
 
-- [ ] 9.1 First-run flow: output folder save panel → screen-recording permission probe (`SCShareableContent`) → guided denial-recovery panels with System Settings deep links
-- [ ] 9.2 Just-in-time mic permission; per-permission re-check on every record attempt
-- [ ] 9.3 Settings window (menu bar only, ⌘,): General/Recording/Audio/Mouse/Shortcuts/Output panes, immediate apply, recording-time lock
-- [ ] 9.4 Theme (auto/light/dark), launch at login (`SMAppService`), thumbnail toggle, Reset All Settings (confirm, no recordings touched)
-- [ ] 9.5 Accessibility: VoiceOver labels on every control, full keyboard operation (incl. frame-nudge arrows in trim editor), Reduce Transparency solid fallback, Reduce Motion paths
+- [x] 9.1 First-run flow: output folder save panel → screen-recording permission probe (`SCShareableContent`) → guided denial-recovery panels with System Settings deep links
+- [x] 9.2 Just-in-time mic permission; per-permission re-check on every record attempt
+- [x] 9.3 Settings window (menu bar only, ⌘,): General/Recording/Audio/Mouse/Shortcuts/Output panes, immediate apply, recording-time lock
+- [x] 9.4 Theme (auto/light/dark), launch at login (`SMAppService`), thumbnail toggle, Reset All Settings (confirm, no recordings touched)
+- [x] 9.5 Accessibility: VoiceOver labels on every control, full keyboard operation (incl. frame-nudge arrows in trim editor), Reduce Transparency solid fallback, Reduce Motion paths
 
 ## 9a. Localization
 

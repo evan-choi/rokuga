@@ -19,6 +19,7 @@ struct OptionsPopoverView: View {
                 } label: {
                     Label(OutputFolderStore.currentFolder().lastPathComponent, systemImage: "folder")
                 }
+                .accessibilityLabel(Text("Choose output folder"))
             }
 
             section("Countdown") {

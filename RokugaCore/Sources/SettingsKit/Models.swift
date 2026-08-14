@@ -46,6 +46,14 @@ public enum PointerStyle: String, CaseIterable, Codable, Sendable {
     case dot
 }
 
+// MARK: - Appearance
+
+public enum Theme: String, CaseIterable, Codable, Sendable {
+    case auto
+    case light
+    case dark
+}
+
 // MARK: - Countdown
 
 public enum CountdownDuration: Int, CaseIterable, Codable, Sendable {

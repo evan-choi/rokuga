@@ -18,6 +18,9 @@ struct TrimEditorView: View {
             TimelineRepresentable(model: model)
                 .frame(height: 72)
                 .padding(.horizontal, 16)
+                .accessibilityLabel(Text("Trim timeline"))
+                .accessibilityValue(Text(verbatim: "\(timeLabel(model.startSeconds)) – \(timeLabel(model.endSeconds))"))
+                .accessibilityHint(Text("Use Arrow keys to nudge the start handle by one frame, Option-Arrow for the end handle"))
             footer
         }
         .frame(minWidth: 640, minHeight: 460)

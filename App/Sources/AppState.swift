@@ -42,7 +42,23 @@ final class AppState: ObservableObject {
         }
         Hotkeys.bind(to: self)
         Task { await consumeEvents() }
-        Task { @MainActor in summonToolbar() }
+        Task { @MainActor in
+            if settings.onboardingCompleted {
+                summonToolbar()
+            } else {
+                presentOnboarding()
+            }
+        }
+    }
+
+    private var onboardingController: OnboardingController?
+
+    private func presentOnboarding() {
+        onboardingController = OnboardingController { [weak self] in
+            self?.onboardingController = nil
+            self?.summonToolbar()
+        }
+        onboardingController?.present()
     }
 
     func toggleRecording() {
@@ -121,6 +137,61 @@ final class AppState: ObservableObject {
 
     func requestRecord() {
         guard recordingState.canStart else { return }
+        Task { @MainActor in
+            guard await preflightPermissions() else { return }
+            proceedWithRecordFlow()
+        }
+    }
+
+    /// Per-attempt permission re-check (task 9.2): screen permission is probed every time;
+    /// mic permission is requested just-in-time only when mic capture is enabled.
+    private func preflightPermissions() async -> Bool {
+        guard await ShareableContentService.hasScreenRecordingPermission() else {
+            presentScreenPermissionRecovery()
+            return false
+        }
+        if settings.captureMicrophone {
+            let granted = await MicrophoneCapture.requestPermission()
+            if !granted {
+                return presentMicDeniedChoice()
+            }
+        }
+        return true
+    }
+
+    private func presentScreenPermissionRecovery() {
+        NSApp.activate(ignoringOtherApps: true)
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Screen recording permission required")
+        alert.informativeText = String(localized: "Allow Rokuga in System Settings › Privacy & Security › Screen Recording, then relaunch.")
+        alert.addButton(withTitle: String(localized: "Open System Settings…"))
+        alert.addButton(withTitle: String(localized: "Cancel"))
+        if alert.runModal() == .alertFirstButtonReturn {
+            PermissionLinks.openScreenRecording()
+        }
+    }
+
+    /// Returns true when the user chooses to continue recording without the microphone.
+    private func presentMicDeniedChoice() -> Bool {
+        NSApp.activate(ignoringOtherApps: true)
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Microphone access denied")
+        alert.informativeText = String(localized: "Record without the microphone, or grant access in System Settings.")
+        alert.addButton(withTitle: String(localized: "Record Without Mic"))
+        alert.addButton(withTitle: String(localized: "Open System Settings…"))
+        alert.addButton(withTitle: String(localized: "Cancel"))
+        switch alert.runModal() {
+        case .alertFirstButtonReturn:
+            return true
+        case .alertSecondButtonReturn:
+            PermissionLinks.openMicrophone()
+            return false
+        default:
+            return false
+        }
+    }
+
+    private func proceedWithRecordFlow() {
         let mode = settings.recordingMode
         switch mode {
         case .fullScreen:
