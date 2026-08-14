@@ -22,16 +22,16 @@
 - [x] 3.3 System audio via SCStream (`capturesAudio`, `excludeCurrentProcessAudio`) + mic via AVCaptureSession → 48 kHz lock-free mixer → single AAC track
 - [x] 3.4 Rate control: VBR quality 0–100 mapping + capped-VBR "CBR" (`AVVideoDataRateLimitsKey` 1.1×/1 s); AAC 128–320 kbps
 - [x] 3.5 Resolution cap (≤ 5K) & FPS cap (≤ 60) with automatic downscale of oversized sources
-- [ ] 3.6 Failure-safe finalization: crash/power-loss recovery of playable partials, disk-full preflight + 30 s watermark + auto-stop < 500 MB free
+- [x] 3.6 Failure-safe finalization: crash/power-loss recovery of playable partials, disk-full preflight + 30 s watermark + auto-stop < 500 MB free
 
 ## 4. UI shell (windowless, Liquid Glass)
 
-- [ ] 4.1 Menu bar `MenuBarExtra`: idle menu (toolbar, last recording, output folder, settings, quit) ↔ recording state with native red-dot + elapsed time + pause/stop
-- [ ] 4.2 Recording toolbar: non-activating `NSPanel` HUD at bottom-center of the mouse-pointer display; summon via menu bar / ⇧⌘6 / launch; Esc & record dismiss
-- [ ] 4.3 Mode buttons ×3 (area/full screen/window) + options popover (⇧⌘5-style: save location, countdown, audio, mouse, thumbnail toggles) + 녹화 button
-- [ ] 4.4 Liquid Glass materials with `NSVisualEffectView`/`.ultraThinMaterial` fallback (13.3–15) + reduce-transparency accessibility path
+- [x] 4.1 Menu bar `MenuBarExtra`: idle menu (toolbar, last recording, output folder, settings, quit) ↔ recording state with native red-dot + elapsed time + pause/stop
+- [x] 4.2 Recording toolbar: non-activating `NSPanel` HUD at bottom-center of the mouse-pointer display; summon via menu bar / ⇧⌘6 / launch; Esc & record dismiss
+- [x] 4.3 Mode buttons ×3 (area/full screen/window) + options popover (⇧⌘5-style: save location, countdown, audio, mouse, thumbnail toggles) + 녹화 button
+- [x] 4.4 Liquid Glass materials with `NSVisualEffectView`/`.ultraThinMaterial` fallback (13.3–15) + reduce-transparency accessibility path
 - [ ] 4.5 Region selection overlay: drag-select, resizable edges/corners, magnifier with window snapping, per-display persistence
-- [ ] 4.6 Countdown overlay (1–10 s, Esc cancels, always capture-excluded)
+- [x] 4.6 Countdown overlay (1–10 s, Esc cancels, always capture-excluded)
 
 ## 5. Recording controls & hotkeys
 

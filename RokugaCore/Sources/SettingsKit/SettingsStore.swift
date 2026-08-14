@@ -134,6 +134,21 @@ public final class SettingsStore: @unchecked Sendable {
         set { lock.withLock { defaults.set(newValue, forKey: Key.outputFolderBookmark.rawValue) } }
     }
 
+    /// Last-used selection rectangle per display (task 4.5), keyed by display ID.
+    public var selectedRegions: [String: CGRect] {
+        get {
+            lock.withLock {
+                guard let data = defaults.data(forKey: Key.selectedRegions.rawValue) else { return [:] }
+                return (try? JSONDecoder().decode([String: CGRect].self, from: data)) ?? [:]
+            }
+        }
+        set {
+            lock.withLock {
+                defaults.set(try? JSONEncoder().encode(newValue), forKey: Key.selectedRegions.rawValue)
+            }
+        }
+    }
+
     // MARK: Reset
 
     /// Reset all preferences to defaults. Never touches recordings on disk.
