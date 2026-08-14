@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Rokuga — Neumorphism</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',-apple-system,sans-serif; }
+  :root { --bg:#e6e9f0; --txt:#4a5268; --hi:#ffffff; --lo:#c3c8d4; --accent:#e5484d; }
+  body { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px; background:var(--bg); color:var(--txt); }
+  .badge { position:fixed; top:16px; left:16px; font-size:13px; font-weight:600; padding:8px 16px; border-radius:99px; background:var(--bg);
+    box-shadow:6px 6px 12px var(--lo), -6px -6px 12px var(--hi); }
+  .window { width:760px; border-radius:28px; background:var(--bg); padding:4px;
+    box-shadow:18px 18px 40px var(--lo), -18px -18px 40px var(--hi); }
+  .titlebar { display:flex; align-items:center; gap:8px; padding:18px 22px 8px; }
+  .dot { width:12px; height:12px; border-radius:50%; box-shadow:inset 2px 2px 4px rgba(0,0,0,.15); }
+  .dot.r{background:#ff8a84}.dot.y{background:#ffd479}.dot.g{background:#7fdca0}
+  .title { flex:1; text-align:center; font-size:13px; font-weight:700; margin-right:56px; color:#5b6379; }
+  .modes { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; padding:18px 26px 6px; }
+  .mode { border-radius:18px; padding:18px 8px; text-align:center; cursor:pointer; background:var(--bg);
+    box-shadow:8px 8px 16px var(--lo), -8px -8px 16px var(--hi); transition:.15s; }
+  .mode.active { box-shadow:inset 6px 6px 12px var(--lo), inset -6px -6px 12px var(--hi); color:#3b82f6; }
+  .mode .icon{font-size:24px} .mode .label{font-size:12px; font-weight:700; margin-top:8px}
+  .preview { margin:20px 26px; height:215px; border-radius:20px; position:relative;
+    background:var(--bg);
+    box-shadow:inset 8px 8px 18px var(--lo), inset -8px -8px 18px var(--hi);
+    display:flex; align-items:center; justify-content:center; }
+  .hint{font-size:13px; opacity:.55; font-weight:600;}
+  .marquee { position:absolute; inset:36px 66px; border:2px dashed #9aa4bd; border-radius:10px; }
+  .dims { position:absolute; top:12px; left:70px; font-size:11px; font-weight:700; padding:4px 10px; border-radius:8px; background:var(--bg);
+    box-shadow:4px 4px 8px var(--lo), -4px -4px 8px var(--hi); }
+  .timer { position:absolute; bottom:12px; right:14px; font-variant-numeric:tabular-nums; font-weight:700; font-size:15px; padding:6px 14px; border-radius:12px; background:var(--bg);
+    box-shadow:4px 4px 8px var(--lo), -4px -4px 8px var(--hi); }
+  .timer::before{content:'●'; color:var(--accent); margin-right:8px; animation:blink 1.2s infinite}
+  @keyframes blink{50%{opacity:.25}}
+  .controls { display:flex; align-items:center; gap:18px; padding:6px 26px; }
+  .rec { width:66px; height:66px; border-radius:50%; border:none; cursor:pointer; background:var(--bg);
+    box-shadow:8px 8px 16px var(--lo), -8px -8px 16px var(--hi);
+    display:flex; align-items:center; justify-content:center; }
+  .rec .inner{width:26px; height:26px; border-radius:50%; background:radial-gradient(circle at 32% 30%, #ff7b72, var(--accent));
+    box-shadow:2px 2px 6px rgba(229,72,77,.5);}
+  .ctl { width:48px; height:48px; border-radius:50%; border:none; cursor:pointer; font-size:15px; color:var(--txt); background:var(--bg);
+    box-shadow:6px 6px 12px var(--lo), -6px -6px 12px var(--hi); }
+  .ctl:active{box-shadow:inset 4px 4px 8px var(--lo), inset -4px -4px 8px var(--hi)}
+  .spacer{flex:1}
+  .toggle { display:flex; align-items:center; gap:9px; font-size:12.5px; font-weight:700; padding:11px 15px; border-radius:14px; cursor:pointer; background:var(--bg);
+    box-shadow:6px 6px 12px var(--lo), -6px -6px 12px var(--hi); }
+  .toggle+.toggle{margin-left:10px}
+  .sw{width:32px;height:18px;border-radius:99px;background:var(--bg);position:relative;box-shadow:inset 3px 3px 6px var(--lo), inset -3px -3px 6px var(--hi)}
+  .sw::after{content:'';position:absolute;top:2.5px;left:3px;width:13px;height:13px;border-radius:50%;background:#aab3c8;transition:.2s}
+  .toggle.on .sw::after{transform:translateX(13px);background:#34c98e}
+  .statusbar{display:flex;align-items:center;gap:14px;padding:20px 28px 24px;font-size:12px}
+  .chip{padding:6px 13px;border-radius:10px;font-weight:700;background:var(--bg);box-shadow:inset 4px 4px 8px var(--lo), inset -4px -4px 8px var(--hi)}
+  .path{margin-left:auto;opacity:.6;font-weight:600}
+</style>
+</head>
+<body>
+  <div class="badge">03 · Neumorphism</div>
+  <div class="window">
+    <div class="titlebar">
+      <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+      <div class="title">Rokuga</div>
+    </div>
+    <div class="modes">
+      <div class="mode active"><div class="icon">⬚</div><div class="label">Selected Area</div></div>
+      <div class="mode"><div class="icon">🖥</div><div class="label">Full Screen</div></div>
+      <div class="mode"><div class="icon">🗔</div><div class="label">Window</div></div>
+      <div class="mode"><div class="icon">📷</div><div class="label">Camera</div></div>
+    </div>
+    <div class="preview">
+      <div class="marquee"></div>
+      <div class="dims">1280 × 720</div>
+      <div class="hint">Drag to select an area of the screen</div>
+      <div class="timer">00:01:24</div>
+    </div>
+    <div class="controls">
+      <button class="rec"><div class="inner"></div></button>
+      <button class="ctl">⏸</button>
+      <button class="ctl">⏹</button>
+      <div class="spacer"></div>
+      <div class="toggle on"><span>🔊 System Audio</span><div class="sw"></div></div>
+      <div class="toggle"><span>🎙 Microphone</span><div class="sw"></div></div>
+      <div class="toggle on"><span>🖱 Mouse FX</span><div class="sw"></div></div>
+    </div>
+    <div class="statusbar">
+      <span class="chip">MP4</span><span class="chip">H.264</span><span class="chip">60 FPS</span><span class="chip">VBR · High</span>
+      <span class="path">~/Movies/Rokuga</span>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Rokuga — Glassmorphism</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',-apple-system,sans-serif; }
+  body {
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px;
+    background: linear-gradient(135deg,#667eea 0%,#764ba2 35%,#f093fb 70%,#4facfe 100%);
+    background-attachment: fixed;
+  }
+  .badge { position:fixed; top:16px; left:16px; color:#fff; font-size:13px; font-weight:600; background:rgba(255,255,255,.18); backdrop-filter:blur(12px); padding:6px 14px; border-radius:99px; border:1px solid rgba(255,255,255,.3); }
+  .window {
+    width:760px; border-radius:24px; overflow:hidden;
+    background:rgba(255,255,255,.14); backdrop-filter:blur(28px) saturate(160%);
+    border:1px solid rgba(255,255,255,.35);
+    box-shadow:0 24px 80px rgba(20,10,60,.35), inset 0 1px 0 rgba(255,255,255,.4);
+    color:#fff;
+  }
+  .titlebar { display:flex; align-items:center; gap:8px; padding:14px 18px; border-bottom:1px solid rgba(255,255,255,.18); }
+  .dot { width:12px; height:12px; border-radius:50%; }
+  .dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+  .title { flex:1; text-align:center; font-size:13px; font-weight:600; opacity:.9; margin-right:56px; }
+  .modes { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:20px 24px 8px; }
+  .mode {
+    border-radius:16px; padding:16px 8px; text-align:center; cursor:pointer;
+    background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.22); transition:.2s;
+  }
+  .mode:hover { background:rgba(255,255,255,.2); }
+  .mode.active { background:rgba(255,255,255,.28); border-color:rgba(255,255,255,.6); box-shadow:0 8px 24px rgba(255,255,255,.15) inset; }
+  .mode .icon { font-size:26px; }
+  .mode .label { font-size:12px; font-weight:600; margin-top:8px; letter-spacing:.02em; }
+  .preview {
+    margin:16px 24px; height:220px; border-radius:18px; position:relative; overflow:hidden;
+    background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.2);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .preview .hint { font-size:13px; opacity:.7; }
+  .marquee { position:absolute; inset:34px 60px; border:2px dashed rgba(255,255,255,.75); border-radius:8px; }
+  .dims { position:absolute; top:8px; left:64px; font-size:11px; background:rgba(0,0,0,.45); padding:3px 8px; border-radius:6px; }
+  .timer { position:absolute; bottom:12px; right:14px; font-variant-numeric:tabular-nums; font-weight:700; font-size:15px; background:rgba(0,0,0,.45); padding:5px 12px; border-radius:9px; }
+  .timer::before { content:'●'; color:#ff4444; margin-right:8px; animation:blink 1.2s infinite; }
+  @keyframes blink { 50%{opacity:.25} }
+  .controls { display:flex; align-items:center; gap:16px; padding:8px 24px 4px; }
+  .rec {
+    width:64px; height:64px; border-radius:50%; border:none; cursor:pointer;
+    background:radial-gradient(circle at 30% 30%,#ff7b72,#e5484d 70%);
+    box-shadow:0 10px 30px rgba(229,72,77,.5), inset 0 1px 0 rgba(255,255,255,.5);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .rec .inner { width:22px; height:22px; border-radius:50%; background:#fff; }
+  .ctl {
+    width:46px; height:46px; border-radius:50%; cursor:pointer; font-size:16px; color:#fff;
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.3); backdrop-filter:blur(8px);
+  }
+  .spacer{flex:1}
+  .toggles { display:flex; gap:10px; }
+  .toggle {
+    display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600;
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25);
+    padding:9px 14px; border-radius:12px; cursor:pointer;
+  }
+  .toggle.on .sw { background:#34d399; }
+  .toggle.on .sw::after { transform:translateX(12px); }
+  .sw { width:28px; height:16px; border-radius:99px; background:rgba(255,255,255,.3); position:relative; transition:.2s; }
+  .sw::after { content:''; position:absolute; top:2px; left:2px; width:12px; height:12px; border-radius:50%; background:#fff; transition:.2s; }
+  .statusbar { display:flex; align-items:center; gap:14px; padding:16px 24px 20px; font-size:12px; opacity:.85; }
+  .chip { background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); padding:5px 11px; border-radius:8px; font-weight:600; }
+  .path { margin-left:auto; opacity:.75; }
+</style>
+</head>
+<body>
+  <div class="badge">01 · Glassmorphism</div>
+  <div class="window">
+    <div class="titlebar">
+      <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+      <div class="title">Rokuga</div>
+    </div>
+    <div class="modes">
+      <div class="mode active"><div class="icon">⬚</div><div class="label">Selected Area</div></div>
+      <div class="mode"><div class="icon">🖥</div><div class="label">Full Screen</div></div>
+      <div class="mode"><div class="icon">🗔</div><div class="label">Window</div></div>
+      <div class="mode"><div class="icon">📷</div><div class="label">Camera</div></div>
+    </div>
+    <div class="preview">
+      <div class="marquee"></div>
+      <div class="dims">1280 × 720</div>
+      <div class="hint">Drag to select an area of the screen</div>
+      <div class="timer">00:01:24</div>
+    </div>
+    <div class="controls">
+      <button class="rec"><div class="inner"></div></button>
+      <button class="ctl">⏸</button>
+      <button class="ctl">⏹</button>
+      <div class="spacer"></div>
+      <div class="toggles">
+        <div class="toggle on"><span>🔊 System Audio</span><div class="sw"></div></div>
+        <div class="toggle"><span>🎙 Microphone</span><div class="sw"></div></div>
+        <div class="toggle on"><span>🖱 Mouse FX</span><div class="sw"></div></div>
+      </div>
+    </div>
+    <div class="statusbar">
+      <span class="chip">MP4</span><span class="chip">H.264</span><span class="chip">60 FPS</span><span class="chip">VBR · High</span>
+      <span class="path">~/Movies/Rokuga</span>
+    </div>
+  </div>
+</body>
+</html>

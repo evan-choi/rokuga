@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Rokuga — macOS Native (⇧⌘5) 스타일</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,'Inter','Apple SD Gothic Neo',sans-serif; }
+  body { background:#1c1d22; min-height:100vh; padding:60px 0 100px; }
+  .section { max-width:960px; margin:0 auto 70px; padding:0 30px; }
+  .sec-label { display:inline-block; color:#fff; font-size:14px; font-weight:700; background:#ffffff14; padding:8px 18px; border-radius:99px; margin-bottom:22px; border:1px solid #ffffff22; }
+  .caption { text-align:center; color:#ffffffb0; font-size:12.5px; margin-top:16px; }
+
+  /* 데스크탑 무대 */
+  .desktop { width:900px; height:480px; border-radius:16px; position:relative; overflow:hidden; margin:0 auto;
+    background:linear-gradient(155deg,#e8734a 0%,#d95d7a 30%,#8e5bb8 65%,#4a5fc4 100%);
+    box-shadow:0 24px 60px rgba(0,0,0,.5); }
+  .menubar { position:absolute; top:0; left:0; right:0; height:28px; background:#ffffff2e; backdrop-filter:blur(30px);
+    display:flex; align-items:center; padding:0 14px; gap:16px; font-size:12.5px; font-weight:600; color:#fff; text-shadow:0 1px 2px #0003; z-index:5; }
+  .mb-right{margin-left:auto; display:flex; align-items:center; gap:13px;}
+  .dim { position:absolute; inset:28px 0 0; background:#00000055; }
+
+  /* 선택 마퀴 */
+  .marquee { position:absolute; left:170px; top:90px; width:540px; height:270px; border:1.5px dashed #ffffffee; box-shadow:0 0 0 4000px #00000066; }
+  .handle{position:absolute;width:8px;height:8px;background:#fff;border:1px solid #00000055;border-radius:50%}
+  .h-tl{top:-4px;left:-4px}.h-t{top:-4px;left:50%;margin-left:-4px}.h-tr{top:-4px;right:-4px}
+  .h-l{top:50%;left:-4px;margin-top:-4px}.h-r{top:50%;right:-4px;margin-top:-4px}
+  .h-bl{bottom:-4px;left:-4px}.h-b{bottom:-4px;left:50%;margin-left:-4px}.h-br{bottom:-4px;right:-4px}
+  .dims { position:absolute; top:-26px; left:0; font-family:'JetBrains Mono'; font-size:11px; font-weight:600; color:#fff; background:#000000a0; padding:3px 8px; border-radius:5px; }
+
+  /* ⇧⌘5 스타일 툴바 */
+  .hud { position:absolute; left:50%; transform:translateX(-50%); bottom:34px; z-index:6;
+    display:flex; align-items:center; gap:2px; padding:9px 10px; border-radius:13px;
+    background:#28292ee6; backdrop-filter:blur(40px) saturate(150%);
+    border:.5px solid #ffffff26; box-shadow:0 14px 44px #000a, inset 0 1px 0 #ffffff1a; }
+  .hbtn { width:52px; height:46px; border-radius:8px; border:none; background:transparent; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; position:relative; }
+  .hbtn:hover{background:#ffffff10}
+  .hbtn.sel{background:#ffffff22}
+  .divider { width:1px; height:34px; background:#ffffff22; margin:0 8px; }
+  /* CSS 아이콘 */
+  .ic { position:relative; }
+  .ic-area { width:26px; height:19px; border:1.7px dashed #dddde2; border-radius:3px; }
+  .ic-full { width:26px; height:19px; border:1.7px solid #dddde2; border-radius:3px; }
+  .ic-win  { width:26px; height:19px; border:1.7px solid #dddde2; border-radius:3px; }
+  .ic-win::before{content:'';position:absolute;top:3px;left:2.5px;right:2.5px;height:1.7px;background:#dddde2}
+  .recdot { position:absolute; right:-4px; bottom:-4px; width:11px; height:11px; border-radius:50%; background:#28292e; display:flex; align-items:center; justify-content:center; }
+  .recdot::after{content:'';width:7px;height:7px;border-radius:50%;background:#ff453a}
+  .hbtn.sel .ic-area,.hbtn.sel .ic-full,.hbtn.sel .ic-win{border-color:#fff}
+  /* 옵션/녹화 버튼 */
+  .opt { height:46px; padding:0 16px; border-radius:8px; border:none; background:transparent; cursor:pointer;
+    color:#eee; font-size:13.5px; font-weight:500; display:flex; align-items:center; gap:7px; }
+  .opt:hover{background:#ffffff10}
+  .opt .chev{font-size:9px; color:#aaa}
+  .record { height:38px; margin:0 4px 0 8px; padding:0 18px; border-radius:8px; cursor:pointer;
+    background:#ffffff1e; border:.5px solid #ffffff2e; color:#fff; font-size:13.5px; font-weight:600;
+    display:flex; align-items:center; gap:8px; }
+  .record:hover{background:#ffffff2c}
+  .record .d{width:9px;height:9px;border-radius:50%;background:#ff453a}
+  .hint { position:absolute; left:50%; transform:translateX(-50%); bottom:104px; color:#ffffffdd; font-size:13px; font-weight:500; text-shadow:0 1px 3px #0006; z-index:4; }
+
+  /* 옵션 팝오버 */
+  .popover { position:absolute; right:118px; bottom:96px; width:250px; border-radius:12px; z-index:7;
+    background:#2c2d33f2; backdrop-filter:blur(40px); border:.5px solid #ffffff26;
+    box-shadow:0 18px 50px #000b, inset 0 1px 0 #ffffff18; padding:6px 0; color:#eee; font-size:13px; }
+  .popover::after { content:''; position:absolute; bottom:-7px; right:56px; width:13px; height:13px; background:#2c2d33; transform:rotate(45deg); border-right:.5px solid #ffffff26; border-bottom:.5px solid #ffffff26; }
+  .p-head { padding:7px 14px 4px; font-size:11px; font-weight:700; color:#9a9aa2; }
+  .p-item { display:flex; align-items:center; padding:5.5px 14px 5.5px 30px; position:relative; cursor:pointer; }
+  .p-item:hover{background:#4a8df80f}
+  .p-item.on::before{content:'✓'; position:absolute; left:12px; font-size:11px; font-weight:700; color:#fff}
+  .p-item .sub{margin-left:auto; color:#9a9aa2; font-size:12px}
+  .p-sep { height:1px; background:#ffffff1c; margin:6px 0; }
+
+  /* 녹화 중 메뉴바 */
+  .rec-pill { display:flex; align-items:center; gap:8px; background:#00000042; border-radius:6px; padding:3px 10px; }
+  .rec-pill .stopsq{width:10px;height:10px;border-radius:2.5px;background:#fff;cursor:pointer}
+  .rec-pill .t{font-family:'JetBrains Mono';font-size:11.5px;font-weight:600;color:#fff}
+  .rec-pill .rd{width:8px;height:8px;border-radius:50%;background:#ff453a;animation:blink 1.2s infinite}
+  @keyframes blink{50%{opacity:.25}}
+
+  /* 플로팅 썸네일 */
+  .float-thumb { position:absolute; right:22px; bottom:26px; width:190px; border-radius:10px; overflow:hidden; cursor:pointer; z-index:6;
+    border:2.5px solid #ffffffee; box-shadow:0 14px 40px #000a; animation:slidein .5s ease; }
+  @keyframes slidein{from{transform:translateX(240px)}}
+  .float-thumb .img{height:110px; background:linear-gradient(155deg,#e8734a,#8e5bb8 70%); position:relative}
+  .float-thumb .img::after{content:'▶'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:26px; text-shadow:0 2px 8px #0008}
+  .float-thumb .lbl{background:#1e1f24; color:#ddd; font-size:11px; font-weight:600; padding:6px 10px; display:flex; justify-content:space-between}
+  .float-thumb .lbl span:last-child{color:#8b92a1; font-family:'JetBrains Mono'}
+</style>
+</head>
+<body>
+
+  <!-- A. 영역 녹화 -->
+  <div class="section">
+    <div class="sec-label">A · 화면 영역 녹화 — ⇧⌘5 스타일 툴바 + 마퀴</div>
+    <div class="desktop">
+      <div class="menubar"><span></span><span style="font-weight:800">Finder</span><span>파일</span><span>편집</span><span>보기</span>
+        <div class="mb-right"><span>📶</span><span>🔋</span><span>8월 15일 (토) 오후 2:41</span></div>
+      </div>
+      <div class="dim"></div>
+      <div class="marquee">
+        <div class="dims">1280 × 720</div>
+        <div class="handle h-tl"></div><div class="handle h-t"></div><div class="handle h-tr"></div>
+        <div class="handle h-l"></div><div class="handle h-r"></div>
+        <div class="handle h-bl"></div><div class="handle h-b"></div><div class="handle h-br"></div>
+      </div>
+      <div class="hint">드래그하거나 핸들로 조절한 다음 ‘녹화’를 클릭하세요</div>
+      <div class="hud">
+        <button class="hbtn sel" title="화면 영역 녹화"><div class="ic ic-area"><div class="recdot"></div></div></button>
+        <button class="hbtn" title="전체 화면 녹화"><div class="ic ic-full"><div class="recdot"></div></div></button>
+        <button class="hbtn" title="창 녹화"><div class="ic ic-win"><div class="recdot"></div></div></button>
+        <div class="divider"></div>
+        <button class="opt">옵션 <span class="chev">▼</span></button>
+        <button class="record"><span class="d"></span>녹화</button>
+      </div>
+    </div>
+    <div class="caption">macOS 스크린샷 툴바와 동일한 문법 — 모드 3개 아이콘(우하단 ● = 녹화) · 옵션 · 녹화 버튼</div>
+  </div>
+
+  <!-- B. 옵션 팝오버 -->
+  <div class="section">
+    <div class="sec-label">B · 옵션 팝오버 — 오디오 / 카운트다운 / 마우스 효과 / 저장 위치</div>
+    <div class="desktop">
+      <div class="menubar"><span></span><span style="font-weight:800">Finder</span><span>파일</span><span>편집</span><span>보기</span>
+        <div class="mb-right"><span>📶</span><span>🔋</span><span>8월 15일 (토) 오후 2:41</span></div>
+      </div>
+      <div class="dim"></div>
+      <div class="popover">
+        <div class="p-head">저장 위치</div>
+        <div class="p-item on">동영상 폴더 <span class="sub">~/Movies/Rokuga</span></div>
+        <div class="p-item">기타 위치...</div>
+        <div class="p-sep"></div>
+        <div class="p-head">카운트다운</div>
+        <div class="p-item">끄기</div>
+        <div class="p-item on">3초</div>
+        <div class="p-item">5초</div>
+        <div class="p-item">10초</div>
+        <div class="p-sep"></div>
+        <div class="p-head">오디오</div>
+        <div class="p-item on">시스템 오디오</div>
+        <div class="p-item">마이크 — MacBook Pro 마이크</div>
+        <div class="p-sep"></div>
+        <div class="p-head">옵션</div>
+        <div class="p-item on">마우스 커서 보기</div>
+        <div class="p-item on">마우스 클릭 효과</div>
+        <div class="p-item">앱 창 캡처 제외</div>
+        <div class="p-item on">떠 있는 썸네일 보기</div>
+        <div class="p-item on">마지막 선택 영역 기억</div>
+      </div>
+      <div class="hud">
+        <button class="hbtn sel"><div class="ic ic-area"><div class="recdot"></div></div></button>
+        <button class="hbtn"><div class="ic ic-full"><div class="recdot"></div></div></button>
+        <button class="hbtn"><div class="ic ic-win"><div class="recdot"></div></div></button>
+        <div class="divider"></div>
+        <button class="opt" style="background:#ffffff18">옵션 <span class="chev">▲</span></button>
+        <button class="record"><span class="d"></span>녹화</button>
+      </div>
+    </div>
+    <div class="caption">네이티브 옵션 메뉴 문법 그대로 — 체크(✓) 토글 리스트. 상세 설정(코덱/품질/FPS)은 별도 설정 창</div>
+  </div>
+
+  <!-- C. 녹화 중 -->
+  <div class="section">
+    <div class="sec-label">C · 녹화 중 — 화면엔 아무것도 없음, 메뉴바 타이머/정지만</div>
+    <div class="desktop">
+      <div class="menubar"><span></span><span style="font-weight:800">Keynote</span><span>파일</span><span>편집</span><span>재생</span>
+        <div class="mb-right">
+          <div class="rec-pill"><span class="rd"></span><span class="t">00:04:52</span><span style="color:#fff;font-size:10px">❚❚</span><span class="stopsq"></span></div>
+          <span>📶</span><span>🔋</span><span>오후 2:41</span>
+        </div>
+      </div>
+    </div>
+    <div class="caption">⇧⌘5과 동일 — 녹화 중엔 메뉴바 컨트롤(⏺ 타이머 · 일시정지 · 정지)만 남김. 클릭 한 번으로 정지</div>
+  </div>
+
+  <!-- D. 녹화 종료 -->
+  <div class="section">
+    <div class="sec-label">D · 녹화 종료 — 플로팅 썸네일 → 클릭하면 트림 편집기</div>
+    <div class="desktop">
+      <div class="menubar"><span></span><span style="font-weight:800">Finder</span><span>파일</span><span>편집</span><span>보기</span>
+        <div class="mb-right"><span>📶</span><span>🔋</span><span>오후 2:46</span></div>
+      </div>
+      <div class="float-thumb">
+        <div class="img"></div>
+        <div class="lbl"><span>Recording 2026-08-15</span><span>04:52</span></div>
+      </div>
+    </div>
+    <div class="caption">우하단 플로팅 썸네일(네이티브 스크린샷과 동일) — 클릭 시 트림 편집기, 무시하면 자동 저장</div>
+  </div>
+
+</body>
+</html>
