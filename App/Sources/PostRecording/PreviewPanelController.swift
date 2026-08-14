@@ -138,9 +138,11 @@ struct PreviewPanelView: View {
     var body: some View {
         VStack(spacing: 0) {
             header
-            ScrubbablePlayerView(model: model)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .padding(.horizontal, 12)
+            ScrubbablePlayerView(player: model.player) { [weak model] deltaX, width in
+                model?.scrub(deltaX: deltaX, viewWidth: width)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .padding(.horizontal, 12)
             controls
         }
         .background(GlassBackground(cornerRadius: 16))
@@ -194,19 +196,18 @@ struct PreviewPanelView: View {
 
 /// AVPlayerLayer host that forwards trackpad scroll events for two-finger scrubbing.
 struct ScrubbablePlayerView: NSViewRepresentable {
-    @ObservedObject var model: PreviewModel
+    let player: AVPlayer
+    let onScrub: (CGFloat, CGFloat) -> Void
 
     func makeNSView(context: Context) -> ScrubbablePlayerNSView {
         let view = ScrubbablePlayerNSView()
-        view.playerLayer.player = model.player
-        view.onScrub = { [weak model] deltaX, width in
-            model?.scrub(deltaX: deltaX, viewWidth: width)
-        }
+        view.playerLayer.player = player
+        view.onScrub = onScrub
         return view
     }
 
     func updateNSView(_ view: ScrubbablePlayerNSView, context: Context) {
-        view.playerLayer.player = model.player
+        view.playerLayer.player = player
     }
 }
 

@@ -51,5 +51,9 @@ let package = Package(
             name: "SettingsKitTests",
             dependencies: ["SettingsKit"]
         ),
+        .testTarget(
+            name: "TrimKitTests",
+            dependencies: ["TrimKit"]
+        ),
     ]
 )
