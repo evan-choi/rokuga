@@ -26,6 +26,8 @@ final class AppState: ObservableObject {
     var toolbarController: ToolbarPanelController?
     private var countdownController: CountdownOverlayController?
     private var regionController: RegionSelectionController?
+    private var thumbnailController: ThumbnailPanelController?
+    private var previewController: PreviewPanelController?
 
     init() {
         let box = targetBox
@@ -73,6 +75,7 @@ final class AppState: ObservableObject {
                 lastRecordingURL = url
                 settings.lastRecordingPath = url.path
                 diskMonitor.stop()
+                presentPostRecording(for: url)
             case .failed:
                 diskMonitor.stop()
             }
@@ -197,6 +200,41 @@ final class AppState: ObservableObject {
 
     func cancelCountdown() {
         Task { await coordinator.cancel() }
+    }
+
+    // MARK: Post-recording flow
+
+    private func presentPostRecording(for url: URL) {
+        if settings.showFloatingThumbnail {
+            thumbnailController = ThumbnailPanelController(recordingURL: url, appState: self)
+            thumbnailController?.present()
+        } else {
+            NotificationFallback.postRecordingSaved(url: url)
+        }
+    }
+
+    func presentPreview(for url: URL, expandingFrom frame: NSRect?) {
+        previewController = PreviewPanelController(recordingURL: url, expandingFrom: frame, appState: self)
+    }
+
+    func presentTrimEditor(for url: URL) {
+        // Trim editor window lands in group 8; interim: hand off to the system player.
+        NSWorkspace.shared.open(url)
+    }
+
+    func recordingWasDeleted(_ url: URL) {
+        if lastRecordingURL == url {
+            lastRecordingURL = nil
+            settings.lastRecordingPath = nil
+        }
+    }
+
+    func thumbnailDidClose(_ controller: ThumbnailPanelController) {
+        if thumbnailController === controller { thumbnailController = nil }
+    }
+
+    func previewDidClose(_ controller: PreviewPanelController) {
+        if previewController === controller { previewController = nil }
     }
 
     private func startDiskWatch(outputURL: URL) {

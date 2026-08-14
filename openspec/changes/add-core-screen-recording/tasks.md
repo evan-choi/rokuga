@@ -46,9 +46,9 @@
 ## 7. Post-recording delivery
 
 - [x] 7.1 Timestamped save-to-folder with collision suffixes; "last recording" tracking; security-scoped default `~/Movies/Rokuga`
-- [ ] 7.2 Floating thumbnail panel (bottom-right, click → preview panel, timeout/swipe dismiss, capture-excluded, settings toggle) + notification fallback
+- [x] 7.2 Floating thumbnail panel (bottom-right, click → preview panel, timeout/swipe dismiss, capture-excluded, settings toggle) + notification fallback
 - [ ] 7.3 Preview panel: in-place expand from thumbnail, AVPlayer + scrub bar, QuickTime-style two-finger horizontal scrub, 편집(→trim editor)/삭제(→Trash w/ confirm)/완료(close) actions, non-activating, Esc = Done
-- [ ] 7.4 Menu bar "Open Last Recording"(→preview) / "Open Output Folder" incl. deleted-file recovery path
+- [x] 7.4 Menu bar "Open Last Recording"(→preview) / "Open Output Folder" incl. deleted-file recovery path
 
 ## 8. Trim editor (TrimKit)
 
