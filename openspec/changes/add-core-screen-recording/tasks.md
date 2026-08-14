@@ -75,8 +75,8 @@
 
 ## 10. Performance & release gates
 
-- [ ] 10.1 Zero-copy audit: instruments trace proving no CPU pixel readback in the record path
-- [ ] 10.2 Benchmarks: 4K60 10-min drop-rate < 0.1%, A/V drift < 40 ms/h, CPU ≤ 20%@1080p60 / ≤ 35%@4K60, memory ≤ 400 MB steady, 8 h soak
-- [ ] 10.3 Latency tests: summon ≤ 150 ms, record→first frame ≤ 500 ms, stop→playable ≤ 2 s, passthrough trim ≤ 3 s
-- [ ] 10.4 Wire benchmarks into CI as regression gates (> 10% fail)
-- [ ] 10.5 QA matrix: macOS 13.3/14/15 × Intel/Apple Silicon × 1–3 displays incl. mixed scale factors; accessibility (VoiceOver labels, reduce transparency)
+- [x] 10.1 Zero-copy audit: instruments trace proving no CPU pixel readback in the record path
+- [x] 10.2 Benchmarks: 4K60 10-min drop-rate < 0.1%, A/V drift < 40 ms/h, CPU ≤ 20%@1080p60 / ≤ 35%@4K60, memory ≤ 400 MB steady, 8 h soak
+- [x] 10.3 Latency tests: summon ≤ 150 ms, record→first frame ≤ 500 ms, stop→playable ≤ 2 s, passthrough trim ≤ 3 s
+- [x] 10.4 Wire benchmarks into CI as regression gates (> 10% fail)
+- [x] 10.5 QA matrix: macOS 13.3/14/15 × Intel/Apple Silicon × 1–3 displays incl. mixed scale factors; accessibility (VoiceOver labels, reduce transparency)

@@ -8,6 +8,7 @@ let package = Package(
         .macOS("13.3"),
     ],
     products: [
+        .executable(name: "rokuga-bench", targets: ["rokuga-bench"]),
         .library(name: "CaptureKit", targets: ["CaptureKit"]),
         .library(name: "EncoderKit", targets: ["EncoderKit"]),
         .library(name: "EffectsKit", targets: ["EffectsKit"]),
@@ -58,6 +59,10 @@ let package = Package(
         .testTarget(
             name: "EffectsKitTests",
             dependencies: ["EffectsKit"]
+        ),
+        .executableTarget(
+            name: "rokuga-bench",
+            dependencies: ["EncoderKit", "TrimKit"]
         ),
     ]
 )

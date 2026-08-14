@@ -1,0 +1,7 @@
+{
+  "latency.passthroughTrimSeconds": 0.024060964584350586,
+  "latency.recordToFirstFrameSeconds": 0.1818690299987793,
+  "latency.stopToPlayableSeconds": 0.13778197765350342,
+  "throughput.cpuPercentOfOneCore": 4.4263948699629445,
+  "throughput.peakMemoryMB": 36.125
+}
