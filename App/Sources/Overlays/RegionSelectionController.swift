@@ -28,7 +28,7 @@ final class RegionSelectionController {
 
         panel = CapturePanel(contentRect: display.frame, level: .screenSaver)
         panel.isMovableByWindowBackground = false
-        panel.contentView = NSHostingView(rootView: RegionSelectionView(model: model))
+        panel.contentView = FirstMouseHostingView(rootView: RegionSelectionView(model: model))
         panel.onEscape = onCancel
         panel.onReturn = onRecordRequested
 
@@ -49,6 +49,8 @@ final class RegionSelectionController {
     func present() {
         panel.setFrame(display.frame, display: true)
         panel.orderFrontRegardless()
+        // Key status is required for SwiftUI drag/hover on a non-activating panel; Esc/Return handlers live on this panel too.
+        panel.makeKey()
         panel.registerForCaptureExclusion()
         NSCursor.crosshair.set()
     }
