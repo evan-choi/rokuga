@@ -45,7 +45,7 @@ struct CountdownOverlayView: View {
         ZStack {
             Circle()
                 .fill(Color.black.opacity(0.55))
-            Text("\(model.remaining)")
+            Text(verbatim: "\(model.remaining)")
                 .font(.system(size: 110, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 .contentTransition(.numericText(countsDown: true))

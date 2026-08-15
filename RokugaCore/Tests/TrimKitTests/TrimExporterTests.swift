@@ -69,6 +69,37 @@ final class TrimExporterTests: XCTestCase {
         }
     }
 
+    func testFrameExactExportPreservesHEVC() async throws {
+        let hevcFixture = FileManager.default.temporaryDirectory
+            .appendingPathComponent("trim-hevc-\(UUID().uuidString).mp4")
+        defer { try? FileManager.default.removeItem(at: hevcFixture) }
+        try await writeFixtureMovie(to: hevcFixture, durationSeconds: 2, fps: 30, codec: .hevc)
+
+        let exporter = TrimExporter(sourceURL: hevcFixture)
+        let sourceIsHEVC = try await exporter.sourceIsHEVC()
+        XCTAssertTrue(sourceIsHEVC)
+
+        let out = FileManager.default.temporaryDirectory
+            .appendingPathComponent("trim-hevc-out-\(UUID().uuidString).mp4")
+        defer { try? FileManager.default.removeItem(at: out) }
+        try await exporter.export(
+            kind: .frameExact,
+            range: TrimRange(
+                start: CMTime(seconds: 0.5, preferredTimescale: 600),
+                end: CMTime(seconds: 1.5, preferredTimescale: 600)
+            ),
+            to: out
+        )
+
+        let outputIsHEVC = try await TrimExporter(sourceURL: out).sourceIsHEVC()
+        XCTAssertTrue(outputIsHEVC, "frame-exact export must not silently convert HEVC to H.264")
+    }
+
+    func testH264SourceIsNotReportedAsHEVC() async throws {
+        let isHEVC = try await TrimExporter(sourceURL: fixtureURL).sourceIsHEVC()
+        XCTAssertFalse(isHEVC)
+    }
+
     func testKeyframeIndexFindsSyncSamples() async throws {
         let index = try await KeyframeIndex.load(from: fixtureURL)
         XCTAssertGreaterThanOrEqual(index.seconds.count, 1)
@@ -81,10 +112,15 @@ final class TrimExporterTests: XCTestCase {
         XCTAssertEqual(ThumbnailStrip.secondsPerTile(band: 3, tileWidth: 80), 10.0, accuracy: 0.001)
     }
 
-    private func writeFixtureMovie(to url: URL, durationSeconds: Int, fps: Int32) async throws {
+    private func writeFixtureMovie(
+        to url: URL,
+        durationSeconds: Int,
+        fps: Int32,
+        codec: AVVideoCodecType = .h264
+    ) async throws {
         let writer = try AVAssetWriter(outputURL: url, fileType: .mp4)
         let input = AVAssetWriterInput(mediaType: .video, outputSettings: [
-            AVVideoCodecKey: AVVideoCodecType.h264,
+            AVVideoCodecKey: codec,
             AVVideoWidthKey: 320,
             AVVideoHeightKey: 240,
         ])
