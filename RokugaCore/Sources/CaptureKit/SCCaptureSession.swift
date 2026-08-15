@@ -223,6 +223,10 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         if case let .display(_, crop) = target, let crop {
             config.sourceRect = crop
         }
+        if case .window = target {
+            // Mid-recording window resizes shrink-to-fit instead of cropping (recording-modes spec).
+            config.scalesToFit = true
+        }
 
         if configuration.captureSystemAudio {
             config.capturesAudio = true

@@ -47,6 +47,29 @@ public struct WindowTarget: Equatable, Sendable {
     }
 }
 
+/// Backing scale of the display a rect actually sits on — a 1x-display window captured at an assumed 2x produces a quarter-size image in a black frame.
+public enum DisplayScale {
+    public static func scale(forCGRect rect: CGRect) -> CGFloat {
+        var displays = [CGDirectDisplayID](repeating: 0, count: 16)
+        var count: UInt32 = 0
+        CGGetDisplaysWithRect(rect, 16, &displays, &count)
+        guard count > 0 else { return 2 }
+
+        var bestArea: CGFloat = -1
+        var bestScale: CGFloat = 2
+        for index in 0..<Int(count) {
+            let bounds = CGDisplayBounds(displays[index])
+            let intersection = bounds.intersection(rect)
+            let area = intersection.width * intersection.height
+            guard area > bestArea, bounds.width > 0 else { continue }
+            let pixelWidth = CGDisplayCopyDisplayMode(displays[index])?.pixelWidth ?? Int(bounds.width)
+            bestArea = area
+            bestScale = CGFloat(pixelWidth) / bounds.width
+        }
+        return bestScale
+    }
+}
+
 public enum CaptureTarget: Equatable, Sendable {
     /// Full display, or a cropped region of it when `crop` is non-nil (display-local points).
     case display(DisplayTarget, crop: CGRect?)
@@ -70,8 +93,8 @@ public enum CaptureTarget: Equatable, Sendable {
             let scale = display.pointToPixelScale
             return (Int(crop.width * scale), Int(crop.height * scale))
         case let .window(window):
-            // Windows capture at 2x backing scale on Retina; SCStream sizes the surface.
-            return (Int(window.frame.width * 2), Int(window.frame.height * 2))
+            let scale = DisplayScale.scale(forCGRect: window.frame)
+            return (Int(window.frame.width * scale), Int(window.frame.height * scale))
         }
     }
 }
