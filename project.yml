@@ -19,9 +19,14 @@ settings:
   base:
     SWIFT_VERSION: "5.0"
     MACOSX_DEPLOYMENT_TARGET: "13.3"
-    ENABLE_HARDENED_RUNTIME: YES
     DEAD_CODE_STRIPPING: YES
     CODE_SIGN_STYLE: Automatic
+  configs:
+    # Hardened runtime blocks debugger attach; Release-only (Debug keeps get-task-allow).
+    Debug:
+      ENABLE_HARDENED_RUNTIME: NO
+    Release:
+      ENABLE_HARDENED_RUNTIME: YES
 
 targets:
   Rokuga:
