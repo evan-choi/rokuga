@@ -2,6 +2,11 @@ import AppKit
 import CaptureKit
 import SwiftUI
 
+/// NSHostingView that lets the first click on a non-key panel start SwiftUI gestures immediately (system capture overlays never require a focus click).
+final class FirstMouseHostingView<Content: View>: NSHostingView<Content> {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+}
+
 /// Non-activating floating panel base for all HUD surfaces (toolbar, countdown, thumbnail).
 /// Registers itself in `CaptureExcludedWindows` so it never appears in recordings, and routes Esc to `onEscape`.
 class CapturePanel: NSPanel {
