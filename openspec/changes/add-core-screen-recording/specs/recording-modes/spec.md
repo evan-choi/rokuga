@@ -9,6 +9,32 @@ The app SHALL present exactly three recording modes — Selected Area, Full Scre
 - **WHEN** the user selects a different recording mode while idle
 - **THEN** the toolbar and on-screen overlays update to that mode's target picker and options, and no recording starts
 
+### Requirement: Live selection layers (system capture grammar)
+While the toolbar is visible, the active mode SHALL present its selection layer simultaneously with the toolbar, exactly like the system capture UI. Selected Area: dimmed screen with the resizable/movable marquee visible before recording. Window: a translucent highlight overlay covers the window under the pointer, follows the pointer across windows live, and a click starts recording that window immediately. Full Screen: every display except the one under the pointer is dimmed; moving the pointer re-targets, and a click (or the record button) starts recording the targeted display. Esc dismisses the toolbar and every selection layer together.
+
+#### Scenario: Window hover highlight follows the pointer
+- **WHEN** Window mode is active and the pointer moves from one window to another
+- **THEN** the translucent highlight moves to the newly hovered window immediately
+
+#### Scenario: Click-to-record in Window mode
+- **WHEN** the user clicks a highlighted window
+- **THEN** recording of that window starts immediately without further confirmation
+
+#### Scenario: Multi-display dimming in Full Screen mode
+- **WHEN** Full Screen mode is active on a multi-display setup
+- **THEN** all displays except the one under the pointer are dimmed, and moving the pointer to another display swaps which one is undimmed
+
+### Requirement: Recording-time area punch-through
+Once a Selected Area recording starts, the selection chrome (resize grips, outline, size badge) SHALL disappear; only a click-through dimming overlay remains outside the captured region, keeping the recorded area visually punched out for the whole recording. The overlay MUST never appear in the recording and MUST NOT intercept clicks.
+
+#### Scenario: Chrome removed at record start
+- **WHEN** a Selected Area recording starts
+- **THEN** grips and outline disappear and the dim-with-hole overlay remains until the recording stops
+
+#### Scenario: Punch overlay is click-through
+- **WHEN** the user clicks inside or outside the punched region during recording
+- **THEN** the click lands on the app underneath, not on the overlay
+
 #### Scenario: Mode restored across launches
 - **WHEN** the user quits the app while Window mode is selected and relaunches it
 - **THEN** Window mode is preselected

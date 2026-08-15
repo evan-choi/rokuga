@@ -6,6 +6,7 @@ import SwiftUI
 /// Registers itself in `CaptureExcludedWindows` so it never appears in recordings, and routes Esc to `onEscape`.
 class CapturePanel: NSPanel {
     var onEscape: (() -> Void)?
+    var onReturn: (() -> Void)?
 
     init(contentRect: NSRect, level: NSWindow.Level = .floating) {
         super.init(
@@ -28,11 +29,18 @@ class CapturePanel: NSPanel {
     override var canBecomeKey: Bool { true }
 
     override func keyDown(with event: NSEvent) {
-        if event.keyCode == 53 {
+        switch event.keyCode {
+        case 53:
             onEscape?()
-            return
+        case 36, 76:
+            if let onReturn {
+                onReturn()
+            } else {
+                super.keyDown(with: event)
+            }
+        default:
+            super.keyDown(with: event)
         }
-        super.keyDown(with: event)
     }
 
     func registerForCaptureExclusion() {

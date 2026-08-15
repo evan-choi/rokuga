@@ -12,7 +12,6 @@ final class AppState: ObservableObject {
     @Published private(set) var recordingState: RecordingState = .idle
     @Published private(set) var elapsedSeconds: Int = 0
     @Published private(set) var lastRecordingURL: URL?
-    @Published var selectedWindowTarget: WindowTarget?
 
     let settings = SettingsStore.shared
     let coordinator: RecordingCoordinator
@@ -25,7 +24,10 @@ final class AppState: ObservableObject {
 
     var toolbarController: ToolbarPanelController?
     private var countdownController: CountdownOverlayController?
-    private var regionController: RegionSelectionController?
+    private var areaController: RegionSelectionController?
+    private var windowHoverController: WindowHoverController?
+    private var displaySelectController: DisplaySelectController?
+    private var punchController: PunchOverlayController?
     private var thumbnailController: ThumbnailPanelController?
     private var previewController: PreviewPanelController?
     private var trimEditors: [TrimEditorController] = []
@@ -43,9 +45,7 @@ final class AppState: ObservableObject {
         Hotkeys.bind(to: self)
         Task { await consumeEvents() }
         Task { @MainActor in
-            if settings.onboardingCompleted {
-                summonToolbar()
-            } else {
+            if !settings.onboardingCompleted {
                 presentOnboarding()
             }
         }
@@ -114,6 +114,8 @@ final class AppState: ObservableObject {
         case .idle, .finishing:
             countdownController?.dismiss()
             countdownController = nil
+            punchController?.close()
+            punchController = nil
             stopElapsedTimer(freeze: false)
         case .preparing, .countdown:
             break
@@ -123,14 +125,58 @@ final class AppState: ObservableObject {
     // MARK: Toolbar
 
     func summonToolbar() {
+        guard !recordingState.isActive else { return }
         if toolbarController == nil {
             toolbarController = ToolbarPanelController(appState: self)
         }
         toolbarController?.showAtMouseDisplay()
+        refreshSelectionLayer()
     }
 
     func dismissToolbar() {
         toolbarController?.hide()
+        teardownSelectionLayer()
+    }
+
+    func selectionModeChanged() {
+        refreshSelectionLayer()
+    }
+
+    private func refreshSelectionLayer() {
+        teardownSelectionLayer()
+        guard toolbarController?.isVisible == true else { return }
+        switch settings.recordingMode {
+        case .selectedArea:
+            let controller = RegionSelectionController(
+                display: displayUnderMouse(),
+                settings: settings,
+                onRecordRequested: { [weak self] in self?.requestRecord() },
+                onCancel: { [weak self] in self?.dismissToolbar() }
+            )
+            areaController = controller
+            controller.present()
+        case .window:
+            let controller = WindowHoverController { [weak self] target in
+                self?.recordAfterPreflight(target: .window(target))
+            }
+            windowHoverController = controller
+            controller.present()
+        case .fullScreen:
+            let controller = DisplaySelectController { [weak self] display in
+                self?.recordAfterPreflight(target: .display(display, crop: nil))
+            }
+            displaySelectController = controller
+            controller.present()
+        }
+    }
+
+    private func teardownSelectionLayer() {
+        areaController?.close()
+        areaController = nil
+        windowHoverController?.close()
+        windowHoverController = nil
+        displaySelectController?.close()
+        displaySelectController = nil
     }
 
     // MARK: Record flow
@@ -192,37 +238,42 @@ final class AppState: ObservableObject {
     }
 
     private func proceedWithRecordFlow() {
-        let mode = settings.recordingMode
-        switch mode {
-        case .fullScreen:
-            startRecording(target: .display(displayUnderMouse(), crop: nil))
+        switch settings.recordingMode {
         case .selectedArea:
-            presentRegionSelection()
+            let display = areaController?.display ?? displayUnderMouse()
+            let region = areaController?.currentRegion
+                ?? settings.selectedRegions[String(display.displayID)]?.integral
+            if let region {
+                startRecording(target: .display(display, crop: region))
+            } else {
+                summonToolbar()
+            }
+        case .fullScreen:
+            let display = displaySelectController?.hoveredDisplay ?? displayUnderMouse()
+            startRecording(target: .display(display, crop: nil))
         case .window:
-            if let window = selectedWindowTarget {
-                startRecording(target: .window(window))
+            if let target = windowHoverController?.hoveredWindow {
+                startRecording(target: .window(target))
             } else {
                 summonToolbar()
             }
         }
     }
 
-    private func presentRegionSelection() {
-        dismissToolbar()
-        let display = displayUnderMouse()
-        regionController = RegionSelectionController(display: display, settings: settings) { [weak self] crop in
-            self?.regionController = nil
-            guard let self, let crop else {
-                self?.summonToolbar()
-                return
-            }
-            self.startRecording(target: .display(display, crop: crop))
+    /// Click-to-record from selection layers (window hover / display select) with the same permission preflight.
+    private func recordAfterPreflight(target: CaptureTarget) {
+        Task { @MainActor in
+            guard await preflightPermissions() else { return }
+            startRecording(target: target)
         }
-        regionController?.present()
     }
 
     func startRecording(target: CaptureTarget) {
         dismissToolbar()
+        if case let .display(display, crop) = target, let crop {
+            punchController = PunchOverlayController(display: display, region: crop)
+            punchController?.present()
+        }
         let outputURL = OutputFolderStore.newRecordingURL(settings: settings)
         activeRecordingURL = outputURL
         let encoderConfiguration = makeEncoderConfiguration(for: target)
