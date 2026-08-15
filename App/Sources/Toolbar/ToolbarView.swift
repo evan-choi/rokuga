@@ -16,11 +16,11 @@ struct ToolbarView: View {
             modeButtons
             Divider().frame(height: 28)
             optionsButton
-            Spacer(minLength: 8)
             recordButton
         }
         .padding(.horizontal, 18)
-        .frame(width: 560, height: 64)
+        .frame(height: 64)
+        .fixedSize()
         .background(GlassBackground(cornerRadius: 18))
         .preferredColorScheme(.dark)
     }
