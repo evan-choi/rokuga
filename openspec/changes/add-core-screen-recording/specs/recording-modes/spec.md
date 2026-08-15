@@ -44,7 +44,7 @@ Once a Selected Area recording starts, the selection chrome (resize grips, outli
 - **THEN** mode selection controls are disabled until the recording stops
 
 ### Requirement: Selected Area mode
-In Selected Area mode, the app SHALL let the user draw a rectangular region on any display by clicking and dragging, and SHALL record only that region. The selection overlay MUST show the region's pixel dimensions while drawing and allow adjustment via edge and corner handles before recording starts. The selected region SHALL be restored per display on subsequent uses.
+In Selected Area mode, the app SHALL let the user draw a rectangular region on any display by clicking and dragging, and SHALL record only that region. The selection overlay MUST show the region's pixel dimensions while drawing and allow adjustment via edge and corner handles before recording starts. The selected region SHALL be restored per display on subsequent uses. The selection overlay MUST NOT query the capturable-content APIs, so it works identically before screen-recording permission is granted.
 
 #### Scenario: Drawing a region
 - **WHEN** the user activates area selection and drags from one point to another on a display
@@ -57,10 +57,6 @@ In Selected Area mode, the app SHALL let the user draw a rectangular region on a
 #### Scenario: Moving a region
 - **WHEN** the user drags from inside the selected rectangle
 - **THEN** the entire region moves without resizing, constrained to the display bounds
-
-#### Scenario: Window snapping assist
-- **WHEN** the user hovers over an application window during area selection without dragging
-- **THEN** the window's bounds are highlighted and a single click selects that window's frame as the region
 
 #### Scenario: Cancelling selection
 - **WHEN** the user presses Esc during area selection
