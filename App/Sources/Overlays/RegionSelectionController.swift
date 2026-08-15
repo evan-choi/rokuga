@@ -37,8 +37,6 @@ final class RegionSelectionController {
             .sink { region in
                 settings.selectedRegions[String(display.displayID)] = region
             }
-
-        Task { await loadSnapCandidates() }
     }
 
     /// Current crop in display-local points (SwiftUI top-left = SCStream `sourceRect` orientation).
@@ -60,30 +58,12 @@ final class RegionSelectionController {
         panel.close()
     }
 
-    private func loadSnapCandidates() async {
-        guard let content = try? await ShareableContentService.currentContent() else { return }
-        let displayFrame = display.frame
-        let candidates = ShareableContentService.windowTargets(from: content)
-            .map(\.frame)
-            .filter { displayFrame.intersects($0) }
-            .map { global -> CGRect in
-                CGRect(
-                    x: global.minX - displayFrame.minX,
-                    y: global.minY - displayFrame.minY,
-                    width: global.width,
-                    height: global.height
-                )
-            }
-        model.snapCandidates = candidates
-    }
 }
 
 @MainActor
 final class RegionSelectionModel: ObservableObject {
     @Published var region: CGRect?
-    @Published var hoveredSnap: CGRect?
     @Published var loupePoint: CGPoint?
-    var snapCandidates: [CGRect] = []
     let displaySize: CGSize
     let displayID: CGDirectDisplayID
 
@@ -102,11 +82,6 @@ final class RegionSelectionModel: ObservableObject {
         return r
     }
 
-    func snapCandidate(at point: CGPoint) -> CGRect? {
-        snapCandidates
-            .filter { $0.contains(point) }
-            .min { $0.width * $0.height < $1.width * $1.height }
-    }
 }
 
 struct RegionSelectionView: View {
@@ -131,9 +106,6 @@ struct RegionSelectionView: View {
         GeometryReader { _ in
             ZStack {
                 dimLayer
-                if let snap = model.hoveredSnap, model.region == nil {
-                    snapHighlight(snap)
-                }
                 if let region = model.region {
                     selectionChrome(region)
                 }
@@ -144,20 +116,6 @@ struct RegionSelectionView: View {
             }
             .contentShape(Rectangle())
             .gesture(mainGesture)
-            .onContinuousHover { phase in
-                guard model.region == nil else { return }
-                switch phase {
-                case let .active(point):
-                    model.hoveredSnap = model.snapCandidate(at: point)
-                case .ended:
-                    model.hoveredSnap = nil
-                }
-            }
-            .onTapGesture {
-                if let snap = model.hoveredSnap, model.region == nil {
-                    model.region = model.clamp(snap)
-                }
-            }
         }
         .ignoresSafeArea()
     }
@@ -173,14 +131,6 @@ struct RegionSelectionView: View {
         .allowsHitTesting(false)
     }
 
-    private func snapHighlight(_ rect: CGRect) -> some View {
-        Rectangle()
-            .stroke(Color.accentColor, lineWidth: 2)
-            .background(Color.accentColor.opacity(0.12))
-            .frame(width: rect.width, height: rect.height)
-            .position(x: rect.midX, y: rect.midY)
-            .allowsHitTesting(false)
-    }
 
     @ViewBuilder
     private func selectionChrome(_ region: CGRect) -> some View {
@@ -218,7 +168,7 @@ struct RegionSelectionView: View {
     private var instructionBadge: some View {
         Group {
             if model.region == nil {
-                Text("Drag to select an area — click a window to snap")
+                Text("Drag to select an area")
                     .font(.system(size: 12))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)

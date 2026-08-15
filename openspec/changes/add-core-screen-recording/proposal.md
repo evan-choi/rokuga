@@ -9,7 +9,7 @@ This change establishes the core product: three recording modes, system/micropho
 ## What Changes
 
 - New macOS app (Swift/SwiftUI, macOS 13.3+) with a **windowless UI**: a ⇧⌘5-style floating recording toolbar (menu bar agent app, no main window, no Dock icon) offering three recording modes:
-  - **Selected area**: drag-to-select region with resizable edges/corners and window-snapping magnifier
+  - **Selected area**: drag-to-select region with resizable edges/corners and a pixel-loupe magnifier
   - **Full screen**: entire display capture with multi-display selection
   - **Window**: single application window capture, isolated from overlapping windows
 - System audio capture with no driver installation, plus microphone capture with device selection; both independently toggleable and recordable simultaneously
