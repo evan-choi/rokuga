@@ -67,7 +67,7 @@ The app SHALL provide a menu bar status item at all times while running. While i
 - **THEN** the app asks for confirmation, and on confirm stops the recording, finalizes the file, then quits
 
 ### Requirement: Recording toolbar summon and placement
-The app SHALL present its idle UI as a floating recording toolbar, summoned by the menu bar icon, the toolbar global shortcut (default ⇧⌘6), or app launch. The toolbar MUST appear at the bottom-center of the display that currently contains the mouse pointer, MUST NOT steal keyboard focus from the frontmost app (non-activating panel), and SHALL dismiss on Esc or when a recording starts.
+The app SHALL present its idle UI as a floating recording toolbar, summoned only by the menu bar icon or the toolbar global shortcut (default ⇧⌘6) — never automatically at app launch, mirroring the system capture UI. The toolbar MUST appear at the bottom-center of the display that currently contains the mouse pointer, MUST NOT steal keyboard focus from the frontmost app (non-activating panel), and SHALL dismiss on Esc or when a recording starts.
 
 #### Scenario: Summon on the display under the mouse
 - **WHEN** the user presses ⇧⌘6 while the mouse pointer is on a secondary display

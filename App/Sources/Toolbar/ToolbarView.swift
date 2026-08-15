@@ -6,7 +6,6 @@ struct ToolbarView: View {
     @ObservedObject var appState: AppState
     @AppStorage(SettingsStore.Key.recordingMode.rawValue) private var modeRaw = RecordingMode.selectedArea.rawValue
     @State private var showsOptions = false
-    @State private var showsWindowPicker = false
 
     private var mode: RecordingMode {
         RecordingMode(rawValue: modeRaw) ?? .selectedArea
@@ -37,9 +36,7 @@ struct ToolbarView: View {
     private func modeButton(_ target: RecordingMode, symbol: String, label: LocalizedStringKey) -> some View {
         Button {
             modeRaw = target.rawValue
-            if target == .window {
-                showsWindowPicker = true
-            }
+            appState.selectionModeChanged()
         } label: {
             VStack(spacing: 3) {
                 Image(systemName: symbol)
@@ -58,9 +55,6 @@ struct ToolbarView: View {
         )
         .accessibilityLabel(Text(label))
         .accessibilityAddTraits(mode == target ? .isSelected : [])
-        .popover(isPresented: target == .window ? $showsWindowPicker : .constant(false)) {
-            WindowPickerView(appState: appState)
-        }
     }
 
     private var optionsButton: some View {

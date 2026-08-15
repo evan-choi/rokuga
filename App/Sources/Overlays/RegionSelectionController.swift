@@ -1,63 +1,61 @@
 import AppKit
 import CaptureKit
+import Combine
 import SettingsKit
 import SwiftUI
 
 /// Region-selection overlay (task 4.5): drag to select, resize by 8 handles, move by dragging inside, hover-snap to windows, per-display persistence.
-/// Completion receives the crop in display-local points (SCStream `sourceRect` space) or nil on cancel.
+/// Lives alongside the toolbar (system capture grammar): the toolbar's record button or Return starts recording; Esc dismisses everything.
 @MainActor
 final class RegionSelectionController {
     private let panel: CapturePanel
-    private let display: DisplayTarget
+    let display: DisplayTarget
     private let settings: SettingsStore
-    private let completion: (CGRect?) -> Void
     private let model: RegionSelectionModel
+    private var persistCancellable: AnyCancellable?
 
-    init(display: DisplayTarget, settings: SettingsStore, completion: @escaping (CGRect?) -> Void) {
+    init(
+        display: DisplayTarget,
+        settings: SettingsStore,
+        onRecordRequested: @escaping () -> Void,
+        onCancel: @escaping () -> Void
+    ) {
         self.display = display
         self.settings = settings
-        self.completion = completion
 
         let saved = settings.selectedRegions[String(display.displayID)]
         model = RegionSelectionModel(displaySize: display.frame.size, initialRegion: saved, displayID: display.displayID)
 
         panel = CapturePanel(contentRect: display.frame, level: .screenSaver)
         panel.isMovableByWindowBackground = false
+        panel.contentView = NSHostingView(rootView: RegionSelectionView(model: model))
+        panel.onEscape = onCancel
+        panel.onReturn = onRecordRequested
 
-        let controllerBox = WeakBox<RegionSelectionController>()
-        panel.contentView = NSHostingView(
-            rootView: RegionSelectionView(model: model) { region in
-                controllerBox.value?.finish(with: region)
+        persistCancellable = model.$region
+            .compactMap { $0 }
+            .sink { region in
+                settings.selectedRegions[String(display.displayID)] = region
             }
-        )
-        panel.onEscape = { [weak self] in self?.finish(with: nil) }
-        controllerBox.value = self
 
         Task { await loadSnapCandidates() }
+    }
+
+    /// Current crop in display-local points (SwiftUI top-left = SCStream `sourceRect` orientation).
+    var currentRegion: CGRect? {
+        model.region?.integral
     }
 
     func present() {
         panel.setFrame(display.frame, display: true)
         panel.orderFrontRegardless()
-        panel.makeKey()
         panel.registerForCaptureExclusion()
         NSCursor.crosshair.set()
     }
 
-    private func finish(with region: CGRect?) {
+    func close() {
         NSCursor.arrow.set()
         panel.close()
-        if let region {
-            settings.selectedRegions[String(display.displayID)] = region
-            completion(flippedToDisplayLocal(region))
-        } else {
-            completion(nil)
-        }
-    }
-
-    /// SwiftUI coordinates are top-left based within the overlay, which already matches SCStream's `sourceRect` orientation.
-    private func flippedToDisplayLocal(_ rect: CGRect) -> CGRect {
-        rect.integral
     }
 
     private func loadSnapCandidates() async {
@@ -76,10 +74,6 @@ final class RegionSelectionController {
             }
         model.snapCandidates = candidates
     }
-}
-
-final class WeakBox<T: AnyObject> {
-    weak var value: T?
 }
 
 @MainActor
@@ -115,7 +109,6 @@ final class RegionSelectionModel: ObservableObject {
 
 struct RegionSelectionView: View {
     @ObservedObject var model: RegionSelectionModel
-    let onConfirm: (CGRect?) -> Void
 
     @State private var dragOrigin: CGPoint?
     @State private var dragMode: DragMode = .none
@@ -206,7 +199,6 @@ struct RegionSelectionView: View {
                 .allowsHitTesting(false)
         }
 
-        confirmBar(region)
     }
 
     private func sizeBadge(_ region: CGRect) -> some View {
@@ -220,19 +212,6 @@ struct RegionSelectionView: View {
             .allowsHitTesting(false)
     }
 
-    private func confirmBar(_ region: CGRect) -> some View {
-        HStack(spacing: 10) {
-            Button("Cancel") { onConfirm(nil) }
-                .keyboardShortcut(.cancelAction)
-            Button("Record") { onConfirm(model.region) }
-                .keyboardShortcut(.defaultAction)
-                .buttonStyle(.borderedProminent)
-                .tint(.red)
-        }
-        .padding(10)
-        .background(GlassBackground(cornerRadius: 12))
-        .position(x: region.midX, y: min(region.maxY + 34, model.displaySize.height - 30))
-    }
 
     private var instructionBadge: some View {
         Group {

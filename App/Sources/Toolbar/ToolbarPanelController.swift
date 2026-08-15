@@ -8,12 +8,20 @@ final class ToolbarPanelController {
     private static let bottomMargin: CGFloat = 96
 
     init(appState: AppState) {
-        panel = CapturePanel(contentRect: NSRect(origin: .zero, size: Self.panelSize))
+        panel = CapturePanel(
+            contentRect: NSRect(origin: .zero, size: Self.panelSize),
+            level: NSWindow.Level(rawValue: NSWindow.Level.screenSaver.rawValue + 1)
+        )
         panel.contentView = NSHostingView(
             rootView: ToolbarView(appState: appState)
                 .environmentObject(appState)
         )
-        panel.onEscape = { [weak self] in self?.hide() }
+        panel.onEscape = { [weak appState] in appState?.dismissToolbar() }
+        panel.onReturn = { [weak appState] in appState?.requestRecord() }
+    }
+
+    var isVisible: Bool {
+        panel.isVisible
     }
 
     /// Bottom-center of the display the mouse pointer is on (user requirement t=172).
