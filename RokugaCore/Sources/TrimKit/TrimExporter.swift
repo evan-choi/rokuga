@@ -38,7 +38,11 @@ public final class TrimExporter: @unchecked Sendable {
             preset = AVAssetExportPresetPassthrough
             fileType = destination.pathExtension.lowercased() == "mov" ? .mov : .mp4
         case .frameExact:
-            preset = AVAssetExportPresetHighestQuality
+            // Frame-exact re-encode preserves the source codec: HEVC (H.265) recordings
+            // stay HEVC instead of silently converting to H.264.
+            preset = try await sourceIsHEVC()
+                ? AVAssetExportPresetHEVCHighestQuality
+                : AVAssetExportPresetHighestQuality
             fileType = destination.pathExtension.lowercased() == "mov" ? .mov : .mp4
         case .audioOnlyM4A:
             guard try await hasAudioTrack() else { throw TrimExportError.noAudioTrack }
@@ -87,5 +91,11 @@ public final class TrimExporter: @unchecked Sendable {
 
     public func hasAudioTrack() async throws -> Bool {
         try await !asset.loadTracks(withMediaType: .audio).isEmpty
+    }
+
+    public func sourceIsHEVC() async throws -> Bool {
+        guard let track = try await asset.loadTracks(withMediaType: .video).first else { return false }
+        let descriptions = try await track.load(.formatDescriptions)
+        return descriptions.contains { CMFormatDescriptionGetMediaSubType($0) == kCMVideoCodecType_HEVC }
     }
 }

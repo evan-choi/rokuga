@@ -146,8 +146,8 @@ private struct OutputPane: View {
                 }
             }
             Picker("Codec", selection: $model.videoCodec) {
-                Text(verbatim: "H.264").tag(VideoCodec.h264)
-                Text(verbatim: "HEVC").tag(VideoCodec.hevc)
+                Text(verbatim: "H.264 (AVC)").tag(VideoCodec.h264)
+                Text(verbatim: "H.265 (HEVC)").tag(VideoCodec.hevc)
             }
             Picker("Format", selection: $model.containerFormat) {
                 Text(verbatim: "MP4").tag(ContainerFormat.mp4)

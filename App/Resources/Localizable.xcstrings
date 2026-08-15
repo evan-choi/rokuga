@@ -112,6 +112,7 @@
       }
     },
     "After Recording": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -134,6 +135,7 @@
       }
     },
     "Allow Rokuga in System Settings › Privacy & Security › Screen Recording, then relaunch.": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -156,6 +158,7 @@
       }
     },
     "Animate clicks": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -178,6 +181,7 @@
       }
     },
     "Appearance": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -200,6 +204,7 @@
       }
     },
     "Audio": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -222,6 +227,7 @@
       }
     },
     "Audio quality": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -266,6 +272,7 @@
       }
     },
     "Cancel": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -288,6 +295,7 @@
       }
     },
     "Check Again": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -310,6 +318,7 @@
       }
     },
     "Choose Folder…": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -376,6 +385,7 @@
       }
     },
     "Choose…": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -398,6 +408,7 @@
       }
     },
     "Click Animations": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -420,6 +431,7 @@
       }
     },
     "Codec": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -442,6 +454,7 @@
       }
     },
     "Continue": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -464,6 +477,7 @@
       }
     },
     "Countdown": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -508,6 +522,7 @@
       }
     },
     "Default mode": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -552,6 +567,7 @@
       }
     },
     "Discard": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -574,6 +590,7 @@
       }
     },
     "Discard trim changes?": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -596,6 +613,7 @@
       }
     },
     "Done": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -662,6 +680,7 @@
       }
     },
     "Edit": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -706,6 +725,7 @@
       }
     },
     "Exclude Rokuga windows from recordings": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -728,6 +748,7 @@
       }
     },
     "Export Audio Only…": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -750,6 +771,7 @@
       }
     },
     "Export Failed": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -772,6 +794,7 @@
       }
     },
     "Finish Anyway": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -794,6 +817,7 @@
       }
     },
     "Format": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -816,6 +840,7 @@
       }
     },
     "Frame Rate": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -838,6 +863,7 @@
       }
     },
     "Frame rate": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -860,6 +886,7 @@
       }
     },
     "Frame-exact (re-encode)": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -926,6 +953,7 @@
       }
     },
     "General": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -948,6 +976,7 @@
       }
     },
     "Hide desktop icons in recordings": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -970,6 +999,7 @@
       }
     },
     "Highlight cursor": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -992,6 +1022,7 @@
       }
     },
     "Launch at login": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1036,6 +1067,7 @@
       }
     },
     "Microphone": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1058,6 +1090,7 @@
       }
     },
     "Microphone access denied": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1080,6 +1113,7 @@
       }
     },
     "Mouse": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1102,6 +1136,7 @@
       }
     },
     "Move recording to Trash?": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1124,6 +1159,7 @@
       }
     },
     "Move to Trash": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1168,6 +1204,7 @@
       }
     },
     "OK": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1212,6 +1249,7 @@
       }
     },
     "Open Last Recording": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1234,6 +1272,7 @@
       }
     },
     "Open Output Folder": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1256,6 +1295,7 @@
       }
     },
     "Open Recording Toolbar": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1278,6 +1318,7 @@
       }
     },
     "Open System Settings…": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1322,6 +1363,7 @@
       }
     },
     "Output": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1344,6 +1386,7 @@
       }
     },
     "Pause": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1366,6 +1409,7 @@
       }
     },
     "Pause / Resume": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1410,6 +1454,7 @@
       }
     },
     "Play": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1432,6 +1477,7 @@
       }
     },
     "Pointer style": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1454,6 +1500,7 @@
       }
     },
     "Preferences return to their defaults. Your recordings are not affected.": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1498,6 +1545,7 @@
       }
     },
     "Quit Rokuga": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1542,6 +1590,7 @@
       }
     },
     "Record Without Mic": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1564,6 +1613,7 @@
       }
     },
     "Record microphone": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1586,6 +1636,7 @@
       }
     },
     "Record system audio": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1608,6 +1659,7 @@
       }
     },
     "Record without the microphone, or grant access in System Settings.": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1630,6 +1682,7 @@
       }
     },
     "Recording": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1652,6 +1705,7 @@
       }
     },
     "Recording saved": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1696,6 +1750,7 @@
       }
     },
     "Reset": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1718,6 +1773,7 @@
       }
     },
     "Reset All Settings…": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1740,6 +1796,7 @@
       }
     },
     "Reset all settings?": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1762,6 +1819,7 @@
       }
     },
     "Save & Quit": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1784,6 +1842,7 @@
       }
     },
     "Save As…": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1806,6 +1865,7 @@
       }
     },
     "Save to": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1850,6 +1910,7 @@
       }
     },
     "Screen recording permission required": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1916,6 +1977,7 @@
       }
     },
     "Settings…": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1938,6 +2000,7 @@
       }
     },
     "Shortcuts": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1960,6 +2023,7 @@
       }
     },
     "Show Cursor": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -1982,6 +2046,7 @@
       }
     },
     "Show Floating Thumbnail": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -2004,6 +2069,7 @@
       }
     },
     "Show cursor": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -2026,6 +2092,7 @@
       }
     },
     "Show floating thumbnail after recording": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -2048,6 +2115,7 @@
       }
     },
     "Start / Stop Recording": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -2070,6 +2138,7 @@
       }
     },
     "Start Recording": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -2092,6 +2161,7 @@
       }
     },
     "Stop Recording": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -2114,6 +2184,7 @@
       }
     },
     "Stop recording and quit?": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -2158,6 +2229,7 @@
       }
     },
     "System Audio": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -2180,6 +2252,7 @@
       }
     },
     "The current recording will be saved before Rokuga quits.": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -2202,6 +2275,7 @@
       }
     },
     "The trimmed range has not been exported.": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -2378,5 +2452,5 @@
       }
     }
   },
-  "version": "1.0"
+  "version": "1.1"
 }
