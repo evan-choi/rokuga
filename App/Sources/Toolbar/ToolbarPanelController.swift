@@ -4,18 +4,21 @@ import SwiftUI
 @MainActor
 final class ToolbarPanelController {
     private let panel: CapturePanel
-    private static let panelSize = NSSize(width: 560, height: 64)
+    private let hostingView: NSHostingView<AnyView>
     private static let bottomMargin: CGFloat = 96
 
     init(appState: AppState) {
+        hostingView = NSHostingView(
+            rootView: AnyView(
+                ToolbarView(appState: appState)
+                    .environmentObject(appState)
+            )
+        )
         panel = CapturePanel(
-            contentRect: NSRect(origin: .zero, size: Self.panelSize),
+            contentRect: NSRect(origin: .zero, size: hostingView.fittingSize),
             level: NSWindow.Level(rawValue: NSWindow.Level.screenSaver.rawValue + 1)
         )
-        panel.contentView = NSHostingView(
-            rootView: ToolbarView(appState: appState)
-                .environmentObject(appState)
-        )
+        panel.contentView = hostingView
         panel.onEscape = { [weak appState] in appState?.dismissToolbar() }
         panel.onReturn = { [weak appState] in appState?.requestRecord() }
     }
@@ -30,11 +33,16 @@ final class ToolbarPanelController {
         let screen = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) } ?? NSScreen.main
         guard let visible = screen?.visibleFrame else { return }
 
-        let origin = NSPoint(
-            x: visible.midX - Self.panelSize.width / 2,
-            y: visible.minY + Self.bottomMargin
+        let size = hostingView.fittingSize
+        panel.setFrame(
+            NSRect(
+                x: visible.midX - size.width / 2,
+                y: visible.minY + Self.bottomMargin,
+                width: size.width,
+                height: size.height
+            ),
+            display: true
         )
-        panel.setFrameOrigin(origin)
         panel.orderFrontRegardless()
         panel.makeKey()
         panel.registerForCaptureExclusion()
