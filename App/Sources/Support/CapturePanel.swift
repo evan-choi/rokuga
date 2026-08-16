@@ -13,7 +13,11 @@ class CapturePanel: NSPanel {
     var onEscape: (() -> Void)?
     var onReturn: (() -> Void)?
 
-    init(contentRect: NSRect, level: NSWindow.Level = .floating) {
+    init(
+        contentRect: NSRect,
+        level: NSWindow.Level = .floating,
+        showsWindowShadow: Bool = true
+    ) {
         super.init(
             contentRect: contentRect,
             styleMask: [.nonactivatingPanel, .borderless, .fullSizeContentView],
@@ -23,7 +27,9 @@ class CapturePanel: NSPanel {
         isOpaque = false
         backgroundColor = .clear
         isReleasedWhenClosed = false
-        hasShadow = true
+        // Disable for rounded glass surfaces: this shadow follows the rectangular
+        // window backing and can appear as black edge lines around their corners.
+        hasShadow = showsWindowShadow
         isMovableByWindowBackground = true
         hidesOnDeactivate = false
         becomesKeyOnlyIfNeeded = true

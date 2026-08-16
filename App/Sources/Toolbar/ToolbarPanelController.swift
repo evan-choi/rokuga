@@ -16,7 +16,8 @@ final class ToolbarPanelController {
         )
         panel = CapturePanel(
             contentRect: NSRect(origin: .zero, size: hostingView.fittingSize),
-            level: NSWindow.Level(rawValue: NSWindow.Level.screenSaver.rawValue + 1)
+            level: NSWindow.Level(rawValue: NSWindow.Level.screenSaver.rawValue + 1),
+            showsWindowShadow: false
         )
         panel.contentView = hostingView
         panel.onEscape = { [weak appState] in appState?.dismissToolbar() }
