@@ -219,7 +219,9 @@ private struct AnimatedPaneHeight: ViewModifier {
         if sharedHeight == nil {
             sharedHeight = height
         } else {
-            withAnimation(.easeOut(duration: 0.22)) { sharedHeight = height }
+            withAnimation(.timingCurve(0.22, 1, 0.36, 1, duration: 0.3)) {
+                sharedHeight = height
+            }
         }
     }
 }
