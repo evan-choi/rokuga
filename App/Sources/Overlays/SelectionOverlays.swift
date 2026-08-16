@@ -15,6 +15,11 @@ enum ScreenCoords {
         CGPoint(x: point.x, y: primaryHeight - point.y)
     }
 
+    /// Global Cocoa (bottom-left) rect → global CG (top-left) rect.
+    static func cgRect(fromCocoa rect: CGRect) -> CGRect {
+        CGRect(x: rect.minX, y: primaryHeight - rect.maxY, width: rect.width, height: rect.height)
+    }
+
     static func displayTarget(for screen: NSScreen) -> DisplayTarget? {
         guard let displayID = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID
         else { return nil }
