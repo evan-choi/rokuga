@@ -45,16 +45,19 @@ final class AppState: ObservableObject {
         Hotkeys.bind(to: self)
         Task { await consumeEvents() }
         Task { @MainActor in
-            if !settings.onboardingCompleted {
-                presentOnboarding()
+            let missing = await OnboardingModel.missingSteps(settings: settings)
+            if missing.isEmpty {
+                settings.onboardingCompleted = true
+            } else {
+                presentOnboarding(steps: missing)
             }
         }
     }
 
     private var onboardingController: OnboardingController?
 
-    private func presentOnboarding() {
-        onboardingController = OnboardingController { [weak self] in
+    private func presentOnboarding(steps: [OnboardingModel.Step]) {
+        onboardingController = OnboardingController(steps: steps) { [weak self] in
             self?.onboardingController = nil
             self?.summonToolbar()
         }
