@@ -680,28 +680,6 @@
         }
       }
     },
-    "Drag to select an area — click a window to snap": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ドラッグして範囲を選択 — ウインドウをクリックでスナップ"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "드래그하여 영역 선택 — 창을 클릭하면 창에 맞춰집니다"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "拖动以选择区域 — 点击窗口可自动贴合"
-          }
-        }
-      }
-    },
     "Edit": {
       "extractionState": "stale",
       "localizations": {

@@ -41,3 +41,16 @@ struct GlassBackground: View {
         .overlay(shape.strokeBorder(Color.white.opacity(0.09), lineWidth: 1))
     }
 }
+
+extension View {
+    /// System capture chrome never shows focus rings; suppress them on our HUD surfaces.
+    /// (macOS 13 has no `focusEffectDisabled`; the ring only appears there with Full Keyboard Access on.)
+    @ViewBuilder
+    func hiddenFocusRing() -> some View {
+        if #available(macOS 14.0, *) {
+            focusEffectDisabled()
+        } else {
+            self
+        }
+    }
+}
