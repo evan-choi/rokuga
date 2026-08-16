@@ -214,19 +214,27 @@ final class AreaSelectionView: NSView {
     override func resetCursorRects() {
         addCursorRect(bounds, cursor: .crosshair)
         guard let region else { return }
-        addCursorRect(region.insetBy(dx: 6, dy: 6), cursor: .openHand)
+        // insetBy/intersection return the null rect (infinite origin) for tiny or
+        // non-overlapping rects; addCursorRect asserts isfinite, so guard every rect.
+        addFiniteCursorRect(region.insetBy(dx: 6, dy: 6), cursor: .openHand)
         for handle in Handle.allCases {
             let center = position(of: handle, in: region)
-            addCursorRect(
+            addFiniteCursorRect(
                 CGRect(
                     x: center.x - Self.handleHitRadius,
                     y: center.y - Self.handleHitRadius,
                     width: Self.handleHitRadius * 2,
                     height: Self.handleHitRadius * 2
-                ).intersection(bounds),
+                ),
                 cursor: .crosshair
             )
         }
+    }
+
+    private func addFiniteCursorRect(_ rect: CGRect, cursor: NSCursor) {
+        let clipped = rect.intersection(bounds)
+        guard !clipped.isNull, !clipped.isEmpty else { return }
+        addCursorRect(clipped, cursor: cursor)
     }
 
     // MARK: Geometry

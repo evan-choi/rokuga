@@ -1,2458 +1,2459 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "10s": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "10秒"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "3s" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3秒"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "10초"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3초"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "10秒"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3秒"
           }
         }
       }
     },
-    "30 fps": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "30 fps"
+    "5s" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5秒"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "30 fps"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5초"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "30 fps"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5秒"
           }
         }
       }
     },
-    "3s": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3秒"
+    "10s" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10秒"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3초"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10초"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3秒"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10秒"
           }
         }
       }
     },
-    "5s": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "5秒"
+    "30 fps" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 fps"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "5초"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 fps"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "5秒"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 fps"
           }
         }
       }
     },
-    "60 fps": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "60 fps"
+    "60 fps" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "60 fps"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "60 fps"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "60 fps"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "60 fps"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "60 fps"
           }
         }
       }
     },
-    "After Recording": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画後"
+    "After Recording" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画後"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화 후"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화 후"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "录制后"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制后"
           }
         }
       }
     },
-    "Allow Rokuga in System Settings › Privacy & Security › Screen Recording, then relaunch.": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "システム設定 › プライバシーとセキュリティ › 画面収録でRokugaを許可してから再起動してください。"
+    "Allow Rokuga in System Settings › Privacy & Security › Screen Recording, then relaunch." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システム設定 › プライバシーとセキュリティ › 画面収録でRokugaを許可してから再起動してください。"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "시스템 설정 › 개인정보 보호 및 보안 › 화면 기록에서 Rokuga를 허용한 다음 다시 실행하세요."
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시스템 설정 › 개인정보 보호 및 보안 › 화면 기록에서 Rokuga를 허용한 다음 다시 실행하세요."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "请在系统设置 › 隐私与安全性 › 屏幕录制中允许 Rokuga，然后重新启动。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请在系统设置 › 隐私与安全性 › 屏幕录制中允许 Rokuga，然后重新启动。"
           }
         }
       }
     },
-    "Animate clicks": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "クリックアニメーション"
+    "Animate clicks" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリックアニメーション"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "클릭 애니메이션"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "클릭 애니메이션"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "点击动画"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击动画"
           }
         }
       }
     },
-    "Appearance": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "外観"
+    "Appearance" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外観"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "화면 모드"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "화면 모드"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "外观"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外观"
           }
         }
       }
     },
-    "Audio": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "オーディオ"
+    "Audio" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オーディオ"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "오디오"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오디오"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "音频"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音频"
           }
         }
       }
     },
-    "Audio quality": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "音質"
+    "Audio quality" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音質"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "오디오 품질"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오디오 품질"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "音频质量"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音频质量"
           }
         }
       }
     },
-    "Auto": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自動"
+    "Auto" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "자동"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자동"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自动"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动"
           }
         }
       }
     },
-    "Cancel": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "キャンセル"
+    "Cancel" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセル"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "취소"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "취소"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "取消"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
           }
         }
       }
     },
-    "Check Again": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "再確認"
+    "Check Again" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再確認"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "다시 확인"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 확인"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重新检查"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新检查"
           }
         }
       }
     },
-    "Choose Folder…": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フォルダを選択…"
+    "Choose Folder…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォルダを選択…"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "폴더 선택…"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "폴더 선택…"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "选择文件夹…"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择文件夹…"
           }
         }
       }
     },
-    "Choose Window": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ウインドウを選択"
+    "Choose output folder" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存先フォルダを選択"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "창 선택"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장 폴더 선택"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "选择窗口"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择输出文件夹"
           }
         }
       }
     },
-    "Choose output folder": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保存先フォルダを選択"
+    "Choose Window" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウインドウを選択"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "저장 폴더 선택"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "창 선택"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "选择输出文件夹"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择窗口"
           }
         }
       }
     },
-    "Choose…": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "選択…"
+    "Choose…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択…"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "선택…"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택…"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "选择…"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择…"
           }
         }
       }
     },
-    "Click Animations": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "クリックアニメーション"
+    "Click Animations" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリックアニメーション"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "클릭 애니메이션"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "클릭 애니메이션"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "点击动画"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击动画"
           }
         }
       }
     },
-    "Codec": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "コーデック"
+    "Codec" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コーデック"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "코덱"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "코덱"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "编解码器"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编解码器"
           }
         }
       }
     },
-    "Continue": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "続ける"
+    "Continue" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "続ける"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "계속"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "계속"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "继续"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "继续"
           }
         }
       }
     },
-    "Countdown": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "カウントダウン"
+    "Countdown" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カウントダウン"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "카운트다운"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "카운트다운"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "倒计时"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "倒计时"
           }
         }
       }
     },
-    "Dark": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ダーク"
+    "Dark" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダーク"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "다크"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다크"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "深色"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "深色"
           }
         }
       }
     },
-    "Default mode": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "デフォルトモード"
+    "Default mode" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デフォルトモード"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "기본 모드"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기본 모드"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "默认模式"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "默认模式"
           }
         }
       }
     },
-    "Delete": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "削除"
+    "Delete" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "삭제"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "删除"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除"
           }
         }
       }
     },
-    "Discard": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "破棄"
+    "Discard" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "破棄"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "버리기"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "버리기"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "放弃"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "放弃"
           }
         }
       }
     },
-    "Discard trim changes?": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "トリムの変更を破棄しますか？"
+    "Discard trim changes?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トリムの変更を破棄しますか？"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "다듬기 변경 사항을 버리시겠습니까?"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다듬기 변경 사항을 버리시겠습니까?"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "要放弃修剪更改吗？"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要放弃修剪更改吗？"
           }
         }
       }
     },
-    "Done": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "完了"
+    "Done" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "완료"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "완료"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "完成"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
           }
         }
       }
     },
-    "Dot": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ドット"
+    "Dot" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ドット"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "점"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "점"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "圆点"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "圆点"
           }
         }
       }
     },
-    "Drag to select an area": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ドラッグして範囲を選択"
+    "Drag to select an area" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ドラッグして範囲を選択"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "드래그하여 영역을 선택하세요"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "드래그하여 영역을 선택하세요"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "拖动以选择区域"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拖动以选择区域"
           }
         }
       }
     },
-    "Edit": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "編集"
+    "Edit" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "편집"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "편집"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "编辑"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑"
           }
         }
       }
     },
-    "Esc to cancel": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Escでキャンセル"
+    "Esc to cancel" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escでキャンセル"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Esc 키로 취소"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esc 키로 취소"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "按 Esc 取消"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按 Esc 取消"
           }
         }
       }
     },
-    "Exclude Rokuga windows from recordings": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画からRokugaのウインドウを除外"
+    "Exclude Rokuga windows from recordings" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画からRokugaのウインドウを除外"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화에서 Rokuga 창 제외"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화에서 Rokuga 창 제외"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "从录制中排除 Rokuga 窗口"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从录制中排除 Rokuga 窗口"
           }
         }
       }
     },
-    "Export Audio Only…": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "オーディオのみ書き出す…"
+    "Export Audio Only…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オーディオのみ書き出す…"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "오디오만 내보내기…"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오디오만 내보내기…"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "仅导出音频…"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅导出音频…"
           }
         }
       }
     },
-    "Export Failed": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "書き出しに失敗しました"
+    "Export Failed" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "書き出しに失敗しました"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "내보내기 실패"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "내보내기 실패"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "导出失败"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出失败"
           }
         }
       }
     },
-    "Finish Anyway": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このまま完了"
+    "Finish Anyway" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このまま完了"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "그래도 완료"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "그래도 완료"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "仍然完成"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仍然完成"
           }
         }
       }
     },
-    "Format": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フォーマット"
+    "Format" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォーマット"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "포맷"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "포맷"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "格式"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "格式"
           }
         }
       }
     },
-    "Frame Rate": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フレームレート"
+    "Frame rate" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フレームレート"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "프레임 레이트"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프레임 레이트"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "帧率"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "帧率"
           }
         }
       }
     },
-    "Frame rate": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フレームレート"
+    "Frame Rate" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フレームレート"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "프레임 레이트"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프레임 레이트"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "帧率"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "帧率"
           }
         }
       }
     },
-    "Frame-exact (re-encode)": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フレーム単位で正確（再エンコード）"
+    "Frame-exact (re-encode)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フレーム単位で正確（再エンコード）"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "프레임 단위 정밀 (재인코딩)"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프레임 단위 정밀 (재인코딩)"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "帧级精确（重新编码）"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "帧级精确（重新编码）"
           }
         }
       }
     },
-    "Free, native screen recording at 60 fps.\nNo watermarks, no time limits.": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "無料のネイティブ60fps画面録画。\n透かしなし、時間制限なし。"
+    "Free, native screen recording at 60 fps.\nNo watermarks, no time limits." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料のネイティブ60fps画面録画。\n透かしなし、時間制限なし。"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "무료 네이티브 60fps 화면 녹화.\n워터마크 없음, 시간 제한 없음."
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무료 네이티브 60fps 화면 녹화.\n워터마크 없음, 시간 제한 없음."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "免费的原生 60fps 屏幕录制。\n无水印，无时长限制。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "免费的原生 60fps 屏幕录制。\n无水印，无时长限制。"
           }
         }
       }
     },
-    "Full Screen": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フルスクリーン"
+    "Full Screen" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フルスクリーン"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "전체 화면"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전체 화면"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "全屏"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全屏"
           }
         }
       }
     },
-    "General": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一般"
+    "General" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一般"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "일반"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일반"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "通用"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通用"
           }
         }
       }
     },
-    "Hide desktop icons in recordings": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画でデスクトップのアイコンを隠す"
+    "Hide desktop icons in recordings" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画でデスクトップのアイコンを隠す"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화에서 데스크탑 아이콘 가리기"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화에서 데스크탑 아이콘 가리기"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在录制中隐藏桌面图标"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在录制中隐藏桌面图标"
           }
         }
       }
     },
-    "Highlight cursor": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "カーソルをハイライト"
+    "Highlight cursor" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カーソルをハイライト"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "커서 강조"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "커서 강조"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "高亮光标"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高亮光标"
           }
         }
       }
     },
-    "Launch at login": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ログイン時に起動"
+    "Launch at login" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログイン時に起動"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "로그인 시 실행"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인 시 실행"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "登录时启动"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登录时启动"
           }
         }
       }
     },
-    "Light": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ライト"
+    "Light" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライト"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "라이트"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이트"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "浅色"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "浅色"
           }
         }
       }
     },
-    "Microphone": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "マイク"
+    "macOS requires you to allow screen recording in System Settings, then relaunch Rokuga." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOSではシステム設定で画面収録を許可してから、Rokugaを再起動する必要があります。"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "마이크"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS에서는 시스템 설정에서 화면 기록을 허용한 다음 Rokuga를 다시 실행해야 합니다."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "麦克风"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 要求您在系统设置中允许屏幕录制，然后重新启动 Rokuga。"
           }
         }
       }
     },
-    "Microphone access denied": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "マイクへのアクセスが拒否されました"
+    "Microphone" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイク"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "마이크 접근이 거부됨"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마이크"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "麦克风访问被拒绝"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "麦克风"
           }
         }
       }
     },
-    "Mouse": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "マウス"
+    "Microphone access denied" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイクへのアクセスが拒否されました"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "마우스"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마이크 접근이 거부됨"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "鼠标"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "麦克风访问被拒绝"
           }
         }
       }
     },
-    "Move recording to Trash?": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画をゴミ箱に移動しますか？"
+    "Mouse" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マウス"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화 파일을 휴지통으로 이동하시겠습니까?"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마우스"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "要将录制移到废纸篓吗？"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "鼠标"
           }
         }
       }
     },
-    "Move to Trash": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ゴミ箱に移動"
+    "Move recording to Trash?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画をゴミ箱に移動しますか？"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "휴지통으로 이동"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화 파일을 휴지통으로 이동하시겠습니까?"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "移到废纸篓"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要将录制移到废纸篓吗？"
           }
         }
       }
     },
-    "No capturable windows": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "キャプチャ可能なウインドウがありません"
+    "Move to Trash" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゴミ箱に移動"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "캡처할 수 있는 창 없음"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "휴지통으로 이동"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "没有可捕捉的窗口"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移到废纸篓"
           }
         }
       }
     },
-    "OK": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "OK"
+    "No capturable windows" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャプチャ可能なウインドウがありません"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "확인"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "캡처할 수 있는 창 없음"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "好"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有可捕捉的窗口"
           }
         }
       }
     },
-    "Off": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "オフ"
+    "Off" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフ"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "끔"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "끔"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "关闭"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭"
           }
         }
       }
     },
-    "Open Last Recording": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最後の録画を開く"
+    "OK" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "최근 녹화 열기"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "확인"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "打开最近的录制"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "好"
           }
         }
       }
     },
-    "Open Output Folder": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保存先フォルダを開く"
+    "Open Last Recording" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最後の録画を開く"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "저장 폴더 열기"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최근 녹화 열기"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "打开输出文件夹"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开最近的录制"
           }
         }
       }
     },
-    "Open Recording Toolbar": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画ツールバーを開く"
+    "Open Output Folder" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存先フォルダを開く"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화 툴바 열기"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장 폴더 열기"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "打开录制工具栏"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开输出文件夹"
           }
         }
       }
     },
-    "Open System Settings…": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "システム設定を開く…"
+    "Open Recording Toolbar" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画ツールバーを開く"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "시스템 설정 열기…"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화 툴바 열기"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "打开系统设置…"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开录制工具栏"
           }
         }
       }
     },
-    "Options": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "オプション"
+    "Open System Settings…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システム設定を開く…"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "옵션"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시스템 설정 열기…"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "选项"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开系统设置…"
           }
         }
       }
     },
-    "Output": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "出力"
+    "Options" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オプション"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "출력"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "옵션"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "输出"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选项"
           }
         }
       }
     },
-    "Pause": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一時停止"
+    "Output" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "出力"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "일시 정지"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "출력"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "暂停"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输出"
           }
         }
       }
     },
-    "Pause / Resume": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一時停止 / 再開"
+    "Pause" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一時停止"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "일시 정지 / 재개"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일시 정지"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "暂停 / 继续"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂停"
           }
         }
       }
     },
-    "Permission granted. You're ready to record.": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "許可されました。録画の準備ができました。"
+    "Pause / Resume" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一時停止 / 再開"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "권한이 허용되었습니다. 녹화할 준비가 되었습니다."
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "일시 정지 / 재개"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "权限已授予。可以开始录制了。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂停 / 继续"
           }
         }
       }
     },
-    "Play": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "再生"
+    "Permission granted. You're ready to record." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "許可されました。録画の準備ができました。"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "재생"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "권한이 허용되었습니다. 녹화할 준비가 되었습니다."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "播放"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "权限已授予。可以开始录制了。"
           }
         }
       }
     },
-    "Pointer style": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ポインタのスタイル"
+    "Play" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再生"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "포인터 스타일"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "재생"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "指针样式"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "播放"
           }
         }
       }
     },
-    "Preferences return to their defaults. Your recordings are not affected.": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "環境設定がデフォルトに戻ります。録画ファイルには影響しません。"
+    "Pointer style" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポインタのスタイル"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "환경설정이 기본값으로 돌아갑니다. 녹화 파일은 영향을 받지 않습니다."
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "포인터 스타일"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "偏好设置将恢复为默认值。您的录制不受影响。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指针样式"
           }
         }
       }
     },
-    "Quality": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "品質"
+    "Preferences return to their defaults. Your recordings are not affected." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "環境設定がデフォルトに戻ります。録画ファイルには影響しません。"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "품질"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "환경설정이 기본값으로 돌아갑니다. 녹화 파일은 영향을 받지 않습니다."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "质量"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "偏好设置将恢复为默认值。您的录制不受影响。"
           }
         }
       }
     },
-    "Quit Rokuga": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rokugaを終了"
+    "Quality" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "品質"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rokuga 종료"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "품질"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "退出 Rokuga"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "质量"
           }
         }
       }
     },
-    "Record": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画"
+    "Quit Rokuga" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rokugaを終了"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rokuga 종료"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "录制"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退出 Rokuga"
           }
         }
       }
     },
-    "Record Without Mic": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "マイクなしで録画"
+    "Record" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "마이크 없이 녹화"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "不使用麦克风录制"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制"
           }
         }
       }
     },
-    "Record microphone": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "マイクを録音"
+    "Record microphone" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイクを録音"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "마이크 녹음"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마이크 녹음"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "录制麦克风"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制麦克风"
           }
         }
       }
     },
-    "Record system audio": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "システムオーディオを録音"
+    "Record system audio" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システムオーディオを録音"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "시스템 오디오 녹음"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시스템 오디오 녹음"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "录制系统音频"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制系统音频"
           }
         }
       }
     },
-    "Record without the microphone, or grant access in System Settings.": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "マイクなしで録画するか、システム設定でアクセスを許可してください。"
+    "Record Without Mic" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイクなしで録画"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "마이크 없이 녹화하거나 시스템 설정에서 접근을 허용하세요."
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마이크 없이 녹화"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "不使用麦克风录制，或在系统设置中授予访问权限。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不使用麦克风录制"
           }
         }
       }
     },
-    "Recording": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画"
+    "Record without the microphone, or grant access in System Settings." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイクなしで録画するか、システム設定でアクセスを許可してください。"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마이크 없이 녹화하거나 시스템 설정에서 접근을 허용하세요."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "录制"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不使用麦克风录制，或在系统设置中授予访问权限。"
           }
         }
       }
     },
-    "Recording saved": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画を保存しました"
+    "Recording" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화 저장됨"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "录制已保存"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制"
           }
         }
       }
     },
-    "Recording saved — click to preview": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画を保存しました — クリックでプレビュー"
+    "Recording saved" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画を保存しました"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화 저장됨 — 클릭하여 미리보기"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화 저장됨"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "录制已保存 — 点击预览"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制已保存"
           }
         }
       }
     },
-    "Reset": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "リセット"
+    "Recording saved — click to preview" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画を保存しました — クリックでプレビュー"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "재설정"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화 저장됨 — 클릭하여 미리보기"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重置"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制已保存 — 点击预览"
           }
         }
       }
     },
-    "Reset All Settings…": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すべての設定をリセット…"
+    "Reset" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リセット"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "모든 설정 재설정…"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "재설정"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重置所有设置…"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重置"
           }
         }
       }
     },
-    "Reset all settings?": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すべての設定をリセットしますか？"
+    "Reset all settings?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての設定をリセットしますか？"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "모든 설정을 재설정하시겠습니까?"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 설정을 재설정하시겠습니까?"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "要重置所有设置吗？"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要重置所有设置吗？"
           }
         }
       }
     },
-    "Save & Quit": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保存して終了"
+    "Reset All Settings…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての設定をリセット…"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "저장 후 종료"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 설정 재설정…"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保存并退出"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重置所有设置…"
           }
         }
       }
     },
-    "Save As…": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "別名で保存…"
+    "Save & Quit" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存して終了"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "다른 이름으로 저장…"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장 후 종료"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "另存为…"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存并退出"
           }
         }
       }
     },
-    "Save to": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保存先"
+    "Save As…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "別名で保存…"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "저장 위치"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다른 이름으로 저장…"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保存到"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "另存为…"
           }
         }
       }
     },
-    "Screen Recording Permission": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "画面収録の許可"
+    "Save to" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存先"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "화면 기록 권한"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장 위치"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "屏幕录制权限"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存到"
           }
         }
       }
     },
-    "Screen recording permission required": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "画面収録の許可が必要です"
+    "Screen Recording Permission" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画面収録の許可"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "화면 기록 권한이 필요합니다"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "화면 기록 권한"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "需要屏幕录制权限"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "屏幕录制权限"
           }
         }
       }
     },
-    "Selected Area": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "選択範囲"
+    "Screen recording permission required" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画面収録の許可が必要です"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "선택 영역"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "화면 기록 권한이 필요합니다"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "所选区域"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要屏幕录制权限"
           }
         }
       }
     },
-    "Settings are locked while recording": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画中は設定がロックされます"
+    "Selected Area" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択範囲"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화 중에는 설정이 잠깁니다"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택 영역"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "录制期间设置已锁定"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选区域"
           }
         }
       }
     },
-    "Settings…": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "設定…"
+    "Settings are locked while recording" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画中は設定がロックされます"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "설정…"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화 중에는 설정이 잠깁니다"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "设置…"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制期间设置已锁定"
           }
         }
       }
     },
-    "Shortcuts": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ショートカット"
+    "Settings…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定…"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "단축키"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정…"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "快捷键"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置…"
           }
         }
       }
     },
-    "Show Cursor": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "カーソルを表示"
+    "Shortcuts" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ショートカット"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "커서 표시"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "단축키"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "显示光标"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快捷键"
           }
         }
       }
     },
-    "Show Floating Thumbnail": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フローティングサムネールを表示"
+    "Show cursor" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カーソルを表示"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "플로팅 썸네일 표시"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "커서 표시"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "显示浮动缩略图"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示光标"
           }
         }
       }
     },
-    "Show cursor": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "カーソルを表示"
+    "Show Cursor" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カーソルを表示"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "커서 표시"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "커서 표시"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "显示光标"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示光标"
           }
         }
       }
     },
-    "Show floating thumbnail after recording": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画後にフローティングサムネールを表示"
+    "Show Floating Thumbnail" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フローティングサムネールを表示"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화 후 플로팅 썸네일 표시"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "플로팅 썸네일 표시"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "录制后显示浮动缩略图"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示浮动缩略图"
           }
         }
       }
     },
-    "Start / Stop Recording": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画を開始 / 停止"
+    "Show floating thumbnail after recording" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画後にフローティングサムネールを表示"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화 시작 / 중지"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화 후 플로팅 썸네일 표시"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "开始 / 停止录制"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制后显示浮动缩略图"
           }
         }
       }
     },
-    "Start Recording": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画を開始"
+    "Start / Stop Recording" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画を開始 / 停止"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화 시작"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화 시작 / 중지"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "开始录制"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始 / 停止录制"
           }
         }
       }
     },
-    "Stop Recording": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画を停止"
+    "Start Recording" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画を開始"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화 중지"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화 시작"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "停止录制"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始录制"
           }
         }
       }
     },
-    "Stop recording and quit?": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画を停止して終了しますか？"
+    "Stop Recording" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画を停止"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화를 중지하고 종료하시겠습니까?"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화 중지"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "要停止录制并退出吗？"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止录制"
           }
         }
       }
     },
-    "System": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "システム"
+    "Stop recording and quit?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画を停止して終了しますか？"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "시스템"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화를 중지하고 종료하시겠습니까?"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "系统"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要停止录制并退出吗？"
           }
         }
       }
     },
-    "System Audio": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "システムオーディオ"
+    "System" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システム"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "시스템 오디오"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시스템"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "系统音频"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统"
           }
         }
       }
     },
-    "The current recording will be saved before Rokuga quits.": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rokugaが終了する前に現在の録画が保存されます。"
+    "System Audio" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システムオーディオ"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rokuga가 종료되기 전에 현재 녹화가 저장됩니다."
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시스템 오디오"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rokuga 退出前将保存当前录制。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统音频"
           }
         }
       }
     },
-    "The trimmed range has not been exported.": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "トリムした範囲はまだ書き出されていません。"
+    "The current recording will be saved before Rokuga quits." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rokugaが終了する前に現在の録画が保存されます。"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "다듬은 범위가 아직 내보내지지 않았습니다."
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rokuga가 종료되기 전에 현재 녹화가 저장됩니다."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "修剪的范围尚未导出。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rokuga 退出前将保存当前录制。"
           }
         }
       }
     },
-    "Timeline zoom": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "タイムラインのズーム"
+    "The trimmed range has not been exported." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トリムした範囲はまだ書き出されていません。"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "타임라인 확대/축소"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다듬은 범위가 아직 내보내지지 않았습니다."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "时间线缩放"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修剪的范围尚未导出。"
           }
         }
       }
     },
-    "Trim timeline": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "トリムタイムライン"
+    "Timeline zoom" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タイムラインのズーム"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "다듬기 타임라인"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "타임라인 확대/축소"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "修剪时间线"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "时间线缩放"
           }
         }
       }
     },
-    "Use Arrow keys to nudge the start handle by one frame, Option-Arrow for the end handle": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "矢印キーで開始ハンドルを1フレームずつ移動、Option+矢印で終了ハンドルを移動"
+    "Trim timeline" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トリムタイムライン"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "화살표 키로 시작 핸들을 한 프레임씩 이동, Option+화살표로 끝 핸들 이동"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다듬기 타임라인"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "使用方向键将起始手柄微移一帧，Option+方向键移动结束手柄"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修剪时间线"
           }
         }
       }
     },
-    "Welcome to Rokuga": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rokugaへようこそ"
+    "Use Arrow keys to nudge the start handle by one frame, Option-Arrow for the end handle" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "矢印キーで開始ハンドルを1フレームずつ移動、Option+矢印で終了ハンドルを移動"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rokuga에 오신 것을 환영합니다"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "화살표 키로 시작 핸들을 한 프레임씩 이동, Option+화살표로 끝 핸들 이동"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "欢迎使用 Rokuga"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用方向键将起始手柄微移一帧，Option+方向键移动结束手柄"
           }
         }
       }
     },
-    "Where should recordings go?": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画の保存先は？"
+    "Welcome to Rokuga" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rokugaへようこそ"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화 파일을 어디에 저장할까요?"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rokuga에 오신 것을 환영합니다"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "录制文件保存到哪里？"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "欢迎使用 Rokuga"
           }
         }
       }
     },
-    "Window": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ウインドウ"
+    "Where should recordings go?" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画の保存先は？"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "창"
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "녹화 파일을 어디에 저장할까요?"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "窗口"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制文件保存到哪里？"
           }
         }
       }
     },
-    "macOS requires you to allow screen recording in System Settings, then relaunch Rokuga.": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "macOSではシステム設定で画面収録を許可してから、Rokugaを再起動する必要があります。"
+    "Window" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウインドウ"
           }
         },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "macOS에서는 시스템 설정에서 화면 기록을 허용한 다음 Rokuga를 다시 실행해야 합니다."
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "창"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "macOS 要求您在系统设置中允许屏幕录制，然后重新启动 Rokuga。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "窗口"
           }
         }
       }
     }
   },
-  "version": "1.1"
+  "version" : "1.1"
 }
