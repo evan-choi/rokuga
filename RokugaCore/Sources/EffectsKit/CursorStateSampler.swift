@@ -54,9 +54,8 @@ public final class CursorStateSampler: CursorStateSampling, @unchecked Sendable 
         ) { [weak self] _ in
             guard let self else { return }
             let location = CGEvent(source: nil)?.location ?? .zero
-            self.lock.withLock {
-                self.clicks.append((time: ProcessInfo.processInfo.systemUptime, location: location))
-                if self.clicks.count > 16 { self.clicks.removeFirst() }
+            lock.withLock {
+                self.clicks = [(time: ProcessInfo.processInfo.systemUptime, location: location)]
             }
         }
     }
@@ -99,9 +98,11 @@ public final class CursorStateSampler: CursorStateSampling, @unchecked Sendable 
     }
 }
 
-/// Expanding-ring click animation timeline (pure math, unit tested).
+/// Native-style click indicator timeline (pure math, unit tested).
 public enum ClickRipple {
     public static let lifetime: TimeInterval = 0.5
+    static let radius: CGFloat = 40
+    static let fadeStartProgress = 0.4
 
     /// Progress values in 0...1 for clicks still animating at `now`.
     public static func progresses(
@@ -113,5 +114,13 @@ public enum ClickRipple {
             guard age >= 0, age < lifetime else { return nil }
             return (progress: age / lifetime, location: click.location)
         }
+    }
+
+    static func opacity(at progress: Double) -> CGFloat {
+        let clamped = min(max(progress, 0), 1)
+        guard clamped > fadeStartProgress else { return 1 }
+        let fadeProgress = (clamped - fadeStartProgress) / (1 - fadeStartProgress)
+        let eased = fadeProgress * fadeProgress * (3 - 2 * fadeProgress)
+        return CGFloat(1 - eased)
     }
 }
