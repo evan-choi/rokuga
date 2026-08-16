@@ -131,7 +131,6 @@ struct ShortcutsPane: View {
     var body: some View {
         Form {
             KeyboardShortcuts.Recorder("Open Recording Toolbar", name: .summonToolbar)
-            KeyboardShortcuts.Recorder("Start / Stop Recording", name: .toggleRecording)
         }
         .padding(20)
     }

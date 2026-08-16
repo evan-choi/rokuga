@@ -8,100 +8,108 @@
 
 No watermarks. No time limits. No accounts. No paywalls.
 
+[![CI](https://github.com/evan-choi/rokuga/actions/workflows/ci.yml/badge.svg)](https://github.com/evan-choi/rokuga/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-macOS%2013.3%2B-black?logo=apple)](https://www.apple.com/macos/)
 [![Swift](https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white)](https://swift.org)
-[![Status](https://img.shields.io/badge/Status-Design%20%26%20Spec-yellow)](#project-status)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
+[![Status](https://img.shields.io/badge/Status-Pre--release-yellow)](#project-status)
 
 </div>
 
----
+> Rokuga is under active development. There is no signed public build yet, but the app can be built from source.
 
 ## Why Rokuga?
 
-Commercial screen recorders charge a subscription for what macOS can do natively — and bury it under heavy UIs, launchers, and license nags. Rokuga takes the opposite path:
+Rokuga uses Apple's screen capture and media frameworks directly. It runs as a menu bar app and writes recordings to a folder chosen by the user.
 
-- **Free forever, Apache 2.0 licensed** — every feature, no strings attached
-- **100% native** — Swift + SwiftUI on ScreenCaptureKit, hardware-encoded via VideoToolbox
-- **No main window** — a single floating glass toolbar, summoned by a shortcut, that gets out of your way
-- **Finder is the library** — recordings save straight to a folder you own; no proprietary library to import from or export out of
+- Native Swift and SwiftUI app using ScreenCaptureKit and AVFoundation
+- Floating recording toolbar instead of a main library window
+- Recordings stay in a normal Finder folder
+- No account, network service, watermark, or recording limit
 
-## Features
+## Current capabilities
 
-- 🖥️ **Three recording modes** — selected area, full screen, and window
-- 🎙️ **Audio capture** — system audio and microphone, individually toggleable
-- 🖱️ **Mouse effects** — cursor highlight and click visualization, applied live
-- ✂️ **Built-in trim editor** — QuickTime-grammar yellow trim bar, trackpad-native: pinch to zoom the timeline, two-finger scroll to scrub, full mouse parity
-- ⚡ **Zero-lag pipeline** — ScreenCaptureKit → VideoToolbox hardware encoding, engineered against explicit performance budgets
-- 📸 **Native post-recording flow** — floating thumbnail → preview panel (edit / delete / done), exactly like the system screenshot grammar
-- 🫥 **Capture exclusion** — Rokuga's own UI never appears in your recordings
-- ⌨️ **Global shortcut** — <kbd>⌘⇧6</kbd> to start/stop by default, fully configurable
-- 🎨 **Dark glass UI** — a chic dark-tinted glass theme on the surfaces Rokuga owns; everything else stays purely system-native
-- 🌏 **Localized** — English, 한국어, 日本語, 简体中文
+- Selected-area, full-screen, and individual-window capture
+- Driver-free system audio capture, independently toggleable and excluded from Rokuga's own sounds
+- H.264 and HEVC encoding to MP4 or MOV at up to 5K and 60 fps
+- Cursor visibility, cursor highlight, and click effects rendered into the recording
+- Floating post-recording thumbnail, preview panel, and trim editor
+- Capture exclusion for Rokuga windows and optional desktop-icon exclusion
+- English, Korean, Japanese, and Simplified Chinese localization
+
+See [the implementation task list](openspec/changes/add-core-screen-recording/tasks.md) for the current status of each capability.
+
+### Known limitations
+
+- Microphone capture and system-audio/microphone mixing are not connected to the recording session yet.
+- Selected-area recording supports a movable, resizable crop. Drawing a new marquee, Retina pixel labels, and the pixel loupe remain in progress.
+- Release signing, notarization, and the full hardware and macOS QA matrix are not complete.
 
 ## Requirements
 
+To run Rokuga:
+
 - macOS 13.3 (Ventura) or later
-- Screen Recording permission (and Microphone, if you record voice)
+- Screen Recording permission
 
-## Installation
+To build Rokuga:
 
-> 🚧 Rokuga is not released yet — it is currently in the design & specification phase. Watch the repo to get notified of the first build.
+- Xcode 16
+- XcodeGen
 
-Planned channels: GitHub Releases (signed & notarized `.dmg`) and Homebrew (`brew install --cask rokuga`).
+SwiftLint and SwiftFormat are required only for the same checks used by CI.
+
+## Build from source
+
+```bash
+brew install xcodegen swiftlint swiftformat
+git clone https://github.com/evan-choi/rokuga.git
+cd rokuga
+xcodegen generate
+open Rokuga.xcodeproj
+```
+
+The default ad-hoc signature does not require an Apple account. macOS may reset Screen Recording and Microphone permissions after each rebuild. Run `./scripts/setup-dev-signing.sh` once to create a local self-signed identity and keep permissions between builds.
 
 ## Usage
 
-| Action | Default |
-| --- | --- |
-| Start / stop recording | <kbd>⌘⇧6</kbd> |
-| Pause / resume | toolbar · menu bar item |
-| Cancel countdown / close preview | <kbd>Esc</kbd> |
-| Open last recording | menu bar → *Open Last Recording* |
+1. Press <kbd>⌘⇧6</kbd> or choose **Open Recording Toolbar** from the menu bar.
+2. Choose Selected Area, Full Screen, or Window.
+3. Set the countdown, system audio, output, and cursor options.
+4. Start from the toolbar or the active Full Screen or Window selection layer.
+5. Stop from the elapsed-time control in the menu bar.
+6. Use the post-recording thumbnail to preview, trim, delete, or keep the file.
 
-1. Hit <kbd>⌘⇧6</kbd> — the glass toolbar appears at the bottom-center of your screen
-2. Pick a mode (area / full screen / window), toggle audio, and record
-3. While recording, the system menu bar shows the state — red dot, elapsed time, pause/stop
-4. When you stop, a thumbnail slides in at the bottom-right: click it to preview, trim, delete, or keep
+<kbd>Esc</kbd> closes the toolbar, cancels an active countdown, or closes the preview. Rokuga has no global recording start/stop shortcut.
 
 ## Project status
 
-Rokuga is being built **spec-first** with [OpenSpec](https://github.com/Fission-AI/OpenSpec): every capability is fully specified and design-reviewed before implementation.
+The app shell, recording pipeline, three capture modes, system audio output, post-recording flow, and trim editor are implemented. Unit tests cover the core state machine, encoder, audio output, effects, settings, and trim operations. CI builds the app and runs tests on macOS 14 and 15.
 
-- ✅ Product & UX research
-- ✅ 13 capability specs (recording, audio, trimming, performance, permissions, …) — validated `--strict`
-- ✅ UI design — 12 mockup sets, native dark glass direction (`design/mockups/`)
-- 🚧 Implementation — not started
-- ⬜ First public build
+Rokuga is still pre-release. Remaining work is tracked in [`openspec/changes/add-core-screen-recording/tasks.md`](openspec/changes/add-core-screen-recording/tasks.md); the unchecked items are not considered complete.
 
 ## Development
 
+Run the core test suite:
+
 ```bash
-git clone https://github.com/evan-choi/rokuga.git
-cd rokuga
-
-# Generate the Xcode project and build — works out of the box,
-# no Apple account or certificate required (ad-hoc signing)
-xcodegen generate
-open Rokuga.xcodeproj
-
-# Explore the specs
-openspec list
-openspec show add-core-screen-recording
-
-# Browse the design mockups
-open design/mockups/index.html
+(cd RokugaCore && swift test)
 ```
 
-> **Tip for regular contributors:** ad-hoc signing resets macOS privacy
-> permissions (Screen Recording, Microphone) on every rebuild. Run
-> `./scripts/setup-dev-signing.sh` once to create a local self-signed
-> certificate — no Apple ID needed — so permissions persist across builds.
+Run the repository checks:
+
+```bash
+swiftlint lint --strict
+swiftformat --lint .
+python3 scripts/lint-localization.py
+./scripts/audit-zero-copy.sh
+```
+
+Browse the design mockups with `open design/mockups/index.html`.
 
 ## Contributing
 
-Contributions are welcome! The spec is the source of truth — start by reading the active change under `openspec/changes/`, then open an issue or PR. Spec change proposals are just as valuable as code.
+Read the active change under [`openspec/changes/add-core-screen-recording/`](openspec/changes/add-core-screen-recording/) before changing behavior. Update the relevant spec and task status with the implementation, then run the tests and repository checks above before opening a pull request.
 
 ## License
 
