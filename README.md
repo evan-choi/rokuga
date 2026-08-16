@@ -1,6 +1,6 @@
 <div align="center">
 
-# <img src="docs/logo.png" width="40" align="middle" alt="Rokuga logo"> Rokuga
+# <picture><source media="(prefers-color-scheme: dark)" srcset="docs/wordmark-dark.png"><img src="docs/wordmark-light.png" width="159" alt="Rokuga"></picture>
 
 **A free, native, open-source screen recorder for macOS.**
 
