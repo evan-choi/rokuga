@@ -15,12 +15,19 @@ packages:
     url: https://github.com/sindresorhus/KeyboardShortcuts
     from: 2.0.0
 
+# Signing lives in Configs/Signing.xcconfig (ad-hoc by default so anyone can
+# clone & build; run scripts/setup-dev-signing.sh for a persistent identity).
+configFiles:
+  Debug: Configs/Signing.xcconfig
+  Release: Configs/Signing.xcconfig
+
 settings:
   base:
     SWIFT_VERSION: "5.0"
     MACOSX_DEPLOYMENT_TARGET: "13.3"
     DEAD_CODE_STRIPPING: YES
-    CODE_SIGN_STYLE: Automatic
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
   configs:
     # Hardened runtime blocks debugger attach; Release-only (Debug keeps get-task-allow).
     Debug:
@@ -49,8 +56,8 @@ targets:
       properties:
         CFBundleName: Rokuga
         CFBundleDisplayName: Rokuga
-        CFBundleShortVersionString: "0.1.0"
-        CFBundleVersion: "1"
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSMinimumSystemVersion: "13.3"
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.video

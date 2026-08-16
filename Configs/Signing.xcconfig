@@ -1,0 +1,19 @@
+// Code signing — open-source friendly defaults.
+//
+// Default is ad-hoc signing ("-"): anyone can clone and build immediately,
+// with no Apple account and no certificate.
+//
+// Trade-off: ad-hoc signatures have no stable identity, so macOS TCC grants
+// (Screen Recording, Microphone) are invalidated on every rebuild and you get
+// re-prompted. Fine for a quick run; annoying for day-to-day development.
+//
+// For a persistent identity, run once:
+//
+//   ./scripts/setup-dev-signing.sh
+//
+// It creates a local self-signed "Rokuga Dev" certificate (no Apple ID needed)
+// and writes Signing.local.xcconfig (gitignored) to use it.
+CODE_SIGN_STYLE = Manual
+CODE_SIGN_IDENTITY = -
+
+#include? "Signing.local.xcconfig"

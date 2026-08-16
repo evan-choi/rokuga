@@ -5,3 +5,4 @@ xcuserdata/
 *.xcuserstate
 .swiftpm/
 artifacts/
+Configs/Signing.local.xcconfig
