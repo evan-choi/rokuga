@@ -22,6 +22,26 @@ enum OutputFolderStore {
         return folder
     }
 
+    /// User-facing path such as `~/Movies/Rokuga`. Inside the sandbox, `currentFolder()`
+    /// returns the container path (`~/Library/Containers/…/Data/Movies/Rokuga`) whose
+    /// `Movies` component is a symlink to the real folder, so resolve it before abbreviating.
+    static func displayPath(for url: URL = currentFolder()) -> String {
+        let resolved = url.resolvingSymlinksInPath().path
+        let home = realHomeDirectory()
+        if resolved == home { return "~" }
+        if resolved.hasPrefix(home + "/") {
+            return "~" + resolved.dropFirst(home.count)
+        }
+        return resolved
+    }
+
+    private static func realHomeDirectory() -> String {
+        if let dir = getpwuid(getuid())?.pointee.pw_dir {
+            return String(cString: dir)
+        }
+        return NSHomeDirectory()
+    }
+
     static func setFolder(_ url: URL, settings: SettingsStore = .shared) {
         settings.outputFolderBookmark = try? url.bookmarkData(
             options: [.withSecurityScope],

@@ -102,7 +102,7 @@ final class SettingsModel: ObservableObject {
     }
 
     var outputFolderPath: String {
-        OutputFolderStore.currentFolder().path
+        OutputFolderStore.displayPath()
     }
 
     func chooseOutputFolder() {
