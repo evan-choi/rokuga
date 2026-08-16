@@ -33,8 +33,8 @@ public struct FrameGeometry: Equatable, Sendable {
 
 /// Metal-backed cursor compositor (task 6.1). Renders cursor/halo/click layers into
 /// recorded frames only — the live screen is never touched. The full-resolution frame
-/// stays on the GPU (CoreImage over IOSurface); only the tiny cursor overlay (~256 px)
-/// is rasterized on the CPU each frame.
+/// stays on the GPU (CoreImage over IOSurface); only small cursor/effect overlay tiles
+/// are rasterized on the CPU each frame.
 public final class CursorCompositor: @unchecked Sendable {
     private let options: CursorEffectOptions
     private let geometry: FrameGeometry
@@ -85,27 +85,28 @@ public final class CursorCompositor: @unchecked Sendable {
         defer { budget.record(frameSeconds: CFAbsoluteTimeGetCurrent() - started) }
 
         let snapshot = sampler.snapshot()
-        guard let overlay = CursorOverlayRenderer.render(
+        let overlays = CursorOverlayRenderer.render(
             snapshot: snapshot,
             options: options,
             geometry: geometry,
             level: level,
             now: ProcessInfo.processInfo.systemUptime
-        ) else {
-            return sampleBuffer
-        }
+        )
+        guard !overlays.isEmpty else { return sampleBuffer }
 
         guard let output = makeOutputBuffer(like: imageBuffer) else { return sampleBuffer }
 
         let base = CIImage(cvPixelBuffer: imageBuffer)
         let frameHeight = CGFloat(CVPixelBufferGetHeight(imageBuffer))
-        // CoreImage is bottom-left origin; overlay rect comes in top-left pixel coordinates.
-        let overlayImage = CIImage(cgImage: overlay.image)
-            .transformed(by: CGAffineTransform(
-                translationX: overlay.rect.minX,
-                y: frameHeight - overlay.rect.maxY
-            ))
-        let composited = overlayImage.composited(over: base)
+        let composited = overlays.reduce(base) { image, overlay in
+            // CoreImage is bottom-left origin; overlay rect comes in top-left pixel coordinates.
+            let overlayImage = CIImage(cgImage: overlay.image)
+                .transformed(by: CGAffineTransform(
+                    translationX: overlay.rect.minX,
+                    y: frameHeight - overlay.rect.maxY
+                ))
+            return overlayImage.composited(over: image)
+        }
         context.render(composited, to: output)
 
         return retimedSampleBuffer(from: sampleBuffer, imageBuffer: output) ?? sampleBuffer
@@ -120,7 +121,7 @@ public final class CursorCompositor: @unchecked Sendable {
                 kCVPixelBufferWidthKey as String: width,
                 kCVPixelBufferHeightKey as String: height,
                 kCVPixelBufferIOSurfacePropertiesKey as String: [:],
-                kCVPixelBufferMetalCompatibilityKey as String: true,
+                kCVPixelBufferMetalCompatibilityKey as String: true
             ]
             CVPixelBufferPoolCreate(nil, nil, attributes as CFDictionary, &pool)
         }
@@ -159,7 +160,7 @@ public final class CursorCompositor: @unchecked Sendable {
     }
 }
 
-/// CPU rasterizer for the small cursor overlay tile.
+/// CPU rasterizer for small cursor and click-effect overlay tiles.
 enum CursorOverlayRenderer {
     struct Overlay {
         let image: CGImage
@@ -173,47 +174,71 @@ enum CursorOverlayRenderer {
         geometry: FrameGeometry,
         level: FrameBudgetMonitor.Level,
         now: TimeInterval
-    ) -> Overlay? {
-        guard let center = geometry.pixelPosition(of: snapshot.location) else { return nil }
-
+    ) -> [Overlay] {
         let scale = geometry.scale
-        let tileSide: CGFloat = 256 * max(scale, 1)
-        let tileOrigin = CGPoint(x: center.x - tileSide / 2, y: center.y - tileSide / 2)
-
-        guard let ctx = CGContext(
-            data: nil,
-            width: Int(tileSide),
-            height: Int(tileSide),
-            bitsPerComponent: 8,
-            bytesPerRow: 0,
-            space: CGColorSpace(name: CGColorSpace.sRGB)!,
-            bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue
-        ) else { return nil }
-
-        // CGContext is bottom-left origin; flip so drawing math is top-left like the frame.
-        ctx.translateBy(x: 0, y: tileSide)
-        ctx.scaleBy(x: 1, y: -1)
-
-        let local = CGPoint(x: tileSide / 2, y: tileSide / 2)
+        var overlays: [Overlay] = []
 
         if options.animateClicks, level < .noClickAnimations {
-            for ripple in ClickRipple.progresses(clicks: snapshot.clicks, now: now) {
-                guard let ripplePixel = geometry.pixelPosition(of: ripple.location) else { continue }
-                let rippleLocal = CGPoint(
-                    x: ripplePixel.x - tileOrigin.x,
-                    y: ripplePixel.y - tileOrigin.y
-                )
-                let radius = (10 + 34 * ripple.progress) * scale
-                ctx.setStrokeColor(CGColor(red: 1, green: 0.85, blue: 0.2, alpha: 0.85 * (1 - ripple.progress)))
-                ctx.setLineWidth(2.5 * scale)
-                ctx.strokeEllipse(in: CGRect(
-                    x: rippleLocal.x - radius,
-                    y: rippleLocal.y - radius,
-                    width: radius * 2,
-                    height: radius * 2
-                ))
+            if let ripple = ClickRipple.progresses(clicks: snapshot.clicks, now: now).last,
+               let center = geometry.pixelPosition(of: ripple.location),
+               let click = renderClick(center: center, progress: ripple.progress, scale: scale) {
+                overlays.append(click)
             }
         }
+
+        if let cursor = renderCursor(snapshot: snapshot, options: options, geometry: geometry, level: level, scale: scale) {
+            overlays.append(cursor)
+        }
+        return overlays
+    }
+
+    private static func renderClick(center: CGPoint, progress: Double, scale: CGFloat) -> Overlay? {
+        let radius = ClickRipple.radius * scale
+        let outerLineWidth = 4 * scale
+        let tileDimension = Int(ceil(radius * 2 + outerLineWidth + 2))
+        let tileSide = CGFloat(tileDimension)
+        let tileOrigin = CGPoint(x: center.x - tileSide / 2, y: center.y - tileSide / 2)
+
+        guard let ctx = makeContext(tileDimension: tileDimension) else { return nil }
+
+        let local = CGPoint(x: tileSide / 2, y: tileSide / 2)
+        let ringRect = CGRect(
+            x: local.x - radius,
+            y: local.y - radius,
+            width: radius * 2,
+            height: radius * 2
+        )
+        let opacity = ClickRipple.opacity(at: progress)
+
+        // Match macOS screen recording's black ring with a thin white outline.
+        ctx.setStrokeColor(CGColor(gray: 1, alpha: opacity))
+        ctx.setLineWidth(outerLineWidth)
+        ctx.strokeEllipse(in: ringRect)
+        ctx.setStrokeColor(CGColor(gray: 0, alpha: opacity))
+        ctx.setLineWidth(2 * scale)
+        ctx.strokeEllipse(in: ringRect)
+
+        return makeOverlay(context: ctx, origin: tileOrigin, dimension: tileDimension)
+    }
+
+    private static func renderCursor(
+        snapshot: CursorSnapshot,
+        options: CursorEffectOptions,
+        geometry: FrameGeometry,
+        level: FrameBudgetMonitor.Level,
+        scale: CGFloat
+    ) -> Overlay? {
+        guard options.showCursor || (options.highlight && level < .noHighlight),
+              let center = geometry.pixelPosition(of: snapshot.location)
+        else { return nil }
+
+        let tileDimension = Int(ceil(256 * max(scale, 1)))
+        let tileSide = CGFloat(tileDimension)
+        let tileOrigin = CGPoint(x: center.x - tileSide / 2, y: center.y - tileSide / 2)
+
+        guard let ctx = makeContext(tileDimension: tileDimension) else { return nil }
+
+        let local = CGPoint(x: tileSide / 2, y: tileSide / 2)
 
         if options.highlight, level < .noHighlight {
             let radius = 22 * scale
@@ -227,36 +252,72 @@ enum CursorOverlayRenderer {
         }
 
         if options.showCursor {
-            switch options.pointerStyle {
-            case .dot:
-                let radius = 7 * scale
-                ctx.setFillColor(CGColor(red: 1, green: 0.23, blue: 0.19, alpha: 0.95))
-                ctx.fillEllipse(in: CGRect(
-                    x: local.x - radius,
-                    y: local.y - radius,
-                    width: radius * 2,
-                    height: radius * 2
-                ))
-            case .system:
-                if let image = snapshot.image {
-                    let size = CGSize(
-                        width: snapshot.imagePointSize.width * scale,
-                        height: snapshot.imagePointSize.height * scale
-                    )
-                    let origin = CGPoint(
-                        x: local.x - snapshot.imageHotSpot.x * scale,
-                        y: local.y - snapshot.imageHotSpot.y * scale
-                    )
-                    ctx.saveGState()
-                    ctx.translateBy(x: origin.x, y: origin.y + size.height)
-                    ctx.scaleBy(x: 1, y: -1)
-                    ctx.draw(image, in: CGRect(origin: .zero, size: size))
-                    ctx.restoreGState()
-                }
-            }
+            drawCursor(snapshot: snapshot, options: options, local: local, scale: scale, context: ctx)
         }
 
+        return makeOverlay(context: ctx, origin: tileOrigin, dimension: tileDimension)
+    }
+
+    private static func drawCursor(
+        snapshot: CursorSnapshot,
+        options: CursorEffectOptions,
+        local: CGPoint,
+        scale: CGFloat,
+        context ctx: CGContext
+    ) {
+        switch options.pointerStyle {
+        case .dot:
+            let radius = 7 * scale
+            ctx.setFillColor(CGColor(red: 1, green: 0.23, blue: 0.19, alpha: 0.95))
+            ctx.fillEllipse(in: CGRect(
+                x: local.x - radius,
+                y: local.y - radius,
+                width: radius * 2,
+                height: radius * 2
+            ))
+        case .system:
+            guard let image = snapshot.image else { return }
+            let size = CGSize(
+                width: snapshot.imagePointSize.width * scale,
+                height: snapshot.imagePointSize.height * scale
+            )
+            let origin = CGPoint(
+                x: local.x - snapshot.imageHotSpot.x * scale,
+                y: local.y - snapshot.imageHotSpot.y * scale
+            )
+            ctx.saveGState()
+            ctx.translateBy(x: origin.x, y: origin.y + size.height)
+            ctx.scaleBy(x: 1, y: -1)
+            ctx.draw(image, in: CGRect(origin: .zero, size: size))
+            ctx.restoreGState()
+        }
+    }
+
+    private static func makeContext(tileDimension: Int) -> CGContext? {
+        let tileSide = CGFloat(tileDimension)
+
+        guard let ctx = CGContext(
+            data: nil,
+            width: tileDimension,
+            height: tileDimension,
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: CGColorSpace(name: CGColorSpace.sRGB)!,
+            bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue
+        ) else { return nil }
+
+        // CGContext is bottom-left origin; flip so drawing math is top-left like the frame.
+        ctx.translateBy(x: 0, y: tileSide)
+        ctx.scaleBy(x: 1, y: -1)
+        ctx.setAllowsAntialiasing(true)
+        ctx.setShouldAntialias(true)
+        ctx.interpolationQuality = .high
+        return ctx
+    }
+
+    private static func makeOverlay(context ctx: CGContext, origin: CGPoint, dimension: Int) -> Overlay? {
         guard let image = ctx.makeImage() else { return nil }
-        return Overlay(image: image, rect: CGRect(origin: tileOrigin, size: CGSize(width: tileSide, height: tileSide)))
+        let side = CGFloat(dimension)
+        return Overlay(image: image, rect: CGRect(origin: origin, size: CGSize(width: side, height: side)))
     }
 }
