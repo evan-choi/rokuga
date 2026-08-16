@@ -9,10 +9,12 @@ struct RokugaApp: App {
     @ObservedObject private var appState = AppState.shared
 
     var body: some Scene {
-        MenuBarExtra {
+        // While recording, this SwiftUI item is swapped out for RecordingStatusItemController's
+        // plain NSStatusItem so a single click can stop immediately (menus can't do that).
+        MenuBarExtra(isInserted: .constant(!appState.recordingState.isActive)) {
             MenuBarContentView(appState: appState)
         } label: {
-            MenuBarLabel(appState: appState)
+            Image(systemName: "record.circle")
         }
         .menuBarExtraStyle(.menu)
 
@@ -23,10 +25,13 @@ struct RokugaApp: App {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    private var recordingStatusItem: RecordingStatusItemController?
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         Task { @MainActor in
             ThemeApplier.apply(SettingsStore.shared.theme)
+            recordingStatusItem = RecordingStatusItemController(appState: .shared)
             _ = L10nScreenshotRunner.runIfRequested()
         }
     }
@@ -53,35 +58,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
-struct MenuBarLabel: View {
-    @ObservedObject var appState: AppState
-
-    var body: some View {
-        if appState.recordingState.isActive {
-            HStack(spacing: 4) {
-                Image(systemName: appState.recordingState == .paused ? "pause.circle.fill" : "record.circle.fill")
-                Text(appState.elapsedLabel)
-                    .monospacedDigit()
-            }
-        } else {
-            Image(systemName: "record.circle")
-        }
-    }
-}
-
 struct MenuBarContentView: View {
     @ObservedObject var appState: AppState
 
     var body: some View {
-        if appState.recordingState.isActive {
-            recordingMenu
-        } else {
-            idleMenu
-        }
-    }
-
-    @ViewBuilder
-    private var idleMenu: some View {
         Button("Open Recording Toolbar") {
             appState.summonToolbar()
         }
@@ -108,23 +88,6 @@ struct MenuBarContentView: View {
             NSApp.terminate(nil)
         }
         .keyboardShortcut("q", modifiers: .command)
-    }
-
-    @ViewBuilder
-    private var recordingMenu: some View {
-        Text(verbatim: "● \(appState.elapsedLabel)")
-
-        Divider()
-
-        Button(appState.recordingState == .paused ? "Resume Recording" : "Pause Recording") {
-            appState.pauseOrResume()
-        }
-        .keyboardShortcut("4", modifiers: [.shift, .command])
-
-        Button("Stop Recording") {
-            appState.stopRecording()
-        }
-        .keyboardShortcut("2", modifiers: [.shift, .command])
     }
 }
 

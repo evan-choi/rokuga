@@ -39,9 +39,11 @@
 		EACF2958F8EF366CDBF97860 /* ToolbarPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209F6E4825E2D2B4012A1650 /* ToolbarPanelController.swift */; };
 		F0A29E7C0C1A4192C217804C /* NotificationFallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B5A2FBC1F508081A6907CD6 /* NotificationFallback.swift */; };
 		F9A490C63F12EA1C7C2B1EC3 /* GlassBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB554C599BD6B3D70D9A193 /* GlassBackground.swift */; };
+		FEAEA0D12C5A71B83D46A138 /* RecordingStatusItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0805715E489ACC2428F5C810 /* RecordingStatusItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0805715E489ACC2428F5C810 /* RecordingStatusItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingStatusItem.swift; sourceTree = "<group>"; };
 		14B4579472853FA6D7E3849D /* CapturePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturePanel.swift; sourceTree = "<group>"; };
 		1CB554C599BD6B3D70D9A193 /* GlassBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassBackground.swift; sourceTree = "<group>"; };
 		209F6E4825E2D2B4012A1650 /* ToolbarPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarPanelController.swift; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 				A23E6120208B1DF63AFF7F8A /* Hotkeys.swift */,
 				507D5C4912E93D0B81B378FB /* L10nScreenshotRunner.swift */,
 				F0CCD7F0B41B156B9CCCD698 /* OutputFolderStore.swift */,
+				0805715E489ACC2428F5C810 /* RecordingStatusItem.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -326,6 +329,7 @@
 				51D79BC09766CBB6D5798C29 /* OptionsPopoverView.swift in Sources */,
 				7651654E709DF4674A02BCB0 /* OutputFolderStore.swift in Sources */,
 				AB89462EBDAD15F328A015C5 /* PreviewPanelController.swift in Sources */,
+				FEAEA0D12C5A71B83D46A138 /* RecordingStatusItem.swift in Sources */,
 				5712F500502EC549E5B463BC /* RegionSelectionController.swift in Sources */,
 				417B48F5765C65ACAF3F1974 /* RokugaApp.swift in Sources */,
 				E3DD77C11373F432255B93CF /* SelectionOverlays.swift in Sources */,

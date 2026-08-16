@@ -59,7 +59,6 @@ final class AppState: ObservableObject {
     private func presentOnboarding(steps: [OnboardingModel.Step]) {
         onboardingController = OnboardingController(steps: steps) { [weak self] in
             self?.onboardingController = nil
-            self?.summonToolbar()
         }
         onboardingController?.present()
     }
@@ -111,16 +110,17 @@ final class AppState: ObservableObject {
         case .recording:
             countdownController?.dismiss()
             countdownController = nil
+            onboardingController?.completeSilently()
+            onboardingController = nil
             startElapsedTimer()
-        case .paused:
-            stopElapsedTimer(freeze: true)
         case .idle, .finishing:
             countdownController?.dismiss()
             countdownController = nil
             punchController?.close()
             punchController = nil
             stopElapsedTimer(freeze: false)
-        case .preparing, .countdown:
+        case .preparing, .countdown, .paused:
+            // Pause is not surfaced in the UI; the state remains only as a core capability.
             break
         }
     }
@@ -128,6 +128,12 @@ final class AppState: ObservableObject {
     // MARK: Toolbar
 
     func summonToolbar() {
+        // The final onboarding page asks the user to press this very shortcut, so acting on
+        // it completes onboarding; earlier pages stay up (permission setup may be unfinished).
+        if let onboarding = onboardingController, onboarding.isShowingGetStarted {
+            onboarding.completeSilently()
+            onboardingController = nil
+        }
         guard !recordingState.isActive else { return }
         if toolbarController == nil {
             toolbarController = ToolbarPanelController(appState: self)
@@ -310,16 +316,6 @@ final class AppState: ObservableObject {
                 startDiskWatch(outputURL: outputURL)
             } catch {
                 NSSound.beep()
-            }
-        }
-    }
-
-    func pauseOrResume() {
-        Task {
-            if recordingState == .recording {
-                try? await coordinator.pause()
-            } else if recordingState == .paused {
-                try? await coordinator.resume()
             }
         }
     }
