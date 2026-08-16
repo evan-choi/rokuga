@@ -28,6 +28,7 @@
 		AB89462EBDAD15F328A015C5 /* PreviewPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC9F65E55E649C93CCD296A /* PreviewPanelController.swift */; };
 		B3A15BE4EE95F0BAA7B140C0 /* TrimKit in Frameworks */ = {isa = PBXBuildFile; productRef = 370EC52E590B15D13ED8CCF1 /* TrimKit */; };
 		B73E06B00EC0C2F50C5A756A /* OnboardingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4E0974B9E2D75C0ED0FF8C /* OnboardingController.swift */; };
+		BD7AC692895C63B00536B311 /* AreaSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D03C7DA42BA531465124E3A /* AreaSelectionView.swift */; };
 		C3438E64D2BCDE70E03BE995 /* CaptureKit in Frameworks */ = {isa = PBXBuildFile; productRef = 361978BC34CB105D30F7CD37 /* CaptureKit */; };
 		C3512B81D65D879DE14DC2C7 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE0BABF205AB3C7CA53BA50 /* AppState.swift */; };
 		C523DA4D54A05B6F693D646B /* CountdownOverlayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035550E70EC1750084E3C16 /* CountdownOverlayController.swift */; };
@@ -54,6 +55,7 @@
 		5B4E0974B9E2D75C0ED0FF8C /* OnboardingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingController.swift; sourceTree = "<group>"; };
 		5DC9F65E55E649C93CCD296A /* PreviewPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPanelController.swift; sourceTree = "<group>"; };
 		63805146B27CDDE73095D42F /* TrimEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrimEditorView.swift; sourceTree = "<group>"; };
+		6D03C7DA42BA531465124E3A /* AreaSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AreaSelectionView.swift; sourceTree = "<group>"; };
 		6D42F45DB2E973748F86F890 /* RegionSelectionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionSelectionController.swift; sourceTree = "<group>"; };
 		7F897B54D7B59D7BD94DC58B /* TrimEditorController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrimEditorController.swift; sourceTree = "<group>"; };
 		821A570732095FAEFEBDB55F /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
@@ -189,6 +191,7 @@
 		F4CEED7E172060B1168BF00E /* Overlays */ = {
 			isa = PBXGroup;
 			children = (
+				6D03C7DA42BA531465124E3A /* AreaSelectionView.swift */,
 				C035550E70EC1750084E3C16 /* CountdownOverlayController.swift */,
 				4E766F6B2874B70C5C7041DF /* PixelLoupeView.swift */,
 				6D42F45DB2E973748F86F890 /* RegionSelectionController.swift */,
@@ -305,6 +308,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C3512B81D65D879DE14DC2C7 /* AppState.swift in Sources */,
+				BD7AC692895C63B00536B311 /* AreaSelectionView.swift in Sources */,
 				68768CEEFA0E47EE7CFDCE70 /* CapturePanel.swift in Sources */,
 				C523DA4D54A05B6F693D646B /* CountdownOverlayController.swift in Sources */,
 				F9A490C63F12EA1C7C2B1EC3 /* GlassBackground.swift in Sources */,

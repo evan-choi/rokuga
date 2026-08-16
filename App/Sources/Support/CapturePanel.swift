@@ -22,6 +22,7 @@ class CapturePanel: NSPanel {
         )
         isOpaque = false
         backgroundColor = .clear
+        isReleasedWhenClosed = false
         hasShadow = true
         isMovableByWindowBackground = true
         hidesOnDeactivate = false

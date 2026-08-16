@@ -12,21 +12,22 @@ struct ToolbarView: View {
     }
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 10) {
             modeButtons
-            Divider().frame(height: 28)
+            Divider().frame(height: 22)
             optionsButton
             recordButton
         }
-        .padding(.horizontal, 18)
-        .frame(height: 64)
+        .padding(.horizontal, 12)
+        .frame(height: 54)
         .fixedSize()
-        .background(GlassBackground(cornerRadius: 18))
+        .background(GlassBackground(cornerRadius: 16))
         .preferredColorScheme(.dark)
+        .hiddenFocusRing()
     }
 
     private var modeButtons: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 4) {
             modeButton(.selectedArea, symbol: "rectangle.dashed", label: "Selected Area")
             modeButton(.fullScreen, symbol: "rectangle.inset.filled", label: "Full Screen")
             modeButton(.window, symbol: "macwindow", label: "Window")
@@ -38,19 +39,19 @@ struct ToolbarView: View {
             modeRaw = target.rawValue
             appState.selectionModeChanged()
         } label: {
-            VStack(spacing: 3) {
+            VStack(spacing: 2) {
                 Image(systemName: symbol)
-                    .font(.system(size: 17, weight: .medium))
+                    .font(.system(size: 15, weight: .medium))
                 Text(label)
-                    .font(.system(size: 10))
+                    .font(.system(size: 9.5))
             }
-            .frame(width: 76, height: 46)
-            .contentShape(RoundedRectangle(cornerRadius: 10))
+            .frame(width: 66, height: 40)
+            .contentShape(RoundedRectangle(cornerRadius: 9))
         }
         .buttonStyle(.plain)
         .foregroundStyle(mode == target ? Color.white : Color.white.opacity(0.55))
         .background(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 9)
                 .fill(mode == target ? Color.white.opacity(0.14) : .clear)
         )
         .accessibilityLabel(Text(label))
@@ -62,8 +63,8 @@ struct ToolbarView: View {
             showsOptions.toggle()
         } label: {
             Image(systemName: "slider.horizontal.3")
-                .font(.system(size: 15, weight: .medium))
-                .frame(width: 36, height: 36)
+                .font(.system(size: 13.5, weight: .medium))
+                .frame(width: 30, height: 30)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -78,13 +79,13 @@ struct ToolbarView: View {
         Button {
             appState.requestRecord()
         } label: {
-            HStack(spacing: 8) {
-                Circle().fill(Color.red).frame(width: 10, height: 10)
+            HStack(spacing: 7) {
+                Circle().fill(Color.red).frame(width: 9, height: 9)
                 Text("Record")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: 12.5, weight: .semibold))
             }
-            .padding(.horizontal, 18)
-            .frame(height: 38)
+            .padding(.horizontal, 14)
+            .frame(height: 32)
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
