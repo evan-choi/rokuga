@@ -24,6 +24,14 @@ While the toolbar is visible, the active mode SHALL present its selection layer 
 - **WHEN** Full Screen mode is active on a multi-display setup
 - **THEN** all displays except the one under the pointer are dimmed, and moving the pointer to another display swaps which one is undimmed
 
+#### Scenario: Click-to-record in Full Screen mode
+- **WHEN** Full Screen mode is active and the user clicks a display
+- **THEN** recording of the clicked display starts immediately without further confirmation
+
+#### Scenario: Click-to-record cursor
+- **WHEN** Window or Full Screen mode is active and the pointer is over a target selection layer
+- **THEN** the pointer uses a camera-shaped cursor to indicate that clicking starts recording, and returns to the standard arrow when the selection layer closes
+
 ### Requirement: Recording-time area punch-through
 Once a Selected Area recording starts, the selection chrome (resize grips, outline, size badge) SHALL disappear; only a click-through dimming overlay remains outside the captured region, keeping the recorded area visually punched out for the whole recording. The overlay MUST never appear in the recording and MUST NOT intercept clicks.
 
@@ -107,4 +115,3 @@ In Window mode, the app SHALL record a single chosen application window in isola
 #### Scenario: Minimized window excluded from picker
 - **WHEN** the user opens the window picker
 - **THEN** minimized windows and windows without content (zero size) are not offered
-
