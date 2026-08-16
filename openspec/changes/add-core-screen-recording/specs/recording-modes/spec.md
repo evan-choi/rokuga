@@ -62,6 +62,10 @@ In Selected Area mode, the app SHALL let the user draw a rectangular region on a
 - **WHEN** the user drags an edge or corner handle of an existing selection
 - **THEN** the region resizes accordingly and the pixel labels update in real time
 
+#### Scenario: Resize cursor matches the handle direction
+- **WHEN** the pointer moves over a horizontal, vertical, or diagonal resize handle
+- **THEN** the pointer uses the corresponding bundled 32×32 resize cursor and keeps the cursor centered on the handle
+
 #### Scenario: Moving a region
 - **WHEN** the user drags from inside the selected rectangle
 - **THEN** the entire region moves without resizing, constrained to the display bounds

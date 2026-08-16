@@ -34,6 +34,7 @@
 - [x] 4.6 Countdown overlay (1–10 s, Esc cancels, always capture-excluded)
 - [x] 4.7 Full Screen selection overlay: clicking any display starts recording that display immediately
 - [x] 4.8 Click-to-record cursor: show the bundled camera cursor over Window and Full Screen selection layers and restore the arrow on close
+- [x] 4.9 Area selection resize cursors: use the bundled horizontal, vertical, and two diagonal 32×32 SVGs for all eight handles
 
 ## 5. Recording controls & hotkeys
 
