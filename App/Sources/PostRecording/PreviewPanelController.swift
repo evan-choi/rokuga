@@ -147,10 +147,11 @@ struct PreviewPanelView: View {
         }
         .background(GlassBackground(cornerRadius: 16))
         .preferredColorScheme(.dark)
+        .hiddenFocusRing()
     }
 
     private var header: some View {
-        HStack {
+        HStack(spacing: 16) {
             Text(model.url.lastPathComponent)
                 .font(.system(size: 12, weight: .medium))
                 .lineLimit(1)
