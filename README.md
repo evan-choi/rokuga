@@ -1,8 +1,6 @@
 <div align="center">
 
-<img src="docs/logo.png" width="112" alt="Rokuga logo">
-
-# Rokuga
+# <img src="docs/logo.png" width="40" alt="Rokuga logo"> Rokuga
 
 **A free, native, open-source screen recorder for macOS.**
 
