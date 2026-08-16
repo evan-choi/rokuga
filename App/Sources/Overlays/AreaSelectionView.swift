@@ -234,58 +234,26 @@ final class RegionInteractionView: NSView {
         }
     }
 
-    private static let diagonalNWSE = diagonalCursor(symbol: "arrow.up.left.and.arrow.down.right")
-    private static let diagonalNESW = diagonalCursor(symbol: "arrow.up.right.and.arrow.down.left")
+    private static let westEastCursor = assetCursor(named: "ResizeWestEastCursor", fallback: .resizeLeftRight)
+    private static let northSouthCursor = assetCursor(named: "ResizeNorthSouthCursor", fallback: .resizeUpDown)
+    private static let northWestSouthEastCursor = assetCursor(named: "ResizeNorthWestSouthEastCursor", fallback: .crosshair)
+    private static let northEastSouthWestCursor = assetCursor(named: "ResizeNorthEastSouthWestCursor", fallback: .crosshair)
 
     private static func cursor(for handle: RegionHandle) -> NSCursor {
-        if #available(macOS 15.0, *) {
-            let position: NSCursor.FrameResizePosition
-            switch handle {
-            case .topLeft: position = .topLeft
-            case .top: position = .top
-            case .topRight: position = .topRight
-            case .left: position = .left
-            case .right: position = .right
-            case .bottomLeft: position = .bottomLeft
-            case .bottom: position = .bottom
-            case .bottomRight: position = .bottomRight
-            }
-            return .frameResize(position: position, directions: .all)
-        }
         switch handle {
-        case .left, .right: return .resizeLeftRight
-        case .top, .bottom: return .resizeUpDown
-        case .topLeft, .bottomRight: return diagonalNWSE
-        case .topRight, .bottomLeft: return diagonalNESW
+        case .left, .right: return westEastCursor
+        case .top, .bottom: return northSouthCursor
+        case .topLeft, .bottomRight: return northWestSouthEastCursor
+        case .topRight, .bottomLeft: return northEastSouthWestCursor
         }
     }
 
-    private static func diagonalCursor(symbol: String) -> NSCursor {
-        let side: CGFloat = 24
-        let image = NSImage(size: NSSize(width: side, height: side), flipped: false) { rect in
-            guard let base = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)?
-                .withSymbolConfiguration(.init(pointSize: 14, weight: .bold)) else { return false }
-            let origin = NSPoint(
-                x: (rect.width - base.size.width) / 2,
-                y: (rect.height - base.size.height) / 2
-            )
-            // White halo behind the black glyph keeps the cursor visible over the dim.
-            for delta in [(-1.0, 0.0), (1.0, 0.0), (0.0, -1.0), (0.0, 1.0)] {
-                tinted(base, .white).draw(at: NSPoint(x: origin.x + delta.0, y: origin.y + delta.1), from: .zero, operation: .sourceOver, fraction: 1)
-            }
-            tinted(base, .black).draw(at: origin, from: .zero, operation: .sourceOver, fraction: 1)
-            return true
+    private static func assetCursor(named name: String, fallback: NSCursor) -> NSCursor {
+        guard let image = NSImage(named: NSImage.Name(name)) else {
+            return fallback
         }
-        return NSCursor(image: image, hotSpot: NSPoint(x: side / 2, y: side / 2))
-    }
-
-    private static func tinted(_ image: NSImage, _ color: NSColor) -> NSImage {
-        NSImage(size: image.size, flipped: false) { rect in
-            image.draw(in: rect)
-            color.set()
-            rect.fill(using: .sourceAtop)
-            return true
-        }
+        image.size = NSSize(width: 32, height: 32)
+        return NSCursor(image: image, hotSpot: NSPoint(x: 16, y: 16))
     }
 
     // MARK: Geometry
