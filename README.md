@@ -11,8 +11,6 @@ No watermarks. No time limits. No accounts. No paywalls.
 [![CI](https://github.com/evan-choi/rokuga/actions/workflows/ci.yml/badge.svg)](https://github.com/evan-choi/rokuga/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-macOS%2013.3%2B-black?logo=apple)](https://www.apple.com/macos/)
-[![Swift](https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white)](https://swift.org)
-[![Status](https://img.shields.io/badge/Status-Pre--release-yellow)](#project-status)
 
 </div>
 
@@ -20,12 +18,7 @@ No watermarks. No time limits. No accounts. No paywalls.
 
 ## Why Rokuga?
 
-Rokuga uses Apple's screen capture and media frameworks directly. It runs as a menu bar app and writes recordings to a folder chosen by the user.
-
-- Native Swift and SwiftUI app using ScreenCaptureKit and AVFoundation
-- Floating recording toolbar instead of a main library window
-- Recordings stay in a normal Finder folder
-- No account, network service, watermark, or recording limit
+Rokuga runs as a menu bar app with a floating recording toolbar instead of a library window. It records directly to a Finder folder using ScreenCaptureKit and AVFoundation.
 
 ## Current capabilities
 
@@ -37,13 +30,10 @@ Rokuga uses Apple's screen capture and media frameworks directly. It runs as a m
 - Capture exclusion for Rokuga windows and optional desktop-icon exclusion
 - English, Korean, Japanese, and Simplified Chinese localization
 
-See [the implementation task list](openspec/changes/add-core-screen-recording/tasks.md) for the current status of each capability.
-
 ### Known limitations
 
 - Microphone capture and system-audio/microphone mixing are not connected to the recording session yet.
 - Selected-area recording supports a movable, resizable crop. Drawing a new marquee, Retina pixel labels, and the pixel loupe remain in progress.
-- Release signing, notarization, and the full hardware and macOS QA matrix are not complete.
 
 ## Requirements
 
@@ -57,42 +47,33 @@ To build Rokuga:
 - Xcode 16
 - XcodeGen
 
-SwiftLint and SwiftFormat are required only for the same checks used by CI.
-
 ## Build from source
 
 ```bash
-brew install xcodegen swiftlint swiftformat
+brew install xcodegen
 git clone https://github.com/evan-choi/rokuga.git
 cd rokuga
 xcodegen generate
 open Rokuga.xcodeproj
 ```
 
-The default ad-hoc signature does not require an Apple account. macOS may reset Screen Recording and Microphone permissions after each rebuild. Run `./scripts/setup-dev-signing.sh` once to create a local self-signed identity and keep permissions between builds.
+The default ad-hoc signature does not require an Apple account. For repeated local builds, run `./scripts/setup-dev-signing.sh` once so macOS keeps Screen Recording permission between builds.
 
 ## Usage
 
 1. Press <kbd>⌘⇧6</kbd> or choose **Open Recording Toolbar** from the menu bar.
-2. Choose Selected Area, Full Screen, or Window.
-3. Set the countdown, system audio, output, and cursor options.
-4. Start from the toolbar or the active Full Screen or Window selection layer.
-5. Stop from the elapsed-time control in the menu bar.
-6. Use the post-recording thumbnail to preview, trim, delete, or keep the file.
+2. Choose a recording mode and configure its options.
+3. Start from the toolbar, or click the active Full Screen or Window selection.
+4. Stop from the elapsed-time control in the menu bar, then use the thumbnail to preview or trim the file.
 
-<kbd>Esc</kbd> closes the toolbar, cancels an active countdown, or closes the preview. Rokuga has no global recording start/stop shortcut.
-
-## Project status
-
-The app shell, recording pipeline, three capture modes, system audio output, post-recording flow, and trim editor are implemented. Unit tests cover the core state machine, encoder, audio output, effects, settings, and trim operations. CI builds the app and runs tests on macOS 14 and 15.
-
-Rokuga is still pre-release. Remaining work is tracked in [`openspec/changes/add-core-screen-recording/tasks.md`](openspec/changes/add-core-screen-recording/tasks.md); the unchecked items are not considered complete.
+<kbd>Esc</kbd> closes the toolbar, cancels an active countdown, or closes the preview.
 
 ## Development
 
-Run the core test suite:
+Install the repository check tools and run the core test suite:
 
 ```bash
+brew install swiftlint swiftformat
 (cd RokugaCore && swift test)
 ```
 
@@ -105,11 +86,9 @@ python3 scripts/lint-localization.py
 ./scripts/audit-zero-copy.sh
 ```
 
-Browse the design mockups with `open design/mockups/index.html`.
-
 ## Contributing
 
-Read the active change under [`openspec/changes/add-core-screen-recording/`](openspec/changes/add-core-screen-recording/) before changing behavior. Update the relevant spec and task status with the implementation, then run the tests and repository checks above before opening a pull request.
+Check [`tasks.md`](openspec/changes/add-core-screen-recording/tasks.md) for implementation status and read the active change before modifying behavior. Update the relevant spec and task status with the implementation, then run the tests and repository checks above before opening a pull request.
 
 ## License
 
