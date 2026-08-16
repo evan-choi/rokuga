@@ -1,14 +1,15 @@
 import AppKit
 
-/// AppKit region-selection surface: SwiftUI drag gestures are unreliable on
-/// non-activating borderless panels of an accessory app, so all interaction and
-/// drawing happens in plain NSView mouse handlers.
+/// AppKit region-selection surface: a dashed punch rectangle that always exists
+/// (saved region or centered default). Users resize via the 8 circular grips and
+/// move by dragging inside — there is no draw-to-create gesture, matching the
+/// system capture grammar.
 final class AreaSelectionView: NSView {
     var onRegionChanged: ((CGRect) -> Void)?
 
-    var region: CGRect? {
+    var region: CGRect {
         didSet {
-            if let region { onRegionChanged?(region) }
+            onRegionChanged?(region)
             window?.invalidateCursorRects(for: self)
             needsDisplay = true
         }
@@ -19,6 +20,7 @@ final class AreaSelectionView: NSView {
     private var dragOrigin: CGPoint?
     private var regionAtDragStart: CGRect?
     private var loupePoint: CGPoint?
+    private var cursorPushed = false
 
     private static let handleRadius: CGFloat = 4.5
     private static let handleHitRadius: CGFloat = 12
@@ -26,17 +28,28 @@ final class AreaSelectionView: NSView {
 
     private enum DragMode: Equatable {
         case none
-        case creating
         case moving
         case resizing(Handle)
     }
 
     private enum Handle: CaseIterable {
         case topLeft, top, topRight, left, right, bottomLeft, bottom, bottomRight
+
+        var movesLeft: Bool { [.topLeft, .left, .bottomLeft].contains(self) }
+        var movesRight: Bool { [.topRight, .right, .bottomRight].contains(self) }
+        var movesTop: Bool { [.topLeft, .top, .topRight].contains(self) }
+        var movesBottom: Bool { [.bottomLeft, .bottom, .bottomRight].contains(self) }
     }
 
-    init(frame: NSRect, displayID: CGDirectDisplayID) {
+    init(frame: NSRect, displayID: CGDirectDisplayID, initialRegion: CGRect?) {
         self.displayID = displayID
+        let fallback = CGRect(
+            x: frame.width * 0.25,
+            y: frame.height * 0.25,
+            width: frame.width * 0.5,
+            height: frame.height * 0.5
+        ).integral
+        self.region = initialRegion ?? fallback
         super.init(frame: frame)
     }
 
@@ -54,43 +67,38 @@ final class AreaSelectionView: NSView {
         ctx.setFillColor(NSColor.black.withAlphaComponent(0.4).cgColor)
         ctx.fill(bounds)
 
-        if let region {
-            ctx.saveGState()
-            ctx.setBlendMode(.clear)
-            ctx.fill(region)
-            ctx.restoreGState()
+        ctx.saveGState()
+        ctx.setBlendMode(.clear)
+        ctx.fill(region)
+        ctx.restoreGState()
 
-            ctx.setStrokeColor(NSColor.white.cgColor)
-            ctx.setLineWidth(1.5)
-            ctx.stroke(region)
+        ctx.saveGState()
+        ctx.setStrokeColor(NSColor.white.cgColor)
+        ctx.setLineWidth(1.5)
+        ctx.setLineDash(phase: 0, lengths: [6, 4])
+        ctx.stroke(region)
+        ctx.restoreGState()
 
-            for handle in Handle.allCases {
-                let center = position(of: handle, in: region)
-                let rect = CGRect(
-                    x: center.x - Self.handleRadius,
-                    y: center.y - Self.handleRadius,
-                    width: Self.handleRadius * 2,
-                    height: Self.handleRadius * 2
-                )
-                ctx.setFillColor(NSColor.white.cgColor)
-                ctx.fillEllipse(in: rect)
-                ctx.setStrokeColor(NSColor.black.withAlphaComponent(0.35).cgColor)
-                ctx.setLineWidth(1)
-                ctx.strokeEllipse(in: rect)
-            }
-
-            drawBadge(
-                text: "\(Int(region.width)) × \(Int(region.height))",
-                centerX: region.midX,
-                y: max(region.minY - 26, 8)
+        for handle in Handle.allCases {
+            let center = position(of: handle, in: region)
+            let rect = CGRect(
+                x: center.x - Self.handleRadius,
+                y: center.y - Self.handleRadius,
+                width: Self.handleRadius * 2,
+                height: Self.handleRadius * 2
             )
-        } else {
-            drawBadge(
-                text: String(localized: "Drag to select an area"),
-                centerX: bounds.midX,
-                y: 32
-            )
+            ctx.setFillColor(NSColor.white.cgColor)
+            ctx.fillEllipse(in: rect)
+            ctx.setStrokeColor(NSColor.black.withAlphaComponent(0.35).cgColor)
+            ctx.setLineWidth(1)
+            ctx.strokeEllipse(in: rect)
         }
+
+        drawBadge(
+            text: "\(Int(region.width)) × \(Int(region.height))",
+            centerX: region.midX,
+            y: max(region.minY - 26, 8)
+        )
 
         if let loupePoint {
             drawLoupe(at: loupePoint, in: ctx)
@@ -155,18 +163,14 @@ final class AreaSelectionView: NSView {
         dragOrigin = point
         regionAtDragStart = region
 
-        if let region {
-            if let handle = handleHit(at: point, in: region) {
-                dragMode = .resizing(handle)
-            } else if region.insetBy(dx: -6, dy: -6).contains(point) {
-                dragMode = .moving
-            } else {
-                dragMode = .creating
-                self.region = nil
-                regionAtDragStart = nil
-            }
+        if let handle = handleHit(at: point) {
+            dragMode = .resizing(handle)
+            push(Self.cursor(for: handle))
+        } else if region.contains(point) {
+            dragMode = .moving
+            push(.closedHand)
         } else {
-            dragMode = .creating
+            dragMode = .none
         }
     }
 
@@ -175,22 +179,12 @@ final class AreaSelectionView: NSView {
         let point = convert(event.locationInWindow, from: nil)
 
         switch dragMode {
-        case .creating:
-            region = clamp(
-                CGRect(
-                    x: min(origin.x, point.x),
-                    y: min(origin.y, point.y),
-                    width: abs(point.x - origin.x),
-                    height: abs(point.y - origin.y)
-                )
-            )
-            loupePoint = point
         case .moving:
             guard let start = regionAtDragStart else { return }
-            region = clamp(start.offsetBy(dx: point.x - origin.x, dy: point.y - origin.y))
+            region = clampPosition(start.offsetBy(dx: point.x - origin.x, dy: point.y - origin.y))
         case let .resizing(handle):
             guard let start = regionAtDragStart else { return }
-            region = clamp(resize(start, handle: handle, dx: point.x - origin.x, dy: point.y - origin.y))
+            region = resize(start, handle: handle, dx: point.x - origin.x, dy: point.y - origin.y)
             loupePoint = point
         case .none:
             break
@@ -199,11 +193,7 @@ final class AreaSelectionView: NSView {
     }
 
     override func mouseUp(with event: NSEvent) {
-        if dragMode == .creating,
-           let region,
-           region.width < Self.minimumEdge || region.height < Self.minimumEdge {
-            self.region = nil
-        }
+        popCursorIfNeeded()
         dragMode = .none
         dragOrigin = nil
         regionAtDragStart = nil
@@ -211,12 +201,23 @@ final class AreaSelectionView: NSView {
         needsDisplay = true
     }
 
+    private func push(_ cursor: NSCursor) {
+        cursor.push()
+        cursorPushed = true
+    }
+
+    private func popCursorIfNeeded() {
+        if cursorPushed {
+            NSCursor.pop()
+            cursorPushed = false
+        }
+    }
+
+    // MARK: Cursors
+
     override func resetCursorRects() {
-        addCursorRect(bounds, cursor: .crosshair)
-        guard let region else { return }
-        // insetBy/intersection return the null rect (infinite origin) for tiny or
-        // non-overlapping rects; addCursorRect asserts isfinite, so guard every rect.
-        addFiniteCursorRect(region.insetBy(dx: 6, dy: 6), cursor: .openHand)
+        addCursorRect(bounds, cursor: .arrow)
+        addFiniteCursorRect(region.insetBy(dx: Self.handleHitRadius, dy: Self.handleHitRadius), cursor: .openHand)
         for handle in Handle.allCases {
             let center = position(of: handle, in: region)
             addFiniteCursorRect(
@@ -226,7 +227,7 @@ final class AreaSelectionView: NSView {
                     width: Self.handleHitRadius * 2,
                     height: Self.handleHitRadius * 2
                 ),
-                cursor: .crosshair
+                cursor: Self.cursor(for: handle)
             )
         }
     }
@@ -237,18 +238,70 @@ final class AreaSelectionView: NSView {
         addCursorRect(clipped, cursor: cursor)
     }
 
+    private static let diagonalNWSE = diagonalCursor(symbol: "arrow.up.left.and.arrow.down.right")
+    private static let diagonalNESW = diagonalCursor(symbol: "arrow.up.right.and.arrow.down.left")
+
+    private static func cursor(for handle: Handle) -> NSCursor {
+        if #available(macOS 15.0, *) {
+            let position: NSCursor.FrameResizePosition
+            switch handle {
+            case .topLeft: position = .topLeft
+            case .top: position = .top
+            case .topRight: position = .topRight
+            case .left: position = .left
+            case .right: position = .right
+            case .bottomLeft: position = .bottomLeft
+            case .bottom: position = .bottom
+            case .bottomRight: position = .bottomRight
+            }
+            return .frameResize(position: position, directions: .all)
+        }
+        switch handle {
+        case .left, .right: return .resizeLeftRight
+        case .top, .bottom: return .resizeUpDown
+        case .topLeft, .bottomRight: return diagonalNWSE
+        case .topRight, .bottomLeft: return diagonalNESW
+        }
+    }
+
+    private static func diagonalCursor(symbol: String) -> NSCursor {
+        let side: CGFloat = 24
+        let image = NSImage(size: NSSize(width: side, height: side), flipped: false) { rect in
+            guard let base = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)?
+                .withSymbolConfiguration(.init(pointSize: 14, weight: .bold)) else { return false }
+            let origin = NSPoint(
+                x: (rect.width - base.size.width) / 2,
+                y: (rect.height - base.size.height) / 2
+            )
+            // White halo behind the black glyph keeps the cursor visible over the dim.
+            for delta in [(-1.0, 0.0), (1.0, 0.0), (0.0, -1.0), (0.0, 1.0)] {
+                tinted(base, .white).draw(at: NSPoint(x: origin.x + delta.0, y: origin.y + delta.1), from: .zero, operation: .sourceOver, fraction: 1)
+            }
+            tinted(base, .black).draw(at: origin, from: .zero, operation: .sourceOver, fraction: 1)
+            return true
+        }
+        return NSCursor(image: image, hotSpot: NSPoint(x: side / 2, y: side / 2))
+    }
+
+    private static func tinted(_ image: NSImage, _ color: NSColor) -> NSImage {
+        NSImage(size: image.size, flipped: false) { rect in
+            image.draw(in: rect)
+            color.set()
+            rect.fill(using: .sourceAtop)
+            return true
+        }
+    }
+
     // MARK: Geometry
 
-    private func clamp(_ rect: CGRect) -> CGRect {
-        var r = rect.standardized
+    private func clampPosition(_ rect: CGRect) -> CGRect {
+        var r = rect
         r.origin.x = max(0, min(r.origin.x, bounds.width - r.width))
         r.origin.y = max(0, min(r.origin.y, bounds.height - r.height))
-        r.size.width = min(r.width, bounds.width - r.origin.x)
-        r.size.height = min(r.height, bounds.height - r.origin.y)
         return r
     }
 
-    private func handleHit(at point: CGPoint, in region: CGRect) -> Handle? {
+    private func handleHit(at point: CGPoint) -> Handle? {
         Handle.allCases.first { handle in
             let center = position(of: handle, in: region)
             return hypot(point.x - center.x, point.y - center.y) <= Self.handleHitRadius
@@ -269,25 +322,17 @@ final class AreaSelectionView: NSView {
     }
 
     private func resize(_ rect: CGRect, handle: Handle, dx: CGFloat, dy: CGFloat) -> CGRect {
-        var r = rect
-        switch handle {
-        case .topLeft:
-            r.origin.x += dx; r.origin.y += dy; r.size.width -= dx; r.size.height -= dy
-        case .top:
-            r.origin.y += dy; r.size.height -= dy
-        case .topRight:
-            r.origin.y += dy; r.size.width += dx; r.size.height -= dy
-        case .left:
-            r.origin.x += dx; r.size.width -= dx
-        case .right:
-            r.size.width += dx
-        case .bottomLeft:
-            r.origin.x += dx; r.size.width -= dx; r.size.height += dy
-        case .bottom:
-            r.size.height += dy
-        case .bottomRight:
-            r.size.width += dx; r.size.height += dy
-        }
-        return r
+        var minX = rect.minX
+        var minY = rect.minY
+        var maxX = rect.maxX
+        var maxY = rect.maxY
+        let edge = Self.minimumEdge
+
+        if handle.movesLeft { minX = min(max(0, minX + dx), maxX - edge) }
+        if handle.movesRight { maxX = max(min(bounds.width, maxX + dx), minX + edge) }
+        if handle.movesTop { minY = min(max(0, minY + dy), maxY - edge) }
+        if handle.movesBottom { maxY = max(min(bounds.height, maxY + dy), minY + edge) }
+
+        return CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
     }
 }

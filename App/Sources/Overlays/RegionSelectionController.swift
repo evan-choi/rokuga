@@ -21,9 +21,9 @@ final class RegionSelectionController {
 
         view = AreaSelectionView(
             frame: NSRect(origin: .zero, size: display.frame.size),
-            displayID: display.displayID
+            displayID: display.displayID,
+            initialRegion: settings.selectedRegions[String(display.displayID)]
         )
-        view.region = settings.selectedRegions[String(display.displayID)]
         view.onRegionChanged = { region in
             settings.selectedRegions[String(display.displayID)] = region
         }
@@ -48,7 +48,7 @@ final class RegionSelectionController {
 
     /// Current crop in display-local top-left points (SCStream `sourceRect` space — the flipped view shares it).
     var currentRegion: CGRect? {
-        view.region?.integral
+        view.region.integral
     }
 
     func present() {
