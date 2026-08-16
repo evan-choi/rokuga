@@ -63,14 +63,6 @@ final class AppState: ObservableObject {
         onboardingController?.present()
     }
 
-    func toggleRecording() {
-        if recordingState.isActive {
-            stopRecording()
-        } else if recordingState.canStart {
-            requestRecord()
-        }
-    }
-
     /// Deleted-file recovery (task 7.4): a stale last-recording entry falls back to the output folder.
     func openLastRecording() {
         guard let url = lastRecordingURL, FileManager.default.fileExists(atPath: url.path) else {

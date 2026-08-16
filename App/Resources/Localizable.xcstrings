@@ -2093,29 +2093,6 @@
         }
       }
     },
-    "Start / Stop Recording": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画を開始 / 停止"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화 시작 / 중지"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "开始 / 停止录制"
-          }
-        }
-      }
-    },
     "Stop Recording": {
       "extractionState": "stale",
       "localizations": {

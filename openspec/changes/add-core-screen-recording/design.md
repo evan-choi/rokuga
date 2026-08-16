@@ -2,7 +2,9 @@
 
 ## Context
 
-Greenfield native macOS app. No existing code. The product must deliver a professional, production-quality recording experience — four capture modes, driver-free system audio, mouse effects, lossless trimming, fine-grained output control — entirely on-device, with no accounts or network calls.
+Native macOS menu bar app with an existing SwiftUI app target and a local Swift package. The product has three capture modes, driver-free system audio, mouse effects, trim editing, and output controls. Processing stays on-device and requires no account.
+
+Normative specs define the target contract. `tasks.md` records implementation status. Sections below label incomplete work as **Planned** instead of describing it as existing behavior.
 
 Constraints:
 
@@ -15,7 +17,7 @@ Constraints:
 **Goals:**
 
 - Rock-solid capture pipeline: no dropped-frame cascades, no A/V desync, safe recovery from device disconnects and permission revocation mid-recording
-- All ten capabilities in the proposal implemented to production quality (error states, edge cases, accessibility, localization-ready strings)
+- All capabilities in the proposal implemented with explicit error states, accessibility behavior, and localized user-facing strings
 - Testable core: capture/encode/trim logic isolated from UI in a local Swift package
 
 **Non-Goals:**
@@ -35,30 +37,37 @@ Use `SCStream` + `SCContentFilter` for all screen-based modes.
 
 ### D2. Encoding: AVAssetWriter with hardware VideoToolbox codecs
 
-Real-time writing via `AVAssetWriter` with `AVVideoCodecType.h264` / `.hevc` (hardware-accelerated through VideoToolbox), AAC audio via `AVAssetWriterInput`.
+Real-time writing uses `AVAssetWriter` with `AVVideoCodecType.h264` / `.hevc` and AAC audio through `AVAssetWriterInput`. The current defaults are HEVC and MOV.
 
-- Quality 0–100 maps to a resolution/FPS-aware target bitrate curve fed to `AVVideoAverageBitRateKey`.
-- **VBR** = average bitrate only; **CBR** = average bitrate + `AVVideoDataRateLimitsKey` clamped to ~1.1× target per 1s window (true CBR is not exposed by hardware encoders; this is the standard capped-VBR approximation and is documented as such in the UI tooltip).
-- **Pause/resume**: single continuous `AVAssetWriter` session; on resume, all subsequent sample buffer PTS values are shifted by the accumulated pause duration (no segment stitching, no concat step, A/V stays aligned because both tracks share the same offset).
+- **Existing**: quality 0–100 maps to a resolution/FPS-aware target bitrate curve. The writer applies `AVVideoDataRateLimitsKey` to bound the rate.
+- **Planned**: expose VBR and capped-VBR choices in Settings with an MB/min estimate. True CBR is not exposed by the hardware encoders.
+- **Existing, core only**: the splice clock can remove pause gaps by shifting audio and video PTS by the same accumulated duration. Pause/resume has no app UI or global shortcut.
+- **Planned**: require hardware encoding explicitly and report when the hardware encoder cannot be created.
 - **Alternatives**: FFmpeg — LGPL/GPL friction for MIT distribution, huge binary, unnecessary since VideoToolbox covers H.264/HEVC.
 
 ### D3. Audio: mix system audio + microphone into a single AAC track
 
-System audio arrives as `CMSampleBuffer`s from `SCStream`; microphone via `AVCaptureSession`. Both are converted to a canonical 48 kHz stereo float format and summed in a lock-free mixer before hitting one `AVAssetWriterInput`.
+System audio arrives as `CMSampleBuffer`s from `SCStream` and is written to the AAC track. `AudioMixer` and `MicrophoneCapture` exist, but microphone samples are not yet connected to the recording session.
+
+- **Planned**: connect `MicrophoneCapture`, add input-device selection and disconnect fallback, and expose a live level meter.
 
 - **Why single track**: multi-track MP4 audio has inconsistent player behavior (VLC plays one track, web players ignore extras). One mixed track plays everywhere.
 - **Trade-off**: sources can't be separated post-hoc. Acceptable for v1; a "separate tracks (MOV)" advanced option can ship later without spec changes to defaults.
 
 ### D4. Mouse effects: manual cursor composition (not overlay windows)
 
-Set `showsCursor = false` on the stream and composite the cursor, highlight halo, and click ripples onto each frame on the GPU (Core Image over Metal-backed `CVPixelBuffer`s). Cursor position sampled per frame via `CGEvent(source:).location`; clicks observed with a global `NSEvent` monitor.
+Set `showsCursor = false` on the stream and composite the cursor, highlight halo, and click ripples into recorded frames with Core Image over Metal-backed `CVPixelBuffer`s. The current sampler updates cursor state at 30 Hz; each captured frame uses the latest snapshot. Clicks are observed with a global `NSEvent` monitor. The full-resolution frame remains on the GPU; a small cursor tile is rasterized on the CPU.
 
 - **Why**: overlay windows are invisible in window-isolated capture and would need per-mode exclusion gymnastics; composition works identically across all modes and keeps effects out of live screen (only in the recording), which is the required behavior.
-- **Perf gate**: the compositor must sustain 5K@60 on Apple Silicon base models; benchmark test enforces < 6 ms per-frame budget. Effects auto-degrade (halo only, no ripple animation) if the frame budget is exceeded for 60 consecutive frames.
+- **Existing**: effects degrade from full rendering to no click animation, no highlight, and native cursor fallback when the frame budget is exceeded.
+- **Planned**: sample cursor state at the configured capture rate, add configurable highlight color/size/opacity and independent left/right click effects, measure actual-capture performance, and reduce capture FPS after effect fallback is exhausted.
 
 ### D5. Trim: AVAssetExportSession passthrough with keyframe snapping
 
-`AVAssetExportPresetPassthrough` + `timeRange` for lossless, near-instant trims. The trim start handle snaps to the nearest preceding sync frame (keyframe positions read via `AVSampleCursor`); the UI shows the snapped position so what-you-see-is-what-you-get. If passthrough fails (corrupt index, unsupported source), fall back to an HEVC/H.264 re-encode with a progress bar.
+`AVAssetExportPresetPassthrough` + `timeRange` provides lossless trim export. The editor also has an explicit Frame-exact option that re-encodes with progress reporting.
+
+- **Existing**: the UI snaps near a keyframe when the handle is within the visual snap threshold.
+- **Planned**: snap to the nearest preceding sync frame, validate external MP4/MOV inputs, accept drag-and-drop and Open With, add exact timecode entry, and automatically fall back to frame-exact export when passthrough is unavailable.
 
 - **Alternative**: smart-render (re-encode only the head GOP) — best of both, but significant complexity; deferred.
 - **Timeline interaction**: the filmstrip lives in an `NSScrollView` (native momentum/rubber-band for free); pinch is handled via `magnify` events zooming around the pointer anchor, ⌘+scroll maps to the same zoom path, plain scroll pans. Zoom level = seconds-per-point scale; thumbnail strip re-tiles lazily per zoom band so frame-level zoom never generates thumbnails for the whole clip. Trackpad and mouse are strict input peers — every gesture has a slider/shortcut equivalent (⌘+/⌘−/⌘0 fit). Horizontal `scrollWheel` deltas over the video surface (preview panel and editor preview) drive playhead scrubbing QuickTime-style — phase-aware (`NSEvent.phase`/momentum), seek-throttled to display refresh via `AVPlayer.seek(toleranceBefore:after:)` on a coalescing queue.
@@ -76,17 +85,17 @@ Rokuga.xcodeproj
     └── SettingsKit     — typed settings store, bookmark management
 ```
 
-State machine at the center: `idle → preparing → countdown → recording ⇄ paused → finishing → idle`, owned by a `RecordingCoordinator` actor. All UI observes this single source of truth; the toolbar HUD, menu bar, and hotkeys are just different frontends to the same coordinator.
+State machine at the center: `idle → preparing → countdown → recording → finishing → idle`, owned by a `RecordingCoordinator` actor. The core retains `paused` transitions for splice-clock tests, but the app UI does not expose them. All entry points observe the coordinator state.
 
-### D7. Global hotkeys: KeyboardShortcuts (MIT, sindresorhus)
+### D7. Global toolbar shortcut: KeyboardShortcuts (MIT, sindresorhus)
 
 Battle-tested Carbon `RegisterEventHotKey` wrapper with a recorder UI component, sandbox-safe, MIT-licensed. Writing our own Carbon wrapper is avoidable risk. This is the only third-party dependency.
 
 ### D8. Capture exclusion mechanics
 
-- **Own windows**: `SCContentFilter(display:excludingWindows:)` with all windows owned by our PID (and the countdown/region overlays always excluded regardless of the setting).
+- **Own windows**: `SCContentFilter(display:excludingWindows:)` always excludes windows owned by our PID. This is an invariant, not a user setting.
 - **Desktop icons**: exclude Finder-owned windows at `kCGDesktopIconWindowLevel`; wallpaper (WindowServer backdrop) remains visible — matches user expectation of "clean desktop".
-- Window mode ignores both toggles (isolated capture never contains them) — UI disables the controls with an explanatory tooltip.
+- Window mode ignores the desktop-icons setting because isolated capture never includes the desktop.
 
 ### D9. Storage & persistence
 
@@ -96,43 +105,44 @@ Battle-tested Carbon `RegisterEventHotKey` wrapper with a recorder UI component,
 
 ### D10. System integration choices
 
-- Menu bar: `MenuBarExtra` with state-driven content. Idle → app icon with menu (open toolbar, last recording, output folder, settings, quit). Recording → system-native indicator presentation: red dot + elapsed time + pause/stop, one click to stop (same grammar as ⇧⌘5).
-- Countdown: borderless non-activating overlay window, excluded from capture (D8), 1–10 s configurable, Esc cancels.
+- Menu bar: `MenuBarExtra` provides the idle menu (open toolbar, last recording, output folder, settings, quit). During recording, a separate status item shows `M:SS` and a one-click stop control. Pause is not exposed.
+- Countdown: borderless non-activating overlay window, excluded from capture (D8), with off/3/5/10-second choices. Esc cancels.
 - Launch at login: `SMAppService.mainApp`.
 - Theme: `preferredColorScheme` override (auto/light/dark).
 - Permissions: `SCShareableContent` probe for screen recording, `AVCaptureDevice.requestAccess` for the microphone; each denied state gets a guided panel with a deep link to the exact System Settings pane.
 
 ### D11. UI shell: windowless ⇧⌘5-style HUD + Liquid Glass
 
-- **App form**: menu bar agent (`LSUIElement`) — no main window, no Dock icon. The entire idle UI is a floating toolbar: mode icons ×4 · options popover · record button, presented bottom-center on the target display, matching the macOS screenshot toolbar grammar.
-- **Toolbar hosting**: non-activating borderless `NSPanel` (`.nonactivatingPanel`, `.statusBar` level) hosting SwiftUI — never steals focus from the app being recorded; excluded from capture per D8.
-- **Summoning**: menu bar icon click, global hotkey (default ⇧⌘6, configurable in Settings › Shortcuts), or app launch → toolbar appears at the bottom-center of the display containing the mouse pointer; Esc or starting a recording dismisses it. While recording, nothing is on screen except the menu bar indicator (D10).
-- **Options popover**: ⇧⌘5-style checkmark menu — save location, countdown, FPS quick pick (30/60, synced with Settings), audio sources, mouse options, thumbnail/remember toggles. Advanced encoding (codec/quality/full FPS list/bitrate) lives in the Settings window, opened only from the menu bar menu (⌘,).
-- **Windows that do exist**: Settings and the trim editor — the only two real windows, both secondary and closable without affecting recording. The floating thumbnail and its expanded preview panel (편집/삭제/완료) are transient non-activating panels, not windows.
+- **App form**: menu bar agent (`LSUIElement`) — no main window and no Dock icon. Idle recording UI is a floating toolbar with three mode buttons, an options popover, and a record button.
+- **Toolbar hosting**: non-activating borderless `NSPanel` at `.screenSaver + 1`, excluded from capture per D8. **OPEN**: verify focus retention because the panel becomes key for Esc handling.
+- **Summoning**: menu bar menu or global hotkey (default ⇧⌘6, configurable in Settings › Shortcuts). App launch does not open the toolbar. Esc or starting a recording dismisses it.
+- **Options popover**: segmented controls and toggles for output location, countdown, FPS, audio, mouse effects, and thumbnail behavior. Advanced encoding lives in Settings.
+- **Windows and panels**: onboarding, Settings, and the trim editor are regular windows. The recording toolbar, selection layers, floating thumbnail, and preview are transient panels.
 - **Material**: never raw glass — every window/panel surface layers a dark tint (VS Code Dark family, #1e1e1e–#2e2e36 at 55–75% opacity) over the system material (`NSVisualEffectView`/glass APIs) with forced `.darkAqua` appearance, so surfaces stay chic and legible on bright wallpapers instead of washing out. The dark theme applies exclusively to three surfaces: the toolbar (and its options popover), the trim editor, and the preview (floating thumbnail + preview panel). Everything else — menu bar status item, `NSMenu` dropdowns, dialogs, system recording indicators — is system-rendered as-is, never custom-skinned.
 - **Chrome buttons**: icon actions in panel/toolbar chrome are borderless (`.buttonStyle(.borderless)`) — icon-only, neutral monochrome (no red tint on destructive icons; danger is communicated by the confirmation dialog), shape revealed on hover only, hit target kept ≥ 28pt regardless of visual size.
 - **Iconography**: in-app icons are real SF Symbols via `Image(systemName:)` (`pencil`, `trash`, etc.) — legal on Apple platforms; SF Symbols assets MUST NOT be committed to the MIT repo. AppKit renders the bundled 32×32 `screenshotwindow.svg` and `resize*.svg` assets as custom capture and resize cursors. Other repo-shipped artwork (mockups, web, README) uses Lucide (ISC) equivalents tuned to SF stroke weight (~1.8/24).
 - **Visual language**: native Liquid Glass — `.glassEffect`/glass background APIs where available (macOS 26+), graceful fallback to `NSVisualEffectView`/`.ultraThinMaterial` on macOS 13.3–15. No custom-drawn glass; use system materials so appearance, vibrancy, and accessibility (reduce transparency) come free.
 - **Why**: zero learning curve (users already know ⇧⌘5), no focus-stealing during capture workflows, and the smallest possible UI surface for a recorder — the screen itself is the canvas.
 
-### D12. Performance budget: zero-copy or nothing
+### D12. Performance budget and frame transport
 
-- **Pipeline**: SCK IOSurface frames → optional Metal cursor pass → VideoToolbox hardware encode → incremental `AVAssetWriter` writes. No CPU pixel readback anywhere; software encoding is not a fallback, it is absent.
-- **Threading**: SCK delivery queue is never blocked — encoder back-pressure is handled by a bounded queue with a degradation ladder (effect quality → capture FPS), never by stalling capture or the main thread.
+- **Existing pipeline**: SCK IOSurface frames → optional Core Image/Metal cursor composition → incremental `AVAssetWriter` writes. There is no full-frame CPU readback; the compositor rasterizes only its small overlay tile on the CPU.
+- **Existing degradation**: effect quality falls back stepwise to the native cursor. The capture delivery path does not yet lower runtime FPS.
+- **Planned**: require a hardware encoder, add runtime FPS degradation, and report applied degradation after recording.
 - **Budgets** (baseline M1, 8 GB): ≤ 0.1% dropped frames over 10 min at up to 4K60; < 40 ms A/V drift per hour; app CPU ≤ 20% of one core at 1080p60 (≤ 35% at 4K60); steady-state memory ≤ 400 MB regardless of duration; toolbar summon ≤ 150 ms; record→first frame ≤ 500 ms; stop→playable ≤ 2 s; passthrough trim ≤ 3 s.
-- **Enforcement**: CI benchmarks (capture smoke, encode throughput, memory watermark) fail the build on > 10% regression. Budgets live in the `performance` spec, not in tribal knowledge.
+- **Current enforcement**: CI runs an encoder microbenchmark with synthesized video frames. It does not yet cover ScreenCaptureKit, audio, effects, long-run memory growth, A/V drift, or toolbar latency. The complete gates remain planned in `tasks.md`.
 
 ### D13. Localization: String Catalogs, en base + ko/ja/zh-Hans
 
 - **Mechanism**: Xcode String Catalogs (`.xcstrings`), development language English. SwiftUI string literals auto-extract; a CI lint fails on user-facing literals outside the catalog and on < 100% translation completeness per shipping language.
 - **Languages**: en (base), ko, ja, zh-Hans. Traditional Chinese (zh-Hant) deferred to a follow-up.
 - **Resolution**: system language list + per-app override in System Settings — no in-app picker (native behavior, zero code).
-- **Formatting**: `Date.FormatStyle`/`ByteCountFormatStyle` etc. everywhere; generated file names stay locale-neutral for cross-locale sort/sync stability.
-- **QA**: localized-screenshot pass over toolbar/popover/settings/editor per release; layouts are content-sized (no fixed-width labels) to absorb CJK↔English length swings.
+- **Planned formatting completion**: use `Date.FormatStyle`, `ByteCountFormatStyle`, and other locale-aware formatters for displayed values; keep generated file names locale-neutral for stable sorting.
+- **QA**: String Catalog completeness is automated. CJK truncation and overlap review remains a manual release task until screenshot comparison or accessibility-frame assertions are added.
 
 ## Risks / Trade-offs
 
-- [SCK behavior drifts across macOS versions (13.3 → 15+)] → runtime `#available` gates, capture smoke tests in CI on macOS 13/14/15 runners, graceful capability detection (e.g., hide 120 FPS-class options we don't offer anyway)
+- [SCK behavior drifts across macOS versions (13.3 → 15+)] → runtime `#available` gates, CI on available macOS 14/15 hosted runners, and manual macOS 13.3 coverage
 - [Cursor compositor can't hold 5K@60 on low-end hardware] → GPU-only path, per-frame budget monitor with automatic effect degradation (D4), FPS/resolution suggestions in UI when sustained drops are detected
 - [Capped-VBR "CBR" isn't broadcast-true CBR] → label honestly in UI help; acceptable for the target use cases (uploads, tutorials)
 - [Passthrough trim start snaps to keyframes — up to one GOP (~2 s) coarser than frame-exact] → visible snap in the UI (no silent surprise) + re-encode fallback offered as "frame-exact trim" option
@@ -144,7 +154,7 @@ Battle-tested Carbon `RegisterEventHotKey` wrapper with a recorder UI component,
 
 Greenfield — no migration. Ships as v0.1.0 behind no flags. Rollback = previous build (files produced are standard MP4/MOV, forward/backward compatible).
 
-## Open Questions
+## Resolved defaults
 
-- HEVC default on Apple Silicon vs H.264-everywhere default? (Current lean: H.264 default for share-anywhere compatibility; HEVC opt-in.)
-- Should area-mode selection persist across launches (remember last region)? (Lean: yes, per display.)
+- Default container and codec: MOV and HEVC.
+- Selected Area persists one region per display.
