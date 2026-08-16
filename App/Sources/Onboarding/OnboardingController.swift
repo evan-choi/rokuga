@@ -8,10 +8,11 @@ import SwiftUI
 @MainActor
 final class OnboardingController: NSObject, NSWindowDelegate {
     private let window: NSWindow
-    private let model = OnboardingModel()
+    private let model: OnboardingModel
     private let onComplete: () -> Void
 
-    init(onComplete: @escaping () -> Void) {
+    init(steps: [OnboardingModel.Step], onComplete: @escaping () -> Void) {
+        model = OnboardingModel(steps: steps)
         self.onComplete = onComplete
         window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 520, height: 400),
@@ -48,10 +49,42 @@ final class OnboardingModel: ObservableObject {
         case screenPermission
     }
 
-    @Published var step: Step = .welcome
+    let steps: [Step]
+    @Published var step: Step
     @Published var folderPath = OutputFolderStore.currentFolder().path
     @Published var permissionGranted: Bool?
     @Published var probing = false
+
+    init(steps: [Step]) {
+        self.steps = steps
+        step = steps.first ?? .welcome
+    }
+
+    var isLastStep: Bool {
+        step == steps.last
+    }
+
+    func advance() {
+        guard let index = steps.firstIndex(of: step), index + 1 < steps.count else { return }
+        step = steps[index + 1]
+    }
+
+    /// Unsatisfied requirements, in presentation order. The screen-recording probe runs on every
+    /// launch so a revoked permission re-onboards; folder choice and the welcome intro only gate
+    /// the very first run.
+    static func missingSteps(settings: SettingsStore = .shared) async -> [Step] {
+        var missing: [Step] = []
+        if !settings.onboardingCompleted, settings.outputFolderBookmark == nil {
+            missing.append(.outputFolder)
+        }
+        if await !ShareableContentService.hasScreenRecordingPermission() {
+            missing.append(.screenPermission)
+        }
+        if !missing.isEmpty, !settings.onboardingCompleted {
+            missing.insert(.welcome, at: 0)
+        }
+        return missing
+    }
 
     func chooseFolder() {
         let panel = NSOpenPanel()
@@ -173,19 +206,22 @@ struct OnboardingView: View {
     private var footer: some View {
         HStack {
             Spacer()
-            switch model.step {
-            case .welcome:
-                Button("Continue") { model.step = .outputFolder }
-                    .keyboardShortcut(.defaultAction)
-            case .outputFolder:
-                Button("Continue") { model.step = .screenPermission }
-                    .keyboardShortcut(.defaultAction)
-            case .screenPermission:
-                Button(model.permissionGranted == true ? "Start Recording" : "Finish Anyway", action: onDone)
+            if model.isLastStep {
+                Button(doneLabel, action: onDone)
                     .keyboardShortcut(.defaultAction)
                     .buttonStyle(.borderedProminent)
+            } else {
+                Button("Continue") { model.advance() }
+                    .keyboardShortcut(.defaultAction)
             }
         }
         .padding(16)
+    }
+
+    private var doneLabel: String {
+        if model.step == .screenPermission, model.permissionGranted != true {
+            return "Finish Anyway"
+        }
+        return "Start Recording"
     }
 }
