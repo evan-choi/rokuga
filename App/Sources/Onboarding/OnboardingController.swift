@@ -1,5 +1,6 @@
 import AppKit
 import CaptureKit
+import KeyboardShortcuts
 import SettingsKit
 import SwiftUI
 
@@ -28,8 +29,7 @@ final class OnboardingController: NSObject, NSWindowDelegate {
         window.delegate = self
         window.contentView = NSHostingView(
             rootView: OnboardingView(model: model) { [weak self] in
-                SettingsStore.shared.onboardingCompleted = true
-                self?.window.close()
+                self?.finish()
                 self?.onComplete()
             }
         )
@@ -39,6 +39,21 @@ final class OnboardingController: NSObject, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
     }
+
+    /// Marks onboarding done and closes the window without the completion callback —
+    /// used when the user starts a recording while onboarding is still on screen.
+    func completeSilently() {
+        finish()
+    }
+
+    var isShowingGetStarted: Bool {
+        model.step == .getStarted
+    }
+
+    private func finish() {
+        SettingsStore.shared.onboardingCompleted = true
+        window.close()
+    }
 }
 
 @MainActor
@@ -47,11 +62,12 @@ final class OnboardingModel: ObservableObject {
         case welcome
         case outputFolder
         case screenPermission
+        case getStarted
     }
 
     let steps: [Step]
     @Published var step: Step
-    @Published var folderPath = OutputFolderStore.currentFolder().path
+    @Published var folderPath = OutputFolderStore.displayPath()
     @Published var permissionGranted: Bool?
     @Published var probing = false
 
@@ -80,8 +96,9 @@ final class OnboardingModel: ObservableObject {
         if await !ShareableContentService.hasScreenRecordingPermission() {
             missing.append(.screenPermission)
         }
-        if !missing.isEmpty, !settings.onboardingCompleted {
+        if !settings.onboardingCompleted {
             missing.insert(.welcome, at: 0)
+            missing.append(.getStarted)
         }
         return missing
     }
@@ -94,7 +111,7 @@ final class OnboardingModel: ObservableObject {
         panel.directoryURL = OutputFolderStore.currentFolder()
         guard panel.runModal() == .OK, let url = panel.url else { return }
         OutputFolderStore.setFolder(url)
-        folderPath = url.path
+        folderPath = OutputFolderStore.displayPath(for: url)
     }
 
     func probePermission() {
@@ -150,7 +167,7 @@ struct OnboardingView: View {
                     .foregroundStyle(.red)
                 Text("Welcome to Rokuga")
                     .font(.title.bold())
-                Text("Free, native screen recording at 60 fps.\nNo watermarks, no time limits.")
+                Text("Before you start, let's set up a few things\nneeded for screen recording.")
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
             }
@@ -181,6 +198,33 @@ struct OnboardingView: View {
             }
             .padding(32)
             .onAppear { model.probePermission() }
+        case .getStarted:
+            VStack(spacing: 14) {
+                Image(systemName: "keyboard")
+                    .font(.system(size: 48))
+                    .foregroundStyle(.tint)
+                Text("You're all set")
+                    .font(.title2.bold())
+                shortcutCaps
+                    .padding(.vertical, 6)
+                Text("Press this shortcut anytime to open the recording toolbar and start recording.")
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(32)
+        }
+    }
+
+    private var shortcutCaps: some View {
+        let keys = (KeyboardShortcuts.getShortcut(for: .summonToolbar)?.description ?? "⇧⌘6")
+            .map(String.init)
+        return HStack(spacing: 6) {
+            ForEach(keys.indices, id: \.self) { index in
+                Text(verbatim: keys[index])
+                    .font(.system(size: 19, weight: .medium))
+                    .frame(width: 40, height: 40)
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 9))
+            }
         }
     }
 
@@ -220,8 +264,8 @@ struct OnboardingView: View {
 
     private var doneLabel: String {
         if model.step == .screenPermission, model.permissionGranted != true {
-            return "Finish Anyway"
+            return String(localized: "Finish Anyway")
         }
-        return "Start Recording"
+        return String(localized: "Done")
     }
 }
