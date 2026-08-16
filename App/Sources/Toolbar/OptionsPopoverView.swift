@@ -3,6 +3,15 @@ import SettingsKit
 import SwiftUI
 
 struct OptionsPopoverView: View {
+    private enum Layout {
+        static let outerPadding: CGFloat = 16
+        static let sectionSpacing: CGFloat = 12
+        static let titleSpacing: CGFloat = 4
+        static let rowSpacing: CGFloat = 4
+        static let segmentedControlWidth: CGFloat = 186
+        static let width = segmentedControlWidth + outerPadding * 2
+    }
+
     @AppStorage(SettingsStore.Key.countdown.rawValue) private var countdown = CountdownDuration.three.rawValue
     @AppStorage(SettingsStore.Key.frameRate.rawValue) private var frameRate = FrameRate.fps60.rawValue
     @AppStorage(SettingsStore.Key.captureSystemAudio.rawValue) private var systemAudio = true
@@ -12,7 +21,7 @@ struct OptionsPopoverView: View {
     @AppStorage(SettingsStore.Key.showFloatingThumbnail.rawValue) private var showThumbnail = true
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: Layout.sectionSpacing) {
             section("Save to") {
                 Button {
                     chooseOutputFolder()
@@ -31,6 +40,7 @@ struct OptionsPopoverView: View {
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
+                .frame(width: Layout.segmentedControlWidth)
             }
 
             section("Frame Rate") {
@@ -40,6 +50,7 @@ struct OptionsPopoverView: View {
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
+                .frame(width: Layout.segmentedControlWidth)
             }
 
             section("Audio") {
@@ -56,16 +67,18 @@ struct OptionsPopoverView: View {
                 Toggle("Show Floating Thumbnail", isOn: $showThumbnail)
             }
         }
-        .padding(16)
-        .frame(width: 260)
+        .padding(Layout.outerPadding)
+        .frame(width: Layout.width)
     }
 
     private func section(_ title: LocalizedStringKey, @ViewBuilder content: () -> some View) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: Layout.titleSpacing) {
             Text(title)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
-            content()
+            VStack(alignment: .leading, spacing: Layout.rowSpacing) {
+                content()
+            }
         }
     }
 
