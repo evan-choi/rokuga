@@ -3,11 +3,9 @@ import Foundation
 import ScreenCaptureKit
 
 public struct ExclusionOptions: Equatable, Sendable {
-    public var excludeOwnWindows: Bool
     public var excludeDesktopIcons: Bool
 
-    public init(excludeOwnWindows: Bool, excludeDesktopIcons: Bool) {
-        self.excludeOwnWindows = excludeOwnWindows
+    public init(excludeDesktopIcons: Bool) {
         self.excludeDesktopIcons = excludeDesktopIcons
     }
 }
@@ -36,7 +34,7 @@ public enum ContentFilterBuilder {
         }
     }
 
-    /// Union of: overlay windows (always), own-process windows (toggle), desktop-icon-level windows (toggle).
+    /// Union of: overlay windows (always), own-process windows (always), desktop-icon-level windows (toggle).
     static func excludedWindows(
         in content: SCShareableContent,
         exclusion: ExclusionOptions,
@@ -48,7 +46,7 @@ public enum ContentFilterBuilder {
 
         return content.windows.filter { window in
             if overlayIDs.contains(window.windowID) { return true }
-            if exclusion.excludeOwnWindows, window.owningApplication?.processID == ownPID { return true }
+            if window.owningApplication?.processID == ownPID { return true }
             if exclusion.excludeDesktopIcons, window.windowLayer == desktopIconLevel { return true }
             return false
         }

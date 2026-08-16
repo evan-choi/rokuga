@@ -79,7 +79,6 @@ private struct RecordingPane: View {
                 Text("Full Screen").tag(RecordingMode.fullScreen)
                 Text("Window").tag(RecordingMode.window)
             }
-            Toggle("Exclude Rokuga windows from recordings", isOn: $model.excludeOwnWindows)
             Toggle("Hide desktop icons in recordings", isOn: $model.excludeDesktopIcons)
         }
         .padding(20)
@@ -176,14 +175,13 @@ private struct OutputPane: View {
     }
 }
 
+/// Legacy Settings opener for macOS 13 only.
+/// On macOS 14+ this selector no longer exists; use the `openSettings`
+/// environment action instead (see `SettingsMenuItem`).
 @MainActor
 enum SettingsOpener {
     static func open() {
         NSApp.activate(ignoringOtherApps: true)
-        if #available(macOS 14.0, *) {
-            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        } else {
-            NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
-        }
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
     }
 }

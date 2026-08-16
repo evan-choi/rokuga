@@ -36,7 +36,6 @@ public struct CaptureConfiguration: Equatable, Sendable {
                 && !settings.highlightCursor && !settings.animateClicks,
             captureSystemAudio: settings.captureSystemAudio,
             exclusion: ExclusionOptions(
-                excludeOwnWindows: settings.excludeOwnWindows,
                 excludeDesktopIcons: settings.excludeDesktopIcons
             ),
             cursorEffects: CursorEffectOptions.fromSettings(settings)
