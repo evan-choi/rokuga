@@ -45,6 +45,7 @@
 		14B4579472853FA6D7E3849D /* CapturePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturePanel.swift; sourceTree = "<group>"; };
 		1CB554C599BD6B3D70D9A193 /* GlassBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassBackground.swift; sourceTree = "<group>"; };
 		209F6E4825E2D2B4012A1650 /* ToolbarPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarPanelController.swift; sourceTree = "<group>"; };
+		363BE41FAA2F085FDFBD2F58 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		3BEBD44FF847DBD5E2F20703 /* SelectionOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionOverlays.swift; sourceTree = "<group>"; };
 		3EBA99597B5C4A79AA0F0957 /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		4333162F241D181B98466D2E /* RokugaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RokugaApp.swift; sourceTree = "<group>"; };
@@ -116,6 +117,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		3E10CF5824EE901971E5832F /* Configs */ = {
+			isa = PBXGroup;
+			children = (
+				363BE41FAA2F085FDFBD2F58 /* Signing.xcconfig */,
+			);
+			path = Configs;
+			sourceTree = "<group>";
+		};
 		52877974FB8CA745C8A6AF9F /* Editor */ = {
 			isa = PBXGroup;
 			children = (
@@ -139,6 +148,7 @@
 			isa = PBXGroup;
 			children = (
 				0F0853D08EE88CE47D87F625 /* App */,
+				3E10CF5824EE901971E5832F /* Configs */,
 				DCBC1169A3616CC05BF63DA8 /* Packages */,
 				805FF15BC3F319E5FA68D917 /* Products */,
 			);
@@ -257,7 +267,7 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					BA7DE5DB27F92039C26883B8 = {
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -368,6 +378,7 @@
 		};
 		9A2C2A3895F476EC0800934C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 363BE41FAA2F085FDFBD2F58 /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -399,8 +410,8 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -415,6 +426,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MARKETING_VERSION = 0.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -427,6 +439,7 @@
 		};
 		D2E578E9ADF9584F526B7123 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 363BE41FAA2F085FDFBD2F58 /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -458,8 +471,8 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -480,6 +493,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MARKETING_VERSION = 0.1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;

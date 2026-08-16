@@ -81,6 +81,11 @@ Rokuga is being built **spec-first** with [OpenSpec](https://github.com/Fission-
 git clone https://github.com/evan-choi/rokuga.git
 cd rokuga
 
+# Generate the Xcode project and build — works out of the box,
+# no Apple account or certificate required (ad-hoc signing)
+xcodegen generate
+open Rokuga.xcodeproj
+
 # Explore the specs
 openspec list
 openspec show add-core-screen-recording
@@ -89,7 +94,10 @@ openspec show add-core-screen-recording
 open design/mockups/index.html
 ```
 
-The Xcode project lands with the first implementation phase (see `openspec/changes/add-core-screen-recording/tasks.md`).
+> **Tip for regular contributors:** ad-hoc signing resets macOS privacy
+> permissions (Screen Recording, Microphone) on every rebuild. Run
+> `./scripts/setup-dev-signing.sh` once to create a local self-signed
+> certificate — no Apple ID needed — so permissions persist across builds.
 
 ## Contributing
 
