@@ -23,7 +23,7 @@ final class PreviewPanelController {
             height: Self.size.height
         )
 
-        panel = CapturePanel(contentRect: originFrame ?? targetFrame)
+        panel = CapturePanel(contentRect: originFrame ?? targetFrame, showsWindowShadow: false)
         panel.contentView = NSHostingView(
             rootView: PreviewPanelView(
                 model: model,
