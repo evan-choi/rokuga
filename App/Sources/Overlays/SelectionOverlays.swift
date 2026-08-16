@@ -33,6 +33,16 @@ enum ScreenCoords {
     }
 }
 
+private enum SelectionCursors {
+    static let clickToRecord: NSCursor = {
+        guard let image = NSImage(named: NSImage.Name("ScreenshotWindowCursor")) else {
+            return .crosshair
+        }
+        image.size = NSSize(width: 32, height: 32)
+        return NSCursor(image: image, hotSpot: NSPoint(x: 16, y: 16))
+    }()
+}
+
 /// Front-to-back window geometry for hover hit-testing, refreshed at most every 0.25 s.
 final class WindowHitTester {
     private var cache: [(target: WindowTarget, cgFrame: CGRect)] = []
@@ -83,6 +93,17 @@ final class WindowHitTester {
 class SelectionTrackingView: NSView {
     var onMouseMoved: (() -> Void)?
     var onMouseDown: (() -> Void)?
+    var selectionCursor: NSCursor? {
+        didSet {
+            invalidateSelectionCursorRects()
+        }
+    }
+
+    var selectionCursorRects: [NSRect] = [] {
+        didSet {
+            invalidateSelectionCursorRects()
+        }
+    }
 
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
@@ -90,16 +111,57 @@ class SelectionTrackingView: NSView {
         addTrackingArea(
             NSTrackingArea(
                 rect: bounds,
-                options: [.mouseMoved, .mouseEnteredAndExited, .activeAlways],
+                options: [.mouseMoved, .mouseEnteredAndExited, .cursorUpdate, .activeAlways],
                 owner: self
             )
         )
     }
 
+    override func resetCursorRects() {
+        super.resetCursorRects()
+        if let selectionCursor {
+            for rect in selectionCursorRects {
+                addCursorRect(rect.intersection(bounds), cursor: selectionCursor)
+            }
+        }
+    }
+
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
-    override func mouseMoved(with event: NSEvent) { onMouseMoved?() }
-    override func mouseEntered(with event: NSEvent) { onMouseMoved?() }
+    override func mouseMoved(with event: NSEvent) {
+        onMouseMoved?()
+        applySelectionCursor(for: event)
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        onMouseMoved?()
+        applySelectionCursor(for: event)
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        NSCursor.arrow.set()
+    }
+
+    override func cursorUpdate(with event: NSEvent) {
+        applySelectionCursor(for: event)
+    }
+
     override func mouseDown(with event: NSEvent) { onMouseDown?() }
+
+    private func invalidateSelectionCursorRects() {
+        if let window {
+            window.invalidateCursorRects(for: self)
+        }
+    }
+
+    private func applySelectionCursor(for event: NSEvent) {
+        let point = convert(event.locationInWindow, from: nil)
+        let isRecordTarget = selectionCursorRects.contains { $0.contains(point) }
+        if isRecordTarget, let selectionCursor {
+            selectionCursor.set()
+        } else {
+            NSCursor.arrow.set()
+        }
+    }
 }
 
 /// Window mode selection layer: translucent highlight follows the hovered window; click records it.
@@ -117,6 +179,7 @@ final class WindowHoverController {
             let panel = CapturePanel(contentRect: screen.frame, level: .screenSaver)
             panel.isMovableByWindowBackground = false
             let view = HoverHighlightView(frame: NSRect(origin: .zero, size: screen.frame.size))
+            view.selectionCursor = SelectionCursors.clickToRecord
             view.onMouseMoved = { [weak self] in self?.updateHover() }
             view.onMouseDown = { [weak self] in self?.pick() }
             panel.contentView = view
@@ -130,7 +193,6 @@ final class WindowHoverController {
             panel.orderFrontRegardless()
             panel.registerForCaptureExclusion()
         }
-        NSCursor.crosshair.set()
         updateHover()
     }
 
@@ -148,9 +210,12 @@ final class WindowHoverController {
         let cocoaFrame = hit.map { ScreenCoords.cocoaRect(fromCG: $0.cgFrame) }
         for (panel, view) in zip(panels, highlightViews) {
             if let cocoaFrame, panel.frame.intersects(cocoaFrame) {
-                view.highlightRect = cocoaFrame.offsetBy(dx: -panel.frame.minX, dy: -panel.frame.minY)
+                let highlightRect = cocoaFrame.offsetBy(dx: -panel.frame.minX, dy: -panel.frame.minY)
+                view.highlightRect = highlightRect
+                view.selectionCursorRects = [highlightRect]
             } else {
                 view.highlightRect = nil
+                view.selectionCursorRects = []
             }
         }
     }
@@ -189,8 +254,11 @@ final class DisplaySelectController {
         self.onPick = onPick
         for screen in NSScreen.screens {
             let panel = CapturePanel(contentRect: screen.frame, level: .screenSaver)
+            panel.ignoresMouseEvents = false
             panel.isMovableByWindowBackground = false
             let view = DimView(frame: NSRect(origin: .zero, size: screen.frame.size))
+            view.selectionCursor = SelectionCursors.clickToRecord
+            view.selectionCursorRects = [view.bounds]
             view.onMouseMoved = { [weak self] in self?.updateHover() }
             view.onMouseDown = { [weak self] in self?.pick(screen: screen) }
             panel.contentView = view
@@ -209,6 +277,7 @@ final class DisplaySelectController {
     func close() {
         panels.forEach { $0.panel.close() }
         panels = []
+        NSCursor.arrow.set()
     }
 
     private func updateHover() {
@@ -235,8 +304,10 @@ final class DimView: SelectionTrackingView {
     }
 
     override func draw(_ dirtyRect: NSRect) {
-        guard dimmed else { return }
-        NSColor.black.withAlphaComponent(0.45).setFill()
+        // A fully transparent borderless panel is skipped by WindowServer hit testing.
+        // One alpha step keeps the selected display clickable without visibly dimming it.
+        let alpha: CGFloat = dimmed ? 0.45 : 1.0 / 255.0
+        NSColor.black.withAlphaComponent(alpha).setFill()
         bounds.fill()
     }
 }

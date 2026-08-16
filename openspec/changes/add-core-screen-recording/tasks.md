@@ -32,6 +32,8 @@
 - [x] 4.4 Liquid Glass materials with `NSVisualEffectView`/`.ultraThinMaterial` fallback (13.3–15) + reduce-transparency accessibility path
 - [x] 4.5 Region selection overlay: drag-select, resizable edges/corners, pixel-loupe magnifier, per-display persistence (window snapping dropped: required capturable-content queries pre-permission)
 - [x] 4.6 Countdown overlay (1–10 s, Esc cancels, always capture-excluded)
+- [x] 4.7 Full Screen selection overlay: clicking any display starts recording that display immediately
+- [x] 4.8 Click-to-record cursor: show the bundled camera cursor over Window and Full Screen selection layers and restore the arrow on close
 
 ## 5. Recording controls & hotkeys
 
