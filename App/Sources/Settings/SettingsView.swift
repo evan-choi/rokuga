@@ -6,26 +6,33 @@ import SwiftUI
 struct SettingsView: View {
     @StateObject private var model = SettingsModel()
     @ObservedObject private var appState = AppState.shared
+    @State private var paneHeight: CGFloat?
 
     private var locked: Bool { appState.recordingState.isActive }
 
     var body: some View {
         TabView {
             GeneralPane(model: model)
+                .animatedPaneHeight($paneHeight)
                 .tabItem { Label("General", systemImage: "gearshape") }
                 .disabled(locked)
             RecordingPane(model: model)
+                .animatedPaneHeight($paneHeight)
                 .tabItem { Label("Recording", systemImage: "record.circle") }
                 .disabled(locked)
             AudioPane(model: model)
+                .animatedPaneHeight($paneHeight)
                 .tabItem { Label("Audio", systemImage: "speaker.wave.2") }
                 .disabled(locked)
             MousePane(model: model)
+                .animatedPaneHeight($paneHeight)
                 .tabItem { Label("Mouse", systemImage: "cursorarrow.motionlines") }
                 .disabled(locked)
             ShortcutsPane()
+                .animatedPaneHeight($paneHeight)
                 .tabItem { Label("Shortcuts", systemImage: "keyboard") }
             OutputPane(model: model)
+                .animatedPaneHeight($paneHeight)
                 .tabItem { Label("Output", systemImage: "folder") }
                 .disabled(locked)
         }
@@ -125,7 +132,6 @@ struct ShortcutsPane: View {
         Form {
             KeyboardShortcuts.Recorder("Open Recording Toolbar", name: .summonToolbar)
             KeyboardShortcuts.Recorder("Start / Stop Recording", name: .toggleRecording)
-            KeyboardShortcuts.Recorder("Pause / Resume", name: .pauseResume)
         }
         .padding(20)
     }
@@ -183,5 +189,43 @@ enum SettingsOpener {
     static func open() {
         NSApp.activate(ignoringOtherApps: true)
         NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+    }
+}
+
+/// SwiftUI's Settings `TabView` snaps the window to each pane's size, unlike AppKit's
+/// `NSTabViewController` which animates it. Pinning every pane to one shared height and
+/// animating that value makes the window frame follow smoothly instead.
+private struct AnimatedPaneHeight: ViewModifier {
+    @Binding var sharedHeight: CGFloat?
+    @State private var naturalHeight: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .fixedSize(horizontal: false, vertical: true)
+            .background(
+                GeometryReader { proxy in
+                    Color.clear
+                        .onAppear { apply(proxy.size.height) }
+                        .onChange(of: proxy.size.height) { apply($0) }
+                }
+            )
+            .frame(height: sharedHeight ?? naturalHeight, alignment: .top)
+            .clipped()
+    }
+
+    private func apply(_ height: CGFloat) {
+        naturalHeight = height
+        guard height > 0, sharedHeight != height else { return }
+        if sharedHeight == nil {
+            sharedHeight = height
+        } else {
+            withAnimation(.easeOut(duration: 0.22)) { sharedHeight = height }
+        }
+    }
+}
+
+private extension View {
+    func animatedPaneHeight(_ height: Binding<CGFloat?>) -> some View {
+        modifier(AnimatedPaneHeight(sharedHeight: height))
     }
 }
