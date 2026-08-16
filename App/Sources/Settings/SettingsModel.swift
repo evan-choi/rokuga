@@ -41,11 +41,6 @@ final class SettingsModel: ObservableObject {
         set { update { $0.recordingMode = newValue } }
     }
 
-    var excludeOwnWindows: Bool {
-        get { store.excludeOwnWindows }
-        set { update { $0.excludeOwnWindows = newValue } }
-    }
-
     var excludeDesktopIcons: Bool {
         get { store.excludeDesktopIcons }
         set { update { $0.excludeDesktopIcons = newValue } }

@@ -30,7 +30,6 @@ public final class SettingsStore: @unchecked Sendable {
         case highlightCursor = "mouse.highlight"
         case animateClicks = "mouse.clicks"
         case countdown = "recording.countdown"
-        case excludeOwnWindows = "capture.excludeOwnWindows"
         case excludeDesktopIcons = "capture.excludeDesktopIcons"
         case showFloatingThumbnail = "post.showThumbnail"
         case outputFolderBookmark = "output.folderBookmark"
@@ -54,12 +53,12 @@ public final class SettingsStore: @unchecked Sendable {
     }
 
     public var videoCodec: VideoCodec {
-        get { rawRepresentable(.videoCodec) ?? .h264 }
+        get { rawRepresentable(.videoCodec) ?? .hevc }
         set { setRawRepresentable(newValue, for: .videoCodec) }
     }
 
     public var containerFormat: ContainerFormat {
-        get { rawRepresentable(.containerFormat) ?? .mp4 }
+        get { rawRepresentable(.containerFormat) ?? .mov }
         set { setRawRepresentable(newValue, for: .containerFormat) }
     }
 
@@ -105,18 +104,13 @@ public final class SettingsStore: @unchecked Sendable {
     }
 
     public var animateClicks: Bool {
-        get { bool(.animateClicks, default: false) }
+        get { bool(.animateClicks, default: true) }
         set { set(newValue, for: .animateClicks) }
     }
 
     public var countdown: CountdownDuration {
         get { rawRepresentable(.countdown) ?? .three }
         set { setRawRepresentable(newValue, for: .countdown) }
-    }
-
-    public var excludeOwnWindows: Bool {
-        get { bool(.excludeOwnWindows, default: true) }
-        set { set(newValue, for: .excludeOwnWindows) }
     }
 
     public var excludeDesktopIcons: Bool {
