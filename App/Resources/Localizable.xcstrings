@@ -271,6 +271,28 @@
         }
       }
     },
+    "Before you start, let's set up a few things\nneeded for screen recording.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "始める前に、画面録画に必要な\nいくつかの設定を行います。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시작하기 전에 화면 녹화에 필요한\n몇 가지 설정할게요"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始之前，先完成屏幕录制\n所需的几项设置。"
+          }
+        }
+      }
+    },
     "Cancel": {
       "extractionState": "stale",
       "localizations": {
@@ -887,28 +909,6 @@
         }
       }
     },
-    "Free, native screen recording at 60 fps.\nNo watermarks, no time limits.": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "無料のネイティブ60fps画面録画。\n透かしなし、時間制限なし。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "무료 네이티브 60fps 화면 녹화.\n워터마크 없음, 시간 제한 없음."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "免费的原生 60fps 屏幕录制。\n无水印，无时长限制。"
-          }
-        }
-      }
-    },
     "Full Screen": {
       "localizations": {
         "ja": {
@@ -1388,29 +1388,6 @@
         }
       }
     },
-    "Pause / Resume": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一時停止 / 再開"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "일시 정지 / 재개"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "暂停 / 继续"
-          }
-        }
-      }
-    },
     "Permission granted. You're ready to record.": {
       "localizations": {
         "ja": {
@@ -1498,6 +1475,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "偏好设置将恢复为默认值。您的录制不受影响。"
+          }
+        }
+      }
+    },
+    "Press this shortcut anytime to open the recording toolbar and start recording.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "いつでもこのショートカットで録画ツールバーを開いて録画を開始できます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "언제든 이 단축키를 누르면 녹화 도구 막대가 열리고 녹화를 시작할 수 있어요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "随时按下此快捷键即可打开录制工具栏并开始录制。"
           }
         }
       }
@@ -2117,29 +2116,6 @@
         }
       }
     },
-    "Start Recording": {
-      "extractionState": "stale",
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "録画を開始"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "녹화 시작"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "开始录制"
-          }
-        }
-      }
-    },
     "Stop Recording": {
       "extractionState": "stale",
       "localizations": {
@@ -2405,6 +2381,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "窗口"
+          }
+        }
+      }
+    },
+    "You're all set": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "準備完了"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "준비 완료"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一切就绪"
           }
         }
       }
