@@ -21,6 +21,7 @@ public final class SettingsStore: @unchecked Sendable {
         case videoCodec = "output.codec"
         case containerFormat = "output.container"
         case frameRate = "output.fps"
+        case frameRateMode = "output.frameRateMode"
         case videoQuality = "output.quality" // 0...100 VBR quality
         case audioBitrate = "output.audioBitrate"
         case captureSystemAudio = "audio.system"
@@ -65,6 +66,11 @@ public final class SettingsStore: @unchecked Sendable {
     public var frameRate: FrameRate {
         get { rawRepresentable(.frameRate) ?? .fps60 }
         set { setRawRepresentable(newValue, for: .frameRate) }
+    }
+
+    public var frameRateMode: FrameRateMode {
+        get { rawRepresentable(.frameRateMode) ?? .variable }
+        set { setRawRepresentable(newValue, for: .frameRateMode) }
     }
 
     /// VBR quality 0...100 (see output-settings spec §rate-control).
