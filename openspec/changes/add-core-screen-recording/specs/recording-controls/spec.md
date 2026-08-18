@@ -55,7 +55,7 @@ The app SHALL provide a menu bar status item at all times while running. While i
 - **THEN** the app asks for confirmation, and on confirm stops the recording, finalizes the file, then quits
 
 ### Requirement: Recording toolbar summon and placement
-The app SHALL present its idle UI as a floating recording toolbar, summoned only by the menu bar icon or the toolbar global shortcut (default ⇧⌘6) — never automatically at app launch, mirroring the system capture UI. The toolbar MUST appear at the bottom-center of the display that currently contains the mouse pointer, MUST NOT steal keyboard focus from the frontmost app (non-activating panel), and SHALL dismiss on Esc or when a recording starts.
+The app SHALL present its idle UI as a floating recording toolbar, summoned only by the menu bar icon or the toolbar global shortcut (default ⇧⌘6) — never automatically at app launch, mirroring the system capture UI. The toolbar MUST appear at the bottom-center of the display that currently contains the mouse pointer, MUST move only when its divider handle is dragged, MUST NOT steal keyboard focus from the frontmost app (non-activating panel), and SHALL dismiss on Esc or when a recording starts.
 
 #### Scenario: Summon on the display under the mouse
 - **WHEN** the user presses ⇧⌘6 while the mouse pointer is on a secondary display
@@ -64,6 +64,14 @@ The app SHALL present its idle UI as a floating recording toolbar, summoned only
 #### Scenario: Toolbar does not steal focus
 - **WHEN** the toolbar is summoned while another app is frontmost
 - **THEN** the other app keeps keyboard focus and its window state does not change
+
+#### Scenario: Toolbar moves from its divider handle
+- **WHEN** the user drags the toolbar divider handle
+- **THEN** the toolbar follows the pointer like the system capture toolbar
+
+#### Scenario: Toolbar background remains fixed
+- **WHEN** the user drags the toolbar background
+- **THEN** the toolbar does not move
 
 #### Scenario: Dismissal
 - **WHEN** the user presses Esc or starts a recording
