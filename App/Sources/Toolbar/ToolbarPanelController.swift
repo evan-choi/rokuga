@@ -22,6 +22,8 @@ final class ToolbarPanelController {
             level: Self.windowLevel,
             showsWindowShadow: false
         )
+        panel.isMovable = true
+        panel.isMovableByWindowBackground = false
         panel.contentView = hostingView
         panel.clipContent(toRoundedRect: 16)
         panel.onEscape = { [weak appState] in appState?.dismissToolbar() }
