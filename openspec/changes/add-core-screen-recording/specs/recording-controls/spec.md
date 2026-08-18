@@ -79,7 +79,11 @@ The app SHALL present its idle UI as a floating recording toolbar, summoned only
 
 #### Scenario: Immediate anchored tooltip
 - **WHEN** the pointer enters an icon-only toolbar control
-- **THEN** its label appears immediately above the toolbar in a rounded background with no rectangular outline or window shadow
+- **THEN** its label appears immediately above the toolbar with no delay or fade-in, in a rounded background with no rectangular outline or window shadow
+
+#### Scenario: Immediate tooltip dismissal
+- **WHEN** the pointer exits an icon-only toolbar control
+- **THEN** its tooltip disappears immediately with no fade-out
 
 #### Scenario: Dismissal
 - **WHEN** the user presses Esc or starts a recording
