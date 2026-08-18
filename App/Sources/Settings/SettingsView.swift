@@ -12,10 +12,9 @@ struct SettingsView: View {
 
     var body: some View {
         TabView {
-            GeneralPane(model: model)
+            GeneralPane(model: model, locked: locked)
                 .animatedPaneHeight($paneHeight)
                 .tabItem { Label("General", systemImage: "gearshape") }
-                .disabled(locked)
             RecordingPane(model: model)
                 .animatedPaneHeight($paneHeight)
                 .tabItem { Label("Recording", systemImage: "record.circle") }
@@ -50,6 +49,7 @@ struct SettingsView: View {
 
 private struct GeneralPane: View {
     @ObservedObject var model: SettingsModel
+    let locked: Bool
 
     var body: some View {
         Form {
@@ -70,6 +70,7 @@ private struct GeneralPane: View {
             HStack {
                 Spacer()
                 Button("Reset All Settings…", action: model.resetAll)
+                    .disabled(locked)
             }
         }
         .padding(20)

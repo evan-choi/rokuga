@@ -24,8 +24,7 @@ struct TrimEditorView: View {
             footer
         }
         .frame(minWidth: 640, minHeight: 460)
-        .background(Color(red: 0.11, green: 0.11, blue: 0.13))
-        .preferredColorScheme(.dark)
+        .background(Color(nsColor: .windowBackgroundColor))
         .sheet(isPresented: exportSheetShown) {
             exportProgressSheet
         }

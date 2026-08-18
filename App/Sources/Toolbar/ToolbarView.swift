@@ -22,7 +22,6 @@ struct ToolbarView: View {
         .frame(height: 54)
         .fixedSize()
         .background(GlassBackground(cornerRadius: 16))
-        .preferredColorScheme(.dark)
         .hiddenFocusRing()
     }
 
@@ -49,10 +48,10 @@ struct ToolbarView: View {
             .contentShape(RoundedRectangle(cornerRadius: 9))
         }
         .buttonStyle(.plain)
-        .foregroundStyle(mode == target ? Color.white : Color.white.opacity(0.55))
+        .foregroundStyle(Color.primary)
         .background(
             RoundedRectangle(cornerRadius: 9)
-                .fill(mode == target ? Color.white.opacity(0.14) : .clear)
+                .fill(mode == target ? Color(nsColor: .unemphasizedSelectedContentBackgroundColor) : .clear)
         )
         .accessibilityLabel(Text(label))
         .accessibilityAddTraits(mode == target ? .isSelected : [])
@@ -68,7 +67,7 @@ struct ToolbarView: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .foregroundStyle(Color.white.opacity(0.7))
+        .foregroundStyle(Color.primary)
         .accessibilityLabel(Text("Options"))
         .popover(isPresented: $showsOptions) {
             OptionsPopoverView()
@@ -89,8 +88,8 @@ struct ToolbarView: View {
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
-        .foregroundStyle(.white)
-        .background(Capsule().fill(Color.white.opacity(0.12)))
+        .foregroundStyle(.primary)
+        .background(Capsule().fill(Color(nsColor: .controlBackgroundColor).opacity(0.72)))
         .keyboardShortcut(.defaultAction)
         .accessibilityLabel(Text("Record"))
     }

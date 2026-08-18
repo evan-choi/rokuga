@@ -20,6 +20,7 @@ final class ToolbarPanelController {
             showsWindowShadow: false
         )
         panel.contentView = hostingView
+        panel.clipContent(toRoundedRect: 16)
         panel.onEscape = { [weak appState] in appState?.dismissToolbar() }
         panel.onReturn = { [weak appState] in appState?.requestRecord() }
     }
@@ -31,19 +32,23 @@ final class ToolbarPanelController {
     /// Bottom-center of the display the mouse pointer is on (user requirement t=172).
     func showAtMouseDisplay() {
         let mouse = NSEvent.mouseLocation
-        let screen = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) } ?? NSScreen.main
-        guard let visible = screen?.visibleFrame else { return }
+        guard let screen = NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) ?? NSScreen.main
+        else { return }
+        let visible = screen.visibleFrame
 
         let size = hostingView.fittingSize
-        panel.setFrame(
+        let targetFrame = Self.backingAlignedFrame(
             NSRect(
                 x: visible.midX - size.width / 2,
                 y: visible.minY + Self.bottomMargin,
                 width: size.width,
                 height: size.height
             ),
-            display: true
+            scale: screen.backingScaleFactor
         )
+        panel.setFrame(targetFrame, display: true)
+        hostingView.layer?.contentsScale = screen.backingScaleFactor
+        hostingView.needsDisplay = true
         panel.orderFrontRegardless()
         panel.makeKey()
         panel.registerForCaptureExclusion()
@@ -51,5 +56,20 @@ final class ToolbarPanelController {
 
     func hide() {
         panel.orderOut(nil)
+    }
+
+    private static func backingAlignedFrame(_ frame: NSRect, scale: CGFloat) -> NSRect {
+        let scale = max(scale, 1)
+
+        func aligned(_ value: CGFloat) -> CGFloat {
+            (value * scale).rounded() / scale
+        }
+
+        return NSRect(
+            x: aligned(frame.origin.x),
+            y: aligned(frame.origin.y),
+            width: aligned(frame.width),
+            height: aligned(frame.height)
+        )
     }
 }

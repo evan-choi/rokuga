@@ -32,6 +32,7 @@ final class PreviewPanelController {
                 onDone: { [weak self] in self?.close() }
             )
         )
+        panel.clipContent(toRoundedRect: 16)
         panel.onEscape = { [weak self] in self?.close() }
 
         panel.orderFrontRegardless()
@@ -146,7 +147,6 @@ struct PreviewPanelView: View {
             controls
         }
         .background(GlassBackground(cornerRadius: 16))
-        .preferredColorScheme(.dark)
         .hiddenFocusRing()
     }
 
@@ -155,7 +155,7 @@ struct PreviewPanelView: View {
             Text(model.url.lastPathComponent)
                 .font(.system(size: 12, weight: .medium))
                 .lineLimit(1)
-                .foregroundStyle(.white.opacity(0.75))
+                .foregroundStyle(Color.primary)
             Spacer()
             Button("Edit", action: onEdit)
             Button(action: onDelete) {
@@ -166,7 +166,7 @@ struct PreviewPanelView: View {
                 .keyboardShortcut(.cancelAction)
         }
         .buttonStyle(.plain)
-        .foregroundStyle(.white.opacity(0.85))
+        .foregroundStyle(.primary)
         .padding(.horizontal, 14)
         .frame(height: 40)
     }
@@ -179,7 +179,7 @@ struct PreviewPanelView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .foregroundStyle(.white)
+            .foregroundStyle(.primary)
             .accessibilityLabel(Text(model.isPlaying ? "Pause" : "Play"))
 
             Slider(

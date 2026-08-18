@@ -19,7 +19,6 @@ final class TrimEditorController: NSObject, NSWindowDelegate {
         )
         window.title = url.lastPathComponent
         window.titlebarAppearsTransparent = true
-        window.appearance = NSAppearance(named: .darkAqua)
         window.isReleasedWhenClosed = false
         window.center()
 
