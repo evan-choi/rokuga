@@ -36,6 +36,7 @@ final class ToolbarPanelController {
 
     /// Bottom-center of the display the mouse pointer is on (user requirement t=172).
     func showAtMouseDisplay() {
+        ToolbarTooltipPresenter.shared.hide()
         let mouse = NSEvent.mouseLocation
         guard let screen = NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) ?? NSScreen.main
         else { return }
@@ -60,6 +61,7 @@ final class ToolbarPanelController {
     }
 
     func hide() {
+        ToolbarTooltipPresenter.shared.hide()
         panel.orderOut(nil)
     }
 
