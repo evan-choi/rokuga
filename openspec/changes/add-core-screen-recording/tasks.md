@@ -42,7 +42,7 @@
 - [x] 4.9 Area selection resize cursors: use the bundled horizontal, vertical, and two diagonal 32×32 SVGs for all eight handles
 - [ ] 4.10 Verify that toolbar and preview panels never take keyboard focus from the frontmost app
 - [x] 4.11 Extract shared capture-window chrome for the toolbar, tooltip, preview, and trim editor; apply the native glass/blur material contract to the trim editor
-- [x] 4.12 Add the system-capture toolbar close button and immediate, toolbar-anchored tooltips for icon-only controls; remove rectangular tooltip outlines and window shadows
+- [x] 4.12 Add the system-capture toolbar close button and immediate, fade-free, toolbar-anchored tooltips for icon-only controls; remove rectangular tooltip outlines and window shadows
 - [x] 4.13 Centralize non-key panel cursor tracking for toolbar drag, area resize/move, click-to-record selection, and trim handles
 
 ## 5. Recording controls & hotkeys

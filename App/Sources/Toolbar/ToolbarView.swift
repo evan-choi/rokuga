@@ -234,6 +234,7 @@ final class ToolbarTooltipPresenter {
         )
         panel.ignoresMouseEvents = true
         panel.isMovableByWindowBackground = false
+        panel.animationBehavior = .none
         panel.registerForCaptureExclusion()
         self.panel = panel
         return panel
