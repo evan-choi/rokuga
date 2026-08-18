@@ -21,6 +21,9 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     private var sessionStarted = false
     private var terminalError: Error?
     private var statistics = Statistics()
+    private var constantFrameTimer: DispatchSourceTimer?
+    private var latestConstantFrame: CMSampleBuffer?
+    private var nextConstantFramePTS: CMTime?
 
     /// Drop accounting feeds the perf gates (task 10.2: 4K60 drop-rate < 0.1%).
     public struct Statistics: Equatable, Sendable {
@@ -86,6 +89,7 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
 
     public func markPaused() {
         queue.async { [self] in
+            stopConstantFrameOutput(clearFrame: false)
             spliceClock.markPaused()
         }
     }
@@ -95,6 +99,7 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     public func finish() async throws -> URL {
         let writer: AVAssetWriter? = await withCheckedContinuation { continuation in
             queue.async { [self] in
+                stopConstantFrameOutput(clearFrame: true)
                 videoInput?.markAsFinished()
                 audioInput?.markAsFinished()
                 continuation.resume(returning: self.writer)
@@ -116,6 +121,7 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     public func cancel() async {
         await withCheckedContinuation { continuation in
             queue.async { [self] in
+                stopConstantFrameOutput(clearFrame: true)
                 writer?.cancelWriting()
                 try? FileManager.default.removeItem(at: outputURL)
                 continuation.resume()
@@ -126,7 +132,7 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     // MARK: Video path
 
     private func appendVideo(_ sampleBuffer: CMSampleBuffer) {
-        guard let writer, let videoInput, terminalError == nil else { return }
+        guard let writer, terminalError == nil else { return }
 
         let sourcePTS = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
         let adjustedPTS = spliceClock.adjusted(sourcePTS)
@@ -137,7 +143,18 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
             sessionStarted = true
         }
 
-        guard videoInput.isReadyForMoreMediaData, let retimed = retime(sampleBuffer, to: adjustedPTS) else {
+        if configuration.frameRateMode == .constant {
+            updateConstantFrame(sampleBuffer, adjustedPTS: adjustedPTS)
+        } else {
+            appendVideoSample(sampleBuffer, at: adjustedPTS)
+        }
+    }
+
+    private func appendVideoSample(_ sampleBuffer: CMSampleBuffer, at pts: CMTime, duration: CMTime? = nil) {
+        guard let writer, let videoInput, terminalError == nil else { return }
+        guard videoInput.isReadyForMoreMediaData,
+              let retimed = retime(sampleBuffer, to: pts, duration: duration)
+        else {
             statistics.videoFramesDropped += 1
             return
         }
@@ -146,6 +163,56 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
         } else {
             terminalError = RecordingSinkError.writerFailed(writer.error?.localizedDescription ?? "video append")
         }
+    }
+
+    /// CFR keeps a single latest-frame reference and emits it on the encoder queue's
+    /// fixed cadence. Static screen content therefore remains constant-rate even when
+    /// ScreenCaptureKit does not deliver a new complete frame.
+    private func updateConstantFrame(_ sampleBuffer: CMSampleBuffer, adjustedPTS: CMTime) {
+        latestConstantFrame = sampleBuffer
+        guard constantFrameTimer == nil else { return }
+
+        let duration = constantFrameDuration
+        let outputPTS = nextConstantFramePTS ?? adjustedPTS
+        appendVideoSample(sampleBuffer, at: outputPTS, duration: duration)
+        nextConstantFramePTS = CMTimeAdd(outputPTS, duration)
+        startConstantFrameTimer()
+    }
+
+    private func startConstantFrameTimer() {
+        let nanoseconds = max(1, 1_000_000_000 / configuration.frameRate.rawValue)
+        let timer = DispatchSource.makeTimerSource(queue: queue)
+        timer.schedule(
+            deadline: .now() + .nanoseconds(nanoseconds),
+            repeating: .nanoseconds(nanoseconds),
+            leeway: .milliseconds(1)
+        )
+        timer.setEventHandler { [weak self] in
+            self?.emitConstantFrame()
+        }
+        constantFrameTimer = timer
+        timer.resume()
+    }
+
+    private func emitConstantFrame() {
+        guard let sampleBuffer = latestConstantFrame,
+              let pts = nextConstantFramePTS
+        else { return }
+        appendVideoSample(sampleBuffer, at: pts, duration: constantFrameDuration)
+        nextConstantFramePTS = CMTimeAdd(pts, constantFrameDuration)
+    }
+
+    private func stopConstantFrameOutput(clearFrame: Bool) {
+        constantFrameTimer?.cancel()
+        constantFrameTimer = nil
+        if clearFrame {
+            latestConstantFrame = nil
+            nextConstantFramePTS = nil
+        }
+    }
+
+    private var constantFrameDuration: CMTime {
+        CMTime(value: 1, timescale: CMTimeScale(configuration.frameRate.rawValue))
     }
 
     // MARK: Audio path
@@ -197,12 +264,23 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
 
     // MARK: Helpers
 
-    private func retime(_ sampleBuffer: CMSampleBuffer, to pts: CMTime) -> CMSampleBuffer? {
+    private func retime(
+        _ sampleBuffer: CMSampleBuffer,
+        to pts: CMTime,
+        duration: CMTime? = nil
+    ) -> CMSampleBuffer? {
         let originalPTS = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
-        if CMTimeCompare(originalPTS, pts) == 0 { return sampleBuffer }
+        let originalDuration = CMSampleBufferGetDuration(sampleBuffer)
+        if CMTimeCompare(originalPTS, pts) == 0 {
+            if let duration {
+                if CMTimeCompare(originalDuration, duration) == 0 { return sampleBuffer }
+            } else {
+                return sampleBuffer
+            }
+        }
 
         var timing = CMSampleTimingInfo(
-            duration: CMSampleBufferGetDuration(sampleBuffer),
+            duration: duration ?? originalDuration,
             presentationTimeStamp: pts,
             decodeTimeStamp: .invalid
         )

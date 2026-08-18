@@ -476,6 +476,28 @@
         }
       }
     },
+    "Constant (CFR)": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "固定 (CFR)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "고정 (CFR)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恒定 (CFR)"
+          }
+        }
+      }
+    },
     "Continue": {
       "extractionState": "stale",
       "localizations": {
@@ -882,6 +904,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "帧率"
+          }
+        }
+      }
+    },
+    "Frame rate mode": {
+      "extractionState": "stale",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フレームレートモード"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "프레임 레이트 모드"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "帧率模式"
           }
         }
       }
@@ -2292,6 +2337,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "使用方向键将起始手柄微移一帧，Option+方向键移动结束手柄"
+          }
+        }
+      }
+    },
+    "Variable (VFR)": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可変 (VFR)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가변 (VFR)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可变 (VFR)"
           }
         }
       }

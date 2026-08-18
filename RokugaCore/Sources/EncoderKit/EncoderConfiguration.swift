@@ -8,6 +8,7 @@ public struct EncoderConfiguration: Equatable, Sendable {
     public var width: Int
     public var height: Int
     public var frameRate: FrameRate
+    public var frameRateMode: FrameRateMode
     /// VBR quality 0...100 → codec quality mapping (see output-settings spec).
     public var quality: Int
     public var audioBitrate: AudioBitrate
@@ -20,6 +21,7 @@ public struct EncoderConfiguration: Equatable, Sendable {
         width: Int,
         height: Int,
         frameRate: FrameRate,
+        frameRateMode: FrameRateMode,
         quality: Int,
         audioBitrate: AudioBitrate,
         capturesSystemAudio: Bool,
@@ -31,6 +33,7 @@ public struct EncoderConfiguration: Equatable, Sendable {
         self.width = clamped.width
         self.height = clamped.height
         self.frameRate = frameRate
+        self.frameRateMode = frameRateMode
         self.quality = min(max(quality, 0), 100)
         self.audioBitrate = audioBitrate
         self.capturesSystemAudio = capturesSystemAudio
@@ -45,6 +48,7 @@ public struct EncoderConfiguration: Equatable, Sendable {
             width: sourceWidth,
             height: sourceHeight,
             frameRate: settings.frameRate,
+            frameRateMode: settings.frameRateMode,
             quality: settings.videoQuality,
             audioBitrate: settings.audioBitrate,
             capturesSystemAudio: settings.captureSystemAudio,

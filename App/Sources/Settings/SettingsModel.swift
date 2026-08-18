@@ -96,6 +96,11 @@ final class SettingsModel: ObservableObject {
         set { update { $0.frameRate = newValue } }
     }
 
+    var frameRateMode: FrameRateMode {
+        get { store.frameRateMode }
+        set { update { $0.frameRateMode = newValue } }
+    }
+
     var videoQuality: Int {
         get { store.videoQuality }
         set { update { $0.videoQuality = newValue } }

@@ -17,6 +17,7 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertEqual(store.videoCodec, .hevc)
         XCTAssertEqual(store.containerFormat, .mov)
         XCTAssertEqual(store.frameRate, .fps60)
+        XCTAssertEqual(store.frameRateMode, .variable)
         XCTAssertEqual(store.videoQuality, 80)
         XCTAssertTrue(store.captureSystemAudio)
         XCTAssertFalse(store.captureMicrophone)
@@ -28,12 +29,14 @@ final class SettingsStoreTests: XCTestCase {
         store.recordingMode = .window
         store.videoCodec = .h264
         store.frameRate = .fps30
+        store.frameRateMode = .constant
         store.videoQuality = 55
 
         let reread = SettingsStore(defaults: defaults)
         XCTAssertEqual(reread.recordingMode, .window)
         XCTAssertEqual(reread.videoCodec, .h264)
         XCTAssertEqual(reread.frameRate, .fps30)
+        XCTAssertEqual(reread.frameRateMode, .constant)
         XCTAssertEqual(reread.videoQuality, 55)
     }
 
@@ -53,10 +56,12 @@ final class SettingsStoreTests: XCTestCase {
 
     func testResetAllRestoresDefaults() {
         store.videoCodec = .h264
+        store.frameRateMode = .constant
         store.captureMicrophone = true
         store.theme = .light
         store.resetAll()
         XCTAssertEqual(store.videoCodec, .hevc)
+        XCTAssertEqual(store.frameRateMode, .variable)
         XCTAssertFalse(store.captureMicrophone)
         XCTAssertEqual(store.theme, .dark)
     }

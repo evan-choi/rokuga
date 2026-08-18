@@ -162,6 +162,10 @@ private struct OutputPane: View {
                 Text(verbatim: "30 fps").tag(FrameRate.fps30)
                 Text(verbatim: "60 fps").tag(FrameRate.fps60)
             }
+            Picker("Frame rate mode", selection: $model.frameRateMode) {
+                Text("Variable (VFR)").tag(FrameRateMode.variable)
+                Text("Constant (CFR)").tag(FrameRateMode.constant)
+            }
             Slider(value: qualityBinding, in: 0...100, step: 5) {
                 Text("Quality")
             } minimumValueLabel: {

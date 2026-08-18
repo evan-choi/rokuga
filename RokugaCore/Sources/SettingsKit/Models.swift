@@ -24,10 +24,16 @@ public enum ContainerFormat: String, CaseIterable, Codable, Sendable {
     public var fileExtension: String { rawValue }
 }
 
-/// Frame-rate cap. Sources faster than this are downsampled; never upsampled.
+/// Target frame rate. VFR treats it as a cap; CFR emits frames at this cadence.
 public enum FrameRate: Int, CaseIterable, Codable, Sendable {
     case fps30 = 30
     case fps60 = 60
+}
+
+/// Controls whether captured timestamps are preserved or frames are emitted on a fixed cadence.
+public enum FrameRateMode: String, CaseIterable, Codable, Sendable {
+    case variable
+    case constant
 }
 
 // MARK: - Audio
