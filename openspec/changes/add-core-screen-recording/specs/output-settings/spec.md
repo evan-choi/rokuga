@@ -3,11 +3,11 @@
 ## ADDED Requirements
 
 ### Requirement: Container and codec selection
-The app SHALL let the user choose the output container — MP4 or MOV (default: MP4) — and the video codec — H.264 or HEVC (H.265) (default: H.264). Every produced file MUST be playable in QuickTime Player and standard web browsers without additional software.
+The app SHALL let the user choose the output container — MP4 or MOV (default: MOV) — and the video codec — H.264 or HEVC (H.265) (default: HEVC). Every supported combination MUST be playable in QuickTime Player without additional software. H.264 with MP4 is the compatibility choice for browser playback.
 
 #### Scenario: Default output
 - **WHEN** the user records with default settings
-- **THEN** the result is an MP4 file with H.264 video that plays in QuickTime Player and Chrome
+- **THEN** the result is a MOV file with HEVC video that plays in QuickTime Player
 
 #### Scenario: HEVC selection
 - **WHEN** the user selects HEVC and records
@@ -51,7 +51,7 @@ Recorded audio SHALL be encoded as AAC with a selectable bitrate of 128, 192, 25
 - **THEN** the file's audio track is AAC at 320 kbps, 48 kHz stereo
 
 ### Requirement: Output folder and file naming
-The app SHALL save recordings to a user-chosen output folder (default: ~/Movies/Rokuga, created on first run). The folder MUST be changeable in settings with a standard folder picker, remain accessible across app restarts, and be revealable in Finder from settings. Files SHALL be auto-named with a timestamp pattern (e.g., `Recording 2026-08-15 at 14.30.22.mp4`) that sorts chronologically and never collides.
+The app SHALL save recordings to a user-chosen output folder (default: ~/Movies/Rokuga, created on first run). The folder MUST be changeable in settings with a standard folder picker, remain accessible across app restarts, and be revealable in Finder from settings. Files SHALL be auto-named with a timestamp pattern (e.g., `Recording 2026-08-15 at 14.30.22.mov` for the default container) that sorts chronologically and never collides. The extension SHALL match the selected container.
 
 #### Scenario: Folder change persists
 - **WHEN** the user selects a new output folder and relaunches the app

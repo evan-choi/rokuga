@@ -21,7 +21,7 @@ The app SHALL use the standard macOS language resolution: the system language li
 - **THEN** the app relaunches in Japanese with all surfaces localized
 
 ### Requirement: Locale-aware formatting, locale-neutral files
-Dates, times, numbers, and file sizes shown in the UI SHALL use system locale formatters. Generated recording file names SHALL remain locale-neutral (`Rokuga 2026-08-15 at 14.22.31.mp4`) in every language, so files sort and sync identically across locales.
+Dates, times, numbers, and file sizes shown in the UI SHALL use system locale formatters. Generated recording file names SHALL remain locale-neutral (`Rokuga 2026-08-15 at 14.22.31.mov`) in every language, so files sort and sync identically across locales. The extension SHALL match the selected container.
 
 #### Scenario: Localized display, stable file name
 - **WHEN** a recording finishes on a Japanese-language system

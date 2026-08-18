@@ -48,7 +48,7 @@ Once a Selected Area recording starts, the selection chrome (resize grips, outli
 - **THEN** Window mode is preselected
 
 #### Scenario: Mode switching disabled while recording
-- **WHEN** a recording is in progress or paused
+- **WHEN** a recording is in progress
 - **THEN** mode selection controls are disabled until the recording stops
 
 ### Requirement: Selected Area mode
@@ -66,9 +66,9 @@ In Selected Area mode, the app SHALL let the user draw a rectangular region on a
 - **WHEN** the pointer moves over a horizontal, vertical, or diagonal resize handle
 - **THEN** the pointer uses the corresponding bundled 32×32 resize cursor and keeps the cursor centered on the handle
 
-#### Scenario: Moving a region
-- **WHEN** the user drags from inside the selected rectangle
-- **THEN** the entire region moves without resizing, constrained to the display bounds
+#### Scenario: Moving a region across displays
+- **WHEN** the user drags from inside the selected rectangle and crosses a display boundary
+- **THEN** the entire region moves without resizing, and on release it is clamped to the display containing the largest part of the region
 
 #### Scenario: Cancelling selection
 - **WHEN** the user presses Esc during area selection
@@ -83,22 +83,22 @@ In Selected Area mode, the app SHALL let the user draw a rectangular region on a
 - **THEN** the previously used region is shown as the initial selection
 
 ### Requirement: Full Screen mode
-In Full Screen mode, the app SHALL record an entire display at its native pixel resolution (subject to the output resolution cap). When multiple displays are connected, the app MUST let the user choose which display to record and MUST identify displays by name and resolution.
+In Full Screen mode, the app SHALL record an entire display at its native pixel resolution, subject to the output resolution cap. The live selection layer SHALL identify the target display by pointer position; clicking that display or pressing the toolbar record button starts recording it.
 
 #### Scenario: Single display
 - **WHEN** exactly one display is connected and the user starts a Full Screen recording
 - **THEN** that display is recorded without prompting for a display choice
 
 #### Scenario: Multiple displays
-- **WHEN** two or more displays are connected
-- **THEN** the app lists each display with its name and resolution, and records only the selected one
+- **WHEN** two or more displays are connected and the pointer moves to another display
+- **THEN** the selection layer targets that display and dims the others
 
-#### Scenario: Selected display disconnected before start
-- **WHEN** the chosen display is disconnected while idle
-- **THEN** the app falls back to the main display and updates the picker
+#### Scenario: Target display disconnected before start
+- **WHEN** the targeted display is disconnected while idle
+- **THEN** the selection layer retargets an available display
 
 ### Requirement: Window mode
-In Window mode, the app SHALL record a single chosen application window in isolation: windows overlapping the target MUST NOT appear in the recording, and the recording MUST follow the window if it moves or resizes. The window picker SHALL list capturable windows with application name, window title, and a thumbnail preview.
+In Window mode, the app SHALL record a single chosen application window in isolation: windows overlapping the target MUST NOT appear in the recording, and the recording MUST follow the window if it moves or resizes. A live pointer-following overlay SHALL highlight capturable windows and show identifying window metadata before click-to-record.
 
 #### Scenario: Isolated window capture
 - **WHEN** another window is dragged over the recorded window during recording
@@ -116,6 +116,6 @@ In Window mode, the app SHALL record a single chosen application window in isola
 - **WHEN** the recorded window is closed by its application
 - **THEN** the recording stops automatically, the file is finalized safely, and the user is notified why the recording ended
 
-#### Scenario: Minimized window excluded from picker
-- **WHEN** the user opens the window picker
-- **THEN** minimized windows and windows without content (zero size) are not offered
+#### Scenario: Minimized window excluded from targeting
+- **WHEN** Window mode is active
+- **THEN** minimized windows and windows without content (zero size) are not highlighted as recordable targets

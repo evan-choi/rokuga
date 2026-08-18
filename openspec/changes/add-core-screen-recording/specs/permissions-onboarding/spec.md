@@ -7,11 +7,11 @@ On first launch, the app SHALL run a short setup flow that: (1) confirms or chan
 
 #### Scenario: First launch
 - **WHEN** the user launches the app for the first time
-- **THEN** the setup flow appears, and after completion the recording toolbar is shown ready to record
+- **THEN** the setup flow appears, and after completion the app remains available from the menu bar without opening the recording toolbar automatically
 
 #### Scenario: Setup not repeated
 - **WHEN** the user relaunches the app after completing setup
-- **THEN** the app opens directly to the recording toolbar
+- **THEN** the setup flow does not appear and the app remains available from the menu bar
 
 ### Requirement: Permission-gated actions
 The app MUST check the relevant macOS permission before starting any recording: Screen & System Audio Recording for screen modes, Microphone when mic capture is enabled. If a permission is missing, the app MUST NOT fail silently — it SHALL show a guidance panel explaining which permission is needed and why, with a button that opens the exact System Settings pane.
@@ -46,4 +46,3 @@ All permission prompts and guidance panels MUST state what the permission enable
 #### Scenario: Deferred microphone request
 - **WHEN** the user completes first-run setup without enabling the microphone
 - **THEN** no Microphone permission prompt has been shown
-
