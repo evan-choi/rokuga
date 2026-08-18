@@ -147,6 +147,18 @@ class SelectionTrackingView: NSView {
 
     override func mouseDown(with event: NSEvent) { onMouseDown?() }
 
+    @discardableResult
+    func reapplySelectionCursor() -> Bool {
+        guard let window,
+              window.isVisible,
+              NSMouseInRect(NSEvent.mouseLocation, window.frame, false)
+        else { return false }
+
+        let windowPoint = window.convertPoint(fromScreen: NSEvent.mouseLocation)
+        applySelectionCursor(at: convert(windowPoint, from: nil))
+        return true
+    }
+
     private func invalidateSelectionCursorRects() {
         if let window {
             window.invalidateCursorRects(for: self)
@@ -154,7 +166,10 @@ class SelectionTrackingView: NSView {
     }
 
     private func applySelectionCursor(for event: NSEvent) {
-        let point = convert(event.locationInWindow, from: nil)
+        applySelectionCursor(at: convert(event.locationInWindow, from: nil))
+    }
+
+    private func applySelectionCursor(at point: NSPoint) {
         let isRecordTarget = selectionCursorRects.contains { $0.contains(point) }
         if isRecordTarget, let selectionCursor {
             selectionCursor.set()
@@ -194,12 +209,19 @@ final class WindowHoverController {
             panel.registerForCaptureExclusion()
         }
         updateHover()
+        refreshCursor()
     }
 
     func close() {
         panels.forEach { $0.close() }
         panels = []
         NSCursor.arrow.set()
+    }
+
+    func refreshCursor() {
+        if !highlightViews.contains(where: { $0.reapplySelectionCursor() }) {
+            NSCursor.arrow.set()
+        }
     }
 
     private func updateHover() {
@@ -246,7 +268,13 @@ final class HoverHighlightView: SelectionTrackingView {
 /// Full Screen mode selection layer: dims every display except the one under the pointer; click records it.
 @MainActor
 final class DisplaySelectController {
-    private var panels: [(panel: CapturePanel, view: DimView, screen: NSScreen)] = []
+    private struct DisplayPanel {
+        let panel: CapturePanel
+        let view: DimView
+        let screen: NSScreen
+    }
+
+    private var panels: [DisplayPanel] = []
     private let onPick: (DisplayTarget) -> Void
     private(set) var hoveredDisplay: DisplayTarget?
 
@@ -262,7 +290,7 @@ final class DisplaySelectController {
             view.onMouseMoved = { [weak self] in self?.updateHover() }
             view.onMouseDown = { [weak self] in self?.pick(screen: screen) }
             panel.contentView = view
-            panels.append((panel, view, screen))
+            panels.append(DisplayPanel(panel: panel, view: view, screen: screen))
         }
     }
 
@@ -272,12 +300,19 @@ final class DisplaySelectController {
             entry.panel.registerForCaptureExclusion()
         }
         updateHover()
+        refreshCursor()
     }
 
     func close() {
         panels.forEach { $0.panel.close() }
         panels = []
         NSCursor.arrow.set()
+    }
+
+    func refreshCursor() {
+        if !panels.contains(where: { $0.view.reapplySelectionCursor() }) {
+            NSCursor.arrow.set()
+        }
     }
 
     private func updateHover() {

@@ -1,3 +1,4 @@
+import AppKit
 import CaptureKit
 import SettingsKit
 import SwiftUI
@@ -71,6 +72,10 @@ struct ToolbarView: View {
         .accessibilityLabel(Text("Options"))
         .popover(isPresented: $showsOptions) {
             OptionsPopoverView()
+                .background(PopoverWindowLevel(level: ToolbarPanelController.popoverLevel))
+                .onDisappear {
+                    appState.refreshSelectionCursor()
+                }
         }
     }
 
@@ -92,5 +97,37 @@ struct ToolbarView: View {
         .background(Capsule().fill(Color(nsColor: .controlBackgroundColor).opacity(0.72)))
         .keyboardShortcut(.defaultAction)
         .accessibilityLabel(Text("Record"))
+    }
+}
+
+private struct PopoverWindowLevel: NSViewRepresentable {
+    let level: NSWindow.Level
+
+    func makeNSView(context: Context) -> PopoverWindowLevelView {
+        let view = PopoverWindowLevelView()
+        view.targetLevel = level
+        return view
+    }
+
+    func updateNSView(_ view: PopoverWindowLevelView, context: Context) {
+        view.targetLevel = level
+        view.applyWindowLevel()
+    }
+}
+
+private final class PopoverWindowLevelView: NSView {
+    var targetLevel: NSWindow.Level = .normal
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        applyWindowLevel()
+    }
+
+    func applyWindowLevel() {
+        window?.level = targetLevel
+    }
+
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        nil
     }
 }
