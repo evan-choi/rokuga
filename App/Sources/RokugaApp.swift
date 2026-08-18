@@ -24,16 +24,20 @@ struct RokugaApp: App {
     }
 }
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var recordingStatusItem: RecordingStatusItemController?
 
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        ThemeApplier.apply(SettingsStore.shared.theme)
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
-        Task { @MainActor in
-            ThemeApplier.apply(SettingsStore.shared.theme)
-            recordingStatusItem = RecordingStatusItemController(appState: .shared)
-            _ = L10nScreenshotRunner.runIfRequested()
-        }
+        if AppearanceVerificationRunner.runIfRequested() { return }
+        if ThemeRenderingVerificationRunner.runIfRequested() { return }
+        recordingStatusItem = RecordingStatusItemController(appState: .shared)
+        _ = L10nScreenshotRunner.runIfRequested()
     }
 
     /// Quit-while-recording guard (task 5.2): confirm, then finalize safely before terminating.

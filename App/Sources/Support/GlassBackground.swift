@@ -18,27 +18,66 @@ struct VisualEffectView: NSViewRepresentable {
 }
 
 /// Panel background per task 4.4: Liquid Glass on macOS 26+, `NSVisualEffectView` on 13.3–15, solid color under Reduce Transparency.
-/// The dark tint keeps panels legible over bright content (design.md — "vscode dark" tint direction).
+/// A separate contrast scrim keeps chrome legible without changing the native material contract.
 struct GlassBackground: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
 
     var cornerRadius: CGFloat = 16
 
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        let resolvedPalette = palette
         ZStack {
             if reduceTransparency {
-                shape.fill(Color(red: 0.12, green: 0.12, blue: 0.14))
-            } else if #available(macOS 26.0, *) {
-                shape.fill(.clear)
-                    .glassEffect(.regular.tint(Color(red: 0.10, green: 0.10, blue: 0.12).opacity(0.4)), in: shape)
+                shape.fill(resolvedPalette.tint)
             } else {
-                VisualEffectView()
-                    .clipShape(shape)
-                shape.fill(Color(red: 0.10, green: 0.10, blue: 0.12).opacity(0.55))
+                if #available(macOS 26.0, *) {
+                    shape.fill(.clear)
+                        .glassEffect(.regular, in: shape)
+                } else {
+                    VisualEffectView()
+                        .clipShape(shape)
+                }
+                shape.fill(resolvedPalette.tint.opacity(resolvedPalette.scrimOpacity))
             }
         }
-        .overlay(shape.strokeBorder(Color.white.opacity(0.09), lineWidth: 1))
+        .overlay(shape.strokeBorder(resolvedPalette.border, lineWidth: 1))
+    }
+
+    private var palette: GlassPalette {
+        Self.palette(colorScheme: colorScheme, increasedContrast: colorSchemeContrast == .increased)
+    }
+
+    static func palette(colorScheme: ColorScheme, increasedContrast: Bool) -> GlassPalette {
+        if colorScheme == .dark {
+            return GlassPalette(
+                tintColor: NSColor(srgbRed: 0.118, green: 0.118, blue: 0.137, alpha: 1),
+                scrimOpacity: increasedContrast ? 0.84 : 0.70,
+                borderColor: NSColor.white.withAlphaComponent(increasedContrast ? 0.26 : 0.14)
+            )
+        }
+
+        return GlassPalette(
+            tintColor: NSColor(srgbRed: 0.910, green: 0.910, blue: 0.925, alpha: 1),
+            scrimOpacity: increasedContrast ? 0.92 : 0.56,
+            borderColor: NSColor.black.withAlphaComponent(increasedContrast ? 0.22 : 0.12)
+        )
+    }
+}
+
+struct GlassPalette {
+    let tintColor: NSColor
+    let scrimOpacity: Double
+    let borderColor: NSColor
+
+    var tint: Color {
+        Color(nsColor: tintColor)
+    }
+
+    var border: Color {
+        Color(nsColor: borderColor)
     }
 }
 

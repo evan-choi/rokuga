@@ -53,7 +53,7 @@
 - [x] 6.1 Cursor compositor: cursor show/hide, system/dot pointer styles, fixed highlight halo, fixed click animation — recorded-only, invisible live
 - [x] 6.2 Per-frame GPU budget monitor with automatic effect degradation ladder
 - [ ] 6.3 Mouse-effect customization: highlight color/size/opacity, settings preview, independent left/right click toggles and colors
-- [ ] 6.4 Sample cursor state at the configured capture rate so 60 FPS recordings meet the one-frame positional-lag contract
+- [x] 6.4 Sample cursor state at the configured capture rate so 60 FPS recordings meet the one-frame positional-lag contract
 
 ## 7. Post-recording delivery
 
@@ -82,8 +82,8 @@
 - [x] 9.1 First-run flow: output folder save panel → screen-recording permission probe (`SCShareableContent`) → guided denial-recovery panels with System Settings deep links
 - [x] 9.2 Just-in-time mic permission; per-permission re-check on every record attempt
 - [x] 9.3 Settings window (menu bar only, ⌘,): General/Recording/Audio/Mouse/Shortcuts/Output panes, immediate apply, recording-time lock
-- [x] 9.4 Theme (auto/light/dark), launch at login (`SMAppService.mainApp`), thumbnail toggle
-- [ ] 9.5 Accessibility: verify VoiceOver labels on every control, full keyboard operation, Increase Contrast, Reduce Transparency, and Reduce Motion paths
+- [x] 9.4 Theme (auto/light/dark) applies immediately to app-owned windows and transient panels; launch at login (`SMAppService.mainApp`); thumbnail toggle
+- [ ] 9.5 Accessibility: finish VoiceOver and keyboard verification; run release QA for implemented Increase Contrast, Reduce Transparency, and Reduce Motion paths
 - [ ] 9.6 Reset All Settings: reset user preferences while preserving onboarding completion, output bookmark, and last-recording metadata
 - [ ] 9.7 Permission recovery: warning states, one-click relaunch after screen permission grant, previous-mode restoration, and a recording-scoped "without mic" override
 - [ ] 9.8 Refresh the launch-at-login toggle from `SMAppService.mainApp.status` after external changes

@@ -59,6 +59,19 @@ class CapturePanel: NSPanel {
         CaptureExcludedWindows.shared.register(CGWindowID(windowNumber))
     }
 
+    /// Clips transparent glass content to its visible rounded surface so the
+    /// window backing cannot appear as a rectangular edge or shadow.
+    func clipContent(toRoundedRect cornerRadius: CGFloat) {
+        guard let contentView else { return }
+        contentView.wantsLayer = true
+        contentView.layer?.backgroundColor = NSColor.clear.cgColor
+        contentView.layer?.cornerRadius = cornerRadius
+        contentView.layer?.cornerCurve = .continuous
+        contentView.layer?.masksToBounds = true
+        hasShadow = false
+        invalidateShadow()
+    }
+
     override func close() {
         CaptureExcludedWindows.shared.unregister(CGWindowID(windowNumber))
         super.close()
