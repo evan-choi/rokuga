@@ -41,12 +41,6 @@ class ActiveCursorView: NSView {
         applyActiveCursor(for: event)
     }
 
-    override func mouseExited(with event: NSEvent) {
-        if refreshActiveCursor() { return }
-        guard let window, isWindowUnderMouse(window) else { return }
-        NSCursor.arrow.set()
-    }
-
     func activeCursor(at point: NSPoint) -> NSCursor {
         .arrow
     }
@@ -54,8 +48,7 @@ class ActiveCursorView: NSView {
     @discardableResult
     func refreshActiveCursor() -> Bool {
         guard let window,
-              window.isVisible,
-              isWindowUnderMouse(window)
+              window.isVisible
         else { return false }
 
         let windowPoint = window.convertPoint(fromScreen: NSEvent.mouseLocation)
@@ -67,19 +60,11 @@ class ActiveCursorView: NSView {
 
     private func applyActiveCursor(for event: NSEvent) {
         guard let window,
-              event.window === window,
-              isWindowUnderMouse(window)
+              event.window === window
         else { return }
         let point = convert(event.locationInWindow, from: nil)
         guard bounds.contains(point) else { return }
         activeCursor(at: point).set()
-    }
-
-    private func isWindowUnderMouse(_ window: NSWindow) -> Bool {
-        NSWindow.windowNumber(
-            at: NSEvent.mouseLocation,
-            belowWindowWithWindowNumber: 0
-        ) == window.windowNumber
     }
 }
 
