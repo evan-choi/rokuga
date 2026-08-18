@@ -32,7 +32,7 @@ final class PreviewPanelController {
                 onDone: { [weak self] in self?.close() }
             )
         )
-        panel.clipContent(toRoundedRect: 16)
+        panel.clipContent(toRoundedRect: CaptureWindowChrome.panelCornerRadius)
         panel.onEscape = { [weak self] in self?.close() }
 
         panel.orderFrontRegardless()
@@ -146,7 +146,7 @@ struct PreviewPanelView: View {
             .padding(.horizontal, 12)
             controls
         }
-        .background(GlassBackground(cornerRadius: 16))
+        .captureWindowChrome()
         .hiddenFocusRing()
     }
 

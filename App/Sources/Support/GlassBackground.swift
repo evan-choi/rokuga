@@ -58,6 +58,11 @@ struct GlassBackground: View {
     }
 }
 
+enum CaptureWindowChrome {
+    static let panelCornerRadius: CGFloat = 16
+    static let tooltipCornerRadius: CGFloat = 7
+}
+
 struct GlassPalette {
     let tintColor: NSColor
     let scrimOpacity: Double
@@ -73,6 +78,13 @@ struct GlassPalette {
 }
 
 extension View {
+    /// Shared visual chrome for the toolbar, tooltip, preview, and editor surfaces.
+    func captureWindowChrome(
+        cornerRadius: CGFloat = CaptureWindowChrome.panelCornerRadius
+    ) -> some View {
+        background(GlassBackground(cornerRadius: cornerRadius))
+    }
+
     /// System capture chrome never shows focus rings; suppress them on our HUD surfaces.
     /// (macOS 13 has no `focusEffectDisabled`; the ring only appears there with Full Keyboard Access on.)
     @ViewBuilder

@@ -25,7 +25,7 @@ final class ToolbarPanelController {
         panel.isMovable = true
         panel.isMovableByWindowBackground = false
         panel.contentView = hostingView
-        panel.clipContent(toRoundedRect: 16)
+        panel.clipContent(toRoundedRect: CaptureWindowChrome.panelCornerRadius)
         panel.onEscape = { [weak appState] in appState?.dismissToolbar() }
         panel.onReturn = { [weak appState] in appState?.requestRecord() }
     }
