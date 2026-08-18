@@ -25,9 +25,9 @@ Set `NSApp.appearance` to `.darkAqua` in `applicationWillFinishLaunching`, befor
 
 ### Use one Dark glass palette
 
-`GlassBackground` uses a `#1E1E23` scrim at 0.70 opacity and a white border at 0.14 opacity. Increase Contrast raises these to 0.84 and 0.26. Reduce Transparency replaces native material and scrim compositing with the opaque Dark tint.
+`GlassBackground` uses a `#1E1E23` scrim at 0.70 opacity and a white border at 0.14 opacity. Increase Contrast raises these to 0.84 and 0.26. Reduce Transparency replaces native material and scrim compositing with the opaque Dark tint. The shared `captureWindowChrome` modifier applies this contract to the toolbar, tooltip, preview, and trim editor; shared constants keep the panel and tooltip radii consistent.
 
-Native material remains below the scrim: `.glassEffect(.regular)` on macOS 26 and clipped `NSVisualEffectView` on macOS 13.3–15. The explicit scrim, not material tint behavior, provides the contrast floor over arbitrary content. Toolbar and preview hosting layers remain clipped to their rounded bounds with native window shadows disabled.
+Native material remains below the scrim: `.glassEffect(.regular)` on macOS 26 and clipped `NSVisualEffectView` on macOS 13.3–15. The explicit scrim, not material tint behavior, provides the contrast floor over arbitrary content. Rounded hosting layers remain clipped to their visible bounds with native window shadows disabled, including the smaller tooltip panel. The trim editor uses the same material and scrim with square window corners.
 
 ### Resolve app chrome under Dark Aqua
 
@@ -41,7 +41,7 @@ Increase Contrast strengthens the fixed Dark scrim and boundary. Reduce Transpar
 
 - [A dark scrim obscures too much native material] → Keep normal opacity at 0.70 and verify backdrop contribution manually.
 - [Material output differs across macOS releases] → Keep the contrast scrim independent of the renderer and test both implementations.
-- [A transparent panel exposes rectangular backing] → Clip the hosting layer and disable the window shadow.
+- [A transparent panel exposes rectangular backing or a black tooltip outline] → Clip the hosting layer to the shared radius and disable the window shadow.
 
 ## Migration Plan
 

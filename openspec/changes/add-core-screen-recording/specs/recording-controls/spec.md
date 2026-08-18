@@ -14,7 +14,7 @@ The user-facing recording lifecycle SHALL support idle, preparing, countdown, re
 - **THEN** start commands from any entry point are ignored
 
 ### Requirement: Recording countdown
-The app SHALL optionally show an on-screen countdown before recording starts, with choices off, 3 seconds (default), 5 seconds, and 10 seconds. The countdown overlay MUST NOT appear in the recording, and pressing Esc during the countdown MUST cancel the pending recording.
+The app SHALL optionally show an on-screen countdown before recording starts, with choices off, 3 seconds (default), 5 seconds, and 10 seconds. The countdown overlay MUST NOT appear in the recording, and pressing Esc during preparation or countdown MUST cancel the pending recording regardless of which app has keyboard focus.
 
 #### Scenario: Countdown before start
 - **WHEN** countdown is set to 3 and the user starts a recording
@@ -23,6 +23,10 @@ The app SHALL optionally show an on-screen countdown before recording starts, wi
 #### Scenario: Countdown cancelled
 - **WHEN** the user presses Esc during the countdown
 - **THEN** no recording starts and no file is created
+
+#### Scenario: Background countdown cancelled
+- **WHEN** another app has keyboard focus while capture is preparing or counting down and the user presses Esc
+- **THEN** the pending capture is cancelled globally and Esc is released when the app returns to idle
 
 #### Scenario: Countdown disabled
 - **WHEN** countdown is set to off
@@ -55,7 +59,7 @@ The app SHALL provide a menu bar status item at all times while running. While i
 - **THEN** the app asks for confirmation, and on confirm stops the recording, finalizes the file, then quits
 
 ### Requirement: Recording toolbar summon and placement
-The app SHALL present its idle UI as a floating recording toolbar, summoned only by the menu bar icon or the toolbar global shortcut (default ⇧⌘6) — never automatically at app launch, mirroring the system capture UI. The toolbar MUST appear at the bottom-center of the display that currently contains the mouse pointer, MUST move only when its divider handle is dragged, MUST NOT steal keyboard focus from the frontmost app (non-activating panel), and SHALL dismiss on Esc or when a recording starts.
+The app SHALL present its idle UI as a floating recording toolbar, summoned only by the menu bar icon or the toolbar global shortcut (default ⇧⌘6) — never automatically at app launch, mirroring the system capture UI. The toolbar MUST appear at the bottom-center of the display that currently contains the mouse pointer, MUST move only when its divider handle is dragged, MUST NOT steal keyboard focus from the frontmost app (non-activating panel), and SHALL dismiss from its leading close button, Esc, or when a recording starts. Mode and options controls SHALL be icon-only with accessibility labels. Their visible labels SHALL appear without delay in a rounded tooltip anchored directly above the toolbar and using the same fixed-Dark glass contract as the toolbar.
 
 #### Scenario: Summon on the display under the mouse
 - **WHEN** the user presses ⇧⌘6 while the mouse pointer is on a secondary display
@@ -73,16 +77,28 @@ The app SHALL present its idle UI as a floating recording toolbar, summoned only
 - **WHEN** the user drags the toolbar background
 - **THEN** the toolbar does not move
 
+#### Scenario: Immediate anchored tooltip
+- **WHEN** the pointer enters an icon-only toolbar control
+- **THEN** its label appears immediately above the toolbar in a rounded background with no rectangular outline or window shadow
+
 #### Scenario: Dismissal
 - **WHEN** the user presses Esc or starts a recording
 - **THEN** the toolbar disappears and nothing else of the app remains on screen (menu bar item aside)
 
 ### Requirement: Global keyboard shortcut
-The app SHALL provide a user-configurable global keyboard shortcut for showing the recording toolbar. The default is ⇧⌘6. The shortcut MUST work while the app is in the background and MUST be reconfigurable or disableable in settings. Starting and stopping recordings SHALL require an explicit UI action.
+The app SHALL provide a user-configurable global keyboard shortcut for showing the recording toolbar. The default is ⇧⌘6. The shortcut MUST work while the app is in the background and MUST be reconfigurable or disableable in settings. The app SHALL additionally register fixed, state-scoped lifecycle shortcuts: Esc while preparing or counting down cancels the pending capture, and ⌃⌘Esc while recording stops and finalizes it. Lifecycle shortcuts MUST work regardless of app focus and MUST be disabled outside their applicable states.
 
 #### Scenario: Shortcut reassignment
 - **WHEN** the user records a new key combination for opening the toolbar in settings
 - **THEN** the new combination takes effect immediately and the old one no longer triggers
+
+#### Scenario: Stop while another app is focused
+- **WHEN** a recording is active, another app has keyboard focus, and the user presses ⌃⌘Esc
+- **THEN** the recording enters finishing and produces the same finalized output as the menu bar Stop control
+
+#### Scenario: Lifecycle shortcuts are state scoped
+- **WHEN** the app is idle or finishing
+- **THEN** Esc and ⌃⌘Esc are not registered by the app
 
 ### Requirement: Failure-safe finalization
 If a recording ends abnormally (app crash, forced quit, power loss, disk full, capture source lost), the app MUST ensure the footage captured up to that point is recoverable as a playable file, and MUST NOT leave zero-byte or corrupt-unplayable files in the output folder without informing the user on next launch.

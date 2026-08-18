@@ -41,12 +41,15 @@
 - [x] 4.8 Click-to-record cursor: show the bundled camera cursor over Window and Full Screen selection layers and restore the arrow on close
 - [x] 4.9 Area selection resize cursors: use the bundled horizontal, vertical, and two diagonal 32×32 SVGs for all eight handles
 - [ ] 4.10 Verify that toolbar and preview panels never take keyboard focus from the frontmost app
-- [ ] 4.11 Apply the native glass/blur material contract to the trim editor instead of a solid custom background
+- [x] 4.11 Extract shared capture-window chrome for the toolbar, tooltip, preview, and trim editor; apply the native glass/blur material contract to the trim editor
+- [x] 4.12 Add the system-capture toolbar close button and immediate, toolbar-anchored tooltips for icon-only controls; remove rectangular tooltip outlines and window shadows
+- [x] 4.13 Centralize non-key panel cursor tracking for toolbar drag, area resize/move, click-to-record selection, and trim handles
 
 ## 5. Recording controls & hotkeys
 
-- [x] 5.1 Global shortcut via KeyboardShortcuts: toolbar ⇧⌘6 — reconfigurable and disableable; recording start/stop has no global shortcut
+- [x] 5.1 Global shortcut via KeyboardShortcuts: toolbar ⇧⌘6 — reconfigurable and disableable
 - [x] 5.2 Wire toolbar start and menu bar stop to the coordinator; concurrent-start prevention; quit-while-recording confirm + safe finalize
+- [x] 5.3 Register lifecycle-scoped global shortcuts: Esc cancels preparing/countdown and ⌃⌘Esc stops recording/paused; disable both while idle/finishing
 
 ## 6. Mouse effects (EffectsKit)
 

@@ -87,9 +87,9 @@ Rokuga.xcodeproj
 
 State machine at the center: `idle → preparing → countdown → recording → finishing → idle`, owned by a `RecordingCoordinator` actor. The core retains `paused` transitions for splice-clock tests, but the app UI does not expose them. All entry points observe the coordinator state.
 
-### D7. Global toolbar shortcut: KeyboardShortcuts (permissive license, sindresorhus)
+### D7. Global lifecycle shortcuts: KeyboardShortcuts (permissive license, sindresorhus)
 
-Battle-tested Carbon `RegisterEventHotKey` wrapper with a recorder UI component, sandbox-safe, permissively licensed. Writing our own Carbon wrapper is avoidable risk. This is the only third-party dependency.
+Use the existing Carbon `RegisterEventHotKey` wrapper for the configurable toolbar shortcut and fixed lifecycle shortcuts. ⇧⌘6 summons the toolbar. Esc is registered only while capture is preparing or counting down, and ⌃⌘Esc is registered only while recording or internally paused. Idle and finishing states disable both lifecycle shortcuts. This keeps cancellation and stop independent of app focus without reserving Esc outside the pending-capture state. The library is sandbox-safe, permissively licensed, and remains the only third-party dependency.
 
 ### D8. Capture exclusion mechanics
 
@@ -106,7 +106,7 @@ Battle-tested Carbon `RegisterEventHotKey` wrapper with a recorder UI component,
 ### D10. System integration choices
 
 - Menu bar: `MenuBarExtra` provides the idle menu (open toolbar, last recording, output folder, settings, quit). During recording, a separate status item shows `M:SS` and a one-click stop control. Pause is not exposed.
-- Countdown: borderless non-activating overlay window, excluded from capture (D8), with off/3/5/10-second choices. Esc cancels.
+- Countdown: borderless non-activating overlay window, excluded from capture (D8), with off/3/5/10-second choices. A state-scoped global Esc cancels preparation or countdown even when another app has focus.
 - Launch at login: `SMAppService.mainApp`.
 - Appearance: application-wide Dark Aqua fixed before app-owned surfaces are created; no user-selectable theme.
 - Permissions: `SCShareableContent` probe for screen recording, `AVCaptureDevice.requestAccess` for the microphone; each denied state gets a guided panel with a deep link to the exact System Settings pane.
@@ -114,14 +114,16 @@ Battle-tested Carbon `RegisterEventHotKey` wrapper with a recorder UI component,
 ### D11. UI shell: windowless ⇧⌘5-style HUD + Liquid Glass
 
 - **App form**: menu bar agent (`LSUIElement`) — no main window and no Dock icon. Idle recording UI is a floating toolbar with three mode buttons, an options popover, and a record button.
-- **Toolbar hosting**: non-activating borderless `NSPanel` at `.screenSaver + 1`, excluded from capture per D8. **OPEN**: verify focus retention because the panel becomes key for Esc handling.
+- **Toolbar hosting**: non-activating borderless `NSPanel` at `.screenSaver + 1`, excluded from capture per D8. **Existing**: the toolbar becomes key without activating Rokuga so its local Esc/Return handling and popover chrome work; selection interaction panels do not take key status. Recording lifecycle shortcuts do not depend on panel focus. **Planned (task 4.10)**: verify that toolbar and preview key handling does not take keyboard focus from the frontmost app, and revise the event route if it does.
 - **Summoning**: menu bar menu or global hotkey (default ⇧⌘6, configurable in Settings › Shortcuts). App launch does not open the toolbar. Esc or starting a recording dismisses it.
+- **Toolbar controls and tooltips**: a leading close button dismisses the capture UI. Mode and options controls are icon-only; their labels appear with no hover delay in a rounded tooltip anchored directly above the toolbar. Tooltips use a capture-excluded, non-interactive `CapturePanel` and disappear on pointer exit or before any toolbar action. The record action keeps its text label.
 - **Options popover**: segmented controls and toggles for output location, countdown, FPS, audio, mouse effects, and thumbnail behavior. Advanced encoding lives in Settings.
 - **Windows and panels**: onboarding, Settings, and the trim editor are regular windows. The recording toolbar, selection layers, floating thumbnail, and preview are transient panels.
-- **Material and appearance**: app-owned chrome inherits an application-wide Dark Aqua appearance. Glass surfaces use untinted native material as the lower layer and an identically clipped `#1e1e23` scrim at 0.70 opacity above it, keeping the toolbar stable and readable over arbitrary screen content. Active chrome uses full-strength semantic Dark foregrounds and system selection/control surfaces. Increase Contrast strengthens the scrim and border; Reduce Transparency replaces both layers with the opaque Dark palette. Capture overlays and controls drawn over video keep fixed-contrast colors. Menu bar items, menus, dialogs, and system recording indicators remain system-rendered under Dark Aqua.
+- **Material and appearance**: app-owned chrome inherits an application-wide Dark Aqua appearance. `captureWindowChrome` is the shared visual contract for the toolbar, tooltip, preview, and trim editor. It places untinted native material below an identically clipped `#1e1e23` scrim at 0.70 opacity. Each owning window clips to the same corner radius and disables the rectangular window shadow; tooltip chrome uses its smaller shared radius. Active chrome uses full-strength semantic Dark foregrounds and system selection/control surfaces. Increase Contrast strengthens the scrim and border; Reduce Transparency replaces both layers with the opaque Dark palette. Capture overlays and controls drawn over video keep fixed-contrast colors. Menu bar items, menus, dialogs, and system recording indicators remain system-rendered under Dark Aqua.
 - **Chrome buttons**: icon actions in panel/toolbar chrome are borderless (`.buttonStyle(.borderless)`) — icon-only, neutral monochrome (no red tint on destructive icons; danger is communicated by the confirmation dialog), shape revealed on hover only, hit target kept ≥ 28pt regardless of visual size.
 - **Iconography**: in-app icons are real SF Symbols via `Image(systemName:)` (`pencil`, `trash`, etc.) — legal on Apple platforms; SF Symbols assets MUST NOT be committed to the source repository. AppKit renders the bundled 32×32 `screenshotwindow.svg` and `resize*.svg` assets as custom capture and resize cursors. Other repo-shipped artwork (mockups, web, README) uses Lucide (ISC) equivalents tuned to SF stroke weight (~1.8/24).
 - **Visual language**: native Liquid Glass — untinted `.glassEffect`/glass background APIs where available (macOS 26+), graceful fallback to `NSVisualEffectView`/`.ultraThinMaterial` on macOS 13.3–15. The fixed Dark contrast scrim is separate from, and does not replace, those system materials. Reduce Transparency replaces the layered background with the opaque Dark palette.
+- **Cursor tracking**: non-key capture panels use one `ActiveCursorView` path backed by `NSTrackingArea` mouse enter/move events with `.activeAlways`. The same path owns drag-handle, area-resize, click-to-record, and trim-handle cursor updates. It verifies the topmost window under the pointer before setting a cursor and restores the arrow on exit, avoiding competing cursor-rect and push/pop state.
 - **Why**: zero learning curve (users already know ⇧⌘5), no focus-stealing during capture workflows, and the smallest possible UI surface for a recorder — the screen itself is the canvas.
 
 ### D12. Performance budget and frame transport
