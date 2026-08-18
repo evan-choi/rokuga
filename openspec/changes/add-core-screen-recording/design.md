@@ -39,7 +39,7 @@ Use `SCStream` + `SCContentFilter` for all screen-based modes.
 
 Real-time writing uses `AVAssetWriter` with `AVVideoCodecType.h264` / `.hevc` and AAC audio through `AVAssetWriterInput`. The current defaults are HEVC and MOV.
 
-- **Existing**: quality 0–100 maps to a resolution/FPS-aware target bitrate curve. The writer applies `AVVideoDataRateLimitsKey` to bound the rate.
+- **Existing**: quality 0–99 maps to a resolution/FPS-aware target bitrate curve and a VideoToolbox quality target. Quality 100 removes the bitrate cap, requests maximum encoder quality, and uses hardware HEVC 4:4:4 when available. Native odd pixel dimensions remain unchanged through ScreenCaptureKit so the pipeline never softens the whole frame with a one-pixel fractional rescale; only genuinely oversized sources are downscaled.
 - **Planned**: expose VBR and capped-VBR choices in Settings with an MB/min estimate. True CBR is not exposed by the hardware encoders.
 - **Existing, core only**: the splice clock can remove pause gaps by shifting audio and video PTS by the same accumulated duration. Pause/resume has no app UI or global shortcut.
 - **Planned**: require hardware encoding explicitly and report when the hardware encoder cannot be created.

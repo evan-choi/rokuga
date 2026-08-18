@@ -304,15 +304,26 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
             quality: configuration.quality,
             codec: configuration.codec
         )
+        let maximumQuality = configuration.quality == 100
 
-        // AVFoundation has no public data-rate-limits constant; AVAssetWriter documents passthrough of VideoToolbox compression keys.
+        // AVAssetWriter passes VideoToolbox compression keys through to the encoder.
         var compression: [String: Any] = [
-            AVVideoAverageBitRateKey: averageBitrate,
-            kVTCompressionPropertyKey_DataRateLimits as String: RateControl.dataRateLimits(averageBitrate: averageBitrate),
             AVVideoMaxKeyFrameIntervalKey: fps * 2,
             AVVideoAllowFrameReorderingKey: false,
             AVVideoExpectedSourceFrameRateKey: fps,
+            kVTCompressionPropertyKey_Quality as String: Float(configuration.quality) / 100.0,
+            kVTCompressionPropertyKey_PrioritizeEncodingSpeedOverQuality as String: false
         ]
+        if maximumQuality {
+            if configuration.codec == .hevc,
+               Self.supportsHardwareHEVC444(width: configuration.width, height: configuration.height) {
+                compression[AVVideoProfileLevelKey] = Self.hevcMain444Profile
+            }
+        } else {
+            compression[AVVideoAverageBitRateKey] = averageBitrate
+            compression[kVTCompressionPropertyKey_DataRateLimits as String] =
+                RateControl.dataRateLimits(averageBitrate: averageBitrate)
+        }
         if configuration.codec == .h264 {
             compression[AVVideoProfileLevelKey] = AVVideoProfileLevelH264HighAutoLevel
         }
@@ -321,8 +332,39 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
             AVVideoCodecKey: configuration.codec == .hevc ? AVVideoCodecType.hevc : AVVideoCodecType.h264,
             AVVideoWidthKey: configuration.width,
             AVVideoHeightKey: configuration.height,
-            AVVideoCompressionPropertiesKey: compression,
+            AVVideoCompressionPropertiesKey: compression
         ]
+    }
+
+    /// VideoToolbox advertises this profile at runtime, but the SDK does not expose
+    /// its otherwise-public enumeration value as a Swift constant.
+    private static let hevcMain444Profile = "HEVC_Main444_AutoLevel"
+
+    static func supportsHardwareHEVC444(width: Int, height: Int) -> Bool {
+        let encoderSpecification = [
+            kVTVideoEncoderSpecification_EnableHardwareAcceleratedVideoEncoder as String: true,
+            kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder as String: true
+        ] as CFDictionary
+        var session: VTCompressionSession?
+        let status = VTCompressionSessionCreate(
+            allocator: kCFAllocatorDefault,
+            width: Int32(width),
+            height: Int32(height),
+            codecType: kCMVideoCodecType_HEVC,
+            encoderSpecification: encoderSpecification,
+            imageBufferAttributes: nil,
+            compressedDataAllocator: nil,
+            outputCallback: nil,
+            refcon: nil,
+            compressionSessionOut: &session
+        )
+        guard status == noErr, let session else { return false }
+        defer { VTCompressionSessionInvalidate(session) }
+        return VTSessionSetProperty(
+            session,
+            key: kVTCompressionPropertyKey_ProfileLevel,
+            value: hevcMain444Profile as CFString
+        ) == noErr
     }
 
     private func audioOutputSettings() -> [String: Any] {
@@ -330,7 +372,7 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
             AVFormatIDKey: kAudioFormatMPEG4AAC,
             AVSampleRateKey: 48_000,
             AVNumberOfChannelsKey: 2,
-            AVEncoderBitRateKey: configuration.audioBitrate.rawValue * 1_000,
+            AVEncoderBitRateKey: configuration.audioBitrate.rawValue * 1_000
         ]
     }
 }

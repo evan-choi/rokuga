@@ -70,5 +70,11 @@ final class SettingsStoreTests: XCTestCase {
         let small = CaptureLimits.clamped(width: 1280, height: 720)
         XCTAssertEqual(small.width, 1280)
         XCTAssertEqual(small.height, 720)
+
+        // Native odd dimensions stay untouched so ScreenCaptureKit does not
+        // fractionally rescale the entire captured image by one pixel.
+        let odd = CaptureLimits.clamped(width: 1201, height: 863)
+        XCTAssertEqual(odd.width, 1201)
+        XCTAssertEqual(odd.height, 863)
     }
 }
