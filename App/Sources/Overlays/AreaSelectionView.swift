@@ -169,7 +169,7 @@ final class RegionInteractionView: ActiveCursorView {
         } else {
             dragMode = .none
         }
-        activeCursor(at: point).set()
+        refreshActiveCursor()
     }
 
     override func mouseDragged(with event: NSEvent) {
@@ -186,7 +186,7 @@ final class RegionInteractionView: ActiveCursorView {
         case .none:
             break
         }
-        activeCursor(at: convert(event.locationInWindow, from: nil)).set()
+        refreshActiveCursor()
     }
 
     override func mouseUp(with event: NSEvent) {
@@ -194,7 +194,7 @@ final class RegionInteractionView: ActiveCursorView {
         dragMode = .none
         mouseAtDragStart = nil
         regionAtDragStart = nil
-        activeCursor(at: convert(event.locationInWindow, from: nil)).set()
+        refreshActiveCursor()
         if wasEditing {
             onEditEnd?()
         }

@@ -249,18 +249,22 @@ private struct WindowDragHandle: NSViewRepresentable {
 }
 
 private final class WindowDragView: ActiveCursorView {
+    private var isDragging = false
+
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
         true
     }
 
     override func mouseDown(with event: NSEvent) {
-        NSCursor.closedHand.set()
+        isDragging = true
+        refreshActiveCursor()
         window?.performDrag(with: event)
-        NSCursor.openHand.set()
+        isDragging = false
+        refreshActiveCursor()
     }
 
     override func activeCursor(at point: NSPoint) -> NSCursor {
-        .openHand
+        isDragging ? .closedHand : .openHand
     }
 }
 

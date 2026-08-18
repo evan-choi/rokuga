@@ -227,7 +227,7 @@ final class TimelineNSView: ActiveCursorView {
             dragging = nil
             model.seek(to: Double(point.x) / model.pointsPerSecond)
         }
-        activeCursor(at: point).set()
+        refreshActiveCursor()
     }
 
     override func mouseDragged(with event: NSEvent) {
@@ -238,13 +238,13 @@ final class TimelineNSView: ActiveCursorView {
         } else {
             model.seek(to: seconds)
         }
-        activeCursor(at: point).set()
+        refreshActiveCursor()
         needsDisplay = true
     }
 
     override func mouseUp(with event: NSEvent) {
         dragging = nil
-        activeCursor(at: convert(event.locationInWindow, from: nil)).set()
+        refreshActiveCursor()
     }
 
     override func activeCursor(at point: NSPoint) -> NSCursor {

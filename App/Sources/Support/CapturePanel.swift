@@ -8,7 +8,8 @@ final class FirstMouseHostingView<Content: View>: NSHostingView<Content> {
 }
 
 /// Cursor tracking that remains active for non-key capture panels.
-/// AppKit cursor rects are key-window driven, so HUD views resolve the cursor directly.
+/// `cursorUpdate` cannot be combined with `activeAlways`, so inactive HUDs use
+/// the supported mouse-enter/move path and keep all cursor writes here.
 class ActiveCursorView: NSView {
     private var activeCursorTrackingArea: NSTrackingArea?
 
@@ -24,7 +25,7 @@ class ActiveCursorView: NSView {
         }
         let trackingArea = NSTrackingArea(
             rect: .zero,
-            options: [.mouseMoved, .mouseEnteredAndExited, .cursorUpdate, .activeAlways, .inVisibleRect],
+            options: [.mouseMoved, .mouseEnteredAndExited, .activeAlways, .inVisibleRect],
             owner: self,
             userInfo: nil
         )
@@ -40,8 +41,8 @@ class ActiveCursorView: NSView {
         applyActiveCursor(for: event)
     }
 
-    override func cursorUpdate(with event: NSEvent) {
-        applyActiveCursor(for: event)
+    override func mouseExited(with event: NSEvent) {
+        NSCursor.arrow.set()
     }
 
     func activeCursor(at point: NSPoint) -> NSCursor {
@@ -64,6 +65,13 @@ class ActiveCursorView: NSView {
     }
 
     private func applyActiveCursor(for event: NSEvent) {
+        guard let window,
+              event.window === window,
+              NSWindow.windowNumber(
+                  at: NSEvent.mouseLocation,
+                  belowWindowWithWindowNumber: 0
+              ) == window.windowNumber
+        else { return }
         activeCursor(at: convert(event.locationInWindow, from: nil)).set()
     }
 }
