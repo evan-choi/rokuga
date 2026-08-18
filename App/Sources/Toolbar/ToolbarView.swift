@@ -131,39 +131,68 @@ struct ToolbarView: View {
 
 private extension View {
     func captureTooltip(_ label: LocalizedStringKey) -> some View {
-        onHover { isHovering in
-            Task { @MainActor in
-                ToolbarTooltipPresenter.shared.update(label: label, isHovering: isHovering)
-            }
-        }
+        background(TooltipTrackingView(label: label))
     }
+}
+
+private struct TooltipTrackingView: NSViewRepresentable {
+    let label: LocalizedStringKey
+
+    func makeNSView(context: Context) -> TooltipTrackingNSView {
+        TooltipTrackingNSView(label: label)
+    }
+
+    func updateNSView(_ view: TooltipTrackingNSView, context: Context) {
+        view.label = label
+    }
+
+    static func dismantleNSView(_ view: TooltipTrackingNSView, coordinator: ()) {
+        ToolbarTooltipPresenter.shared.hide()
+    }
+}
+
+private final class TooltipTrackingNSView: NSView {
+    var label: LocalizedStringKey
+
+    init(label: LocalizedStringKey) {
+        self.label = label
+        super.init(frame: .zero)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { nil }
+
+    override func updateTrackingAreas() {
+        trackingAreas.forEach(removeTrackingArea)
+        addTrackingArea(NSTrackingArea(
+            rect: .zero,
+            options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect],
+            owner: self,
+            userInfo: nil
+        ))
+        super.updateTrackingAreas()
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        ToolbarTooltipPresenter.shared.show(label, relativeTo: self)
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        ToolbarTooltipPresenter.shared.hide()
+    }
+
+    override func hitTest(_ point: NSPoint) -> NSView? { nil }
 }
 
 @MainActor
 final class ToolbarTooltipPresenter {
     static let shared = ToolbarTooltipPresenter()
 
-    private var showTask: Task<Void, Never>?
     private var panel: CapturePanel?
 
-    func update(label: LocalizedStringKey, isHovering: Bool) {
+    func show(_ label: LocalizedStringKey, relativeTo anchor: NSView) {
         hide()
-        guard isHovering else { return }
-
-        showTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(nanoseconds: 700_000_000)
-            guard !Task.isCancelled else { return }
-            self?.show(label)
-        }
-    }
-
-    func hide() {
-        showTask?.cancel()
-        showTask = nil
-        panel?.orderOut(nil)
-    }
-
-    private func show(_ label: LocalizedStringKey) {
+        guard let toolbarWindow = anchor.window else { return }
         let hostingView = NSHostingView(
             rootView: Text(label)
                 .font(.system(size: 12))
@@ -178,17 +207,22 @@ final class ToolbarTooltipPresenter {
         tooltipPanel.contentView = hostingView
         tooltipPanel.setContentSize(size)
 
-        let mouse = NSEvent.mouseLocation
-        guard let screen = NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) ?? NSScreen.main
-        else { return }
+        let anchorRect = toolbarWindow.convertToScreen(anchor.convert(anchor.bounds, to: nil))
+        guard let screen = toolbarWindow.screen ?? NSScreen.main else { return }
         let visible = screen.visibleFrame.insetBy(dx: 4, dy: 4)
-        let gap: CGFloat = 12
-        let x = min(max(mouse.x - size.width / 2, visible.minX), visible.maxX - size.width)
-        let preferredY = mouse.y + gap
-        let y = preferredY + size.height <= visible.maxY ? preferredY : mouse.y - size.height - gap
+        let gap: CGFloat = 8
+        let x = min(max(anchorRect.midX - size.width / 2, visible.minX), visible.maxX - size.width)
+        let preferredY = toolbarWindow.frame.maxY + gap
+        let y = preferredY + size.height <= visible.maxY
+            ? preferredY
+            : toolbarWindow.frame.minY - size.height - gap
 
         tooltipPanel.setFrameOrigin(NSPoint(x: x, y: y))
         tooltipPanel.orderFrontRegardless()
+    }
+
+    func hide() {
+        panel?.orderOut(nil)
     }
 
     private func makePanel(size: NSSize) -> CapturePanel {
