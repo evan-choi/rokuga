@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Rokuga — 무료로 사용할 수 있는 네이티브 macOS 화면 녹화 앱">
+  <meta name="theme-color" content="#f6f6f2">
+  <title>Rokuga — macOS 화면 녹화, 필요한 것만</title>
+  <style>
+    :root {
+      --ink: #151715;
+      --muted: #686c67;
+      --line: #dedfd9;
+      --paper: #f6f6f2;
+      --surface: #ffffff;
+      --soft: #edeee9;
+      --accent: #ff5b45;
+      --accent-dark: #e84936;
+      --night: #151719;
+      --night-soft: #232629;
+      --radius: 24px;
+      --shadow: 0 24px 70px rgba(30, 32, 28, .11);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+      letter-spacing: -.012em;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, a { font: inherit; }
+    button { color: inherit; }
+    img, svg { display: block; }
+    a { color: inherit; }
+
+    :focus-visible {
+      outline: 3px solid rgba(255, 91, 69, .34);
+      outline-offset: 4px;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 100;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: var(--night);
+      color: #fff;
+      transform: translateY(-160%);
+      transition: transform .2s ease;
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    .container {
+      width: min(1180px, calc(100% - 48px));
+      margin-inline: auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid rgba(222, 223, 217, .76);
+      background: rgba(246, 246, 242, .82);
+      backdrop-filter: blur(18px) saturate(150%);
+    }
+
+    .nav {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-size: 19px;
+      font-weight: 750;
+      letter-spacing: -.035em;
+      text-decoration: none;
+    }
+
+    .brand img {
+      width: 27px;
+      height: 27px;
+    }
+
+    .nav-links {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-links a {
+      color: #4f534f;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .nav-links a:hover { color: var(--ink); }
+
+    .github-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .github-link svg { width: 17px; height: 17px; }
+
+    .nav-download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 16px;
+      border-radius: 999px;
+      color: #fff !important;
+      background: var(--ink);
+      transition: transform .18s ease, background .18s ease;
+    }
+
+    .nav-download:hover {
+      background: #323531;
+      transform: translateY(-1px);
+    }
+
+    .hero {
+      padding: 104px 0 72px;
+      overflow: hidden;
+    }
+
+    .hero-copy {
+      max-width: 900px;
+      margin: 0 auto 70px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 22px;
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #565a55;
+      background: rgba(255, 255, 255, .58);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .eyebrow::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      content: "";
+      box-shadow: 0 0 0 4px rgba(255, 91, 69, .12);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 860px;
+      margin: 0 auto 26px;
+      font-size: clamp(52px, 7.2vw, 92px);
+      line-height: .98;
+      letter-spacing: -.073em;
+      font-weight: 780;
+      text-wrap: balance;
+    }
+
+    h1 .accent { color: var(--accent); }
+
+    .hero-lead {
+      max-width: 650px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: clamp(18px, 2vw, 21px);
+      line-height: 1.58;
+      text-wrap: balance;
+    }
+
+    .hero-actions {
+      margin-top: 34px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 52px;
+      padding: 0 21px;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+
+    .button:hover { transform: translateY(-2px); }
+
+    .button-primary {
+      color: #fff;
+      background: var(--accent);
+      box-shadow: 0 12px 28px rgba(255, 91, 69, .22);
+    }
+
+    .button-primary:hover { background: var(--accent-dark); }
+
+    .button-secondary {
+      border-color: var(--line);
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .button-secondary:hover {
+      border-color: #c5c7c0;
+      background: #fff;
+    }
+
+    .button svg { width: 18px; height: 18px; }
+
+    .hero-meta {
+      margin: 17px 0 0;
+      color: #858982;
+      font-size: 12px;
+    }
+
+    .product-shell {
+      position: relative;
+      max-width: 1120px;
+      margin-inline: auto;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, .85);
+      border-radius: 29px;
+      background: rgba(255, 255, 255, .45);
+      box-shadow: var(--shadow);
+    }
+
+    .product-stage {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      min-height: 520px;
+      overflow: hidden;
+      border-radius: 19px;
+      color: #fff;
+      background:
+        radial-gradient(circle at 77% 22%, rgba(255, 142, 123, .9), transparent 23%),
+        radial-gradient(circle at 18% 92%, rgba(61, 91, 169, .9), transparent 34%),
+        linear-gradient(145deg, #16213a 0%, #293658 36%, #6c405e 69%, #d86855 100%);
+      isolation: isolate;
+    }
+
+    .product-stage::before {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(110deg, rgba(255,255,255,.06), transparent 45%);
+      content: "";
+    }
+
+    .mac-menu {
+      height: 31px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      color: rgba(255,255,255,.84);
+      background: rgba(17, 19, 26, .28);
+      backdrop-filter: blur(22px);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .mac-menu svg { width: 12px; height: 14px; fill: currentColor; }
+    .mac-menu .grow { flex: 1; }
+
+    .selection {
+      position: absolute;
+      top: 18%;
+      left: 18%;
+      width: 55%;
+      height: 49%;
+      border: 1.5px solid rgba(255,255,255,.94);
+      border-radius: 4px;
+      box-shadow: 0 0 0 100vmax rgba(8, 11, 18, .40);
+      transition: inset .4s cubic-bezier(.2,.8,.2,1), width .4s cubic-bezier(.2,.8,.2,1), height .4s cubic-bezier(.2,.8,.2,1), border-radius .4s ease;
+    }
+
+    .product-stage[data-mode="screen"] .selection {
+      top: 31px;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 31px);
+      border-radius: 0;
+    }
+
+    .product-stage[data-mode="window"] .selection {
+      top: 14%;
+      left: 28%;
+      width: 46%;
+      height: 56%;
+      border-radius: 13px;
+    }
+
+    .dimension-label {
+      position: absolute;
+      top: -29px;
+      left: 0;
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: rgba(255,255,255,.92);
+      background: rgba(14, 16, 22, .76);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .handle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border: 1px solid rgba(0,0,0,.25);
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .handle:nth-of-type(1) { top: -4px; left: -4px; }
+    .handle:nth-of-type(2) { top: -4px; right: -4px; }
+    .handle:nth-of-type(3) { bottom: -4px; left: -4px; }
+    .handle:nth-of-type(4) { right: -4px; bottom: -4px; }
+
+    .product-stage[data-mode="screen"] .handle,
+    .product-stage[data-mode="screen"] .dimension-label,
+    .product-stage[data-mode="window"] .handle,
+    .product-stage[data-mode="window"] .dimension-label { opacity: 0; }
+
+    .demo-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 101px;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,.74);
+      font-size: 12px;
+      font-weight: 600;
+      text-shadow: 0 2px 12px rgba(0,0,0,.35);
+      white-space: nowrap;
+    }
+
+    .capture-bar {
+      position: absolute;
+      left: 50%;
+      bottom: 34px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 15px;
+      background: rgba(26, 28, 34, .83);
+      box-shadow: 0 18px 50px rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.11);
+      backdrop-filter: blur(28px) saturate(150%);
+      transform: translateX(-50%);
+    }
+
+    .mode-button {
+      position: relative;
+      width: 47px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      border-radius: 9px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .mode-button:hover { background: rgba(255,255,255,.08); }
+    .mode-button[aria-pressed="true"] { background: rgba(255,255,255,.15); }
+    .mode-button svg { width: 24px; height: 20px; }
+
+    .mode-button::after {
+      position: absolute;
+      bottom: 4px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0;
+      content: "";
+    }
+
+    .mode-button[aria-pressed="true"]::after { opacity: 1; }
+
+    .bar-divider {
+      width: 1px;
+      height: 29px;
+      margin: 0 5px;
+      background: rgba(255,255,255,.15);
+    }
+
+    .option-button, .record-button {
+      min-height: 38px;
+      border: 0;
+      border-radius: 9px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 650;
+      cursor: default;
+    }
+
+    .option-button {
+      padding: 0 12px;
+      background: transparent;
+    }
+
+    .record-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 15px;
+      background: rgba(255,255,255,.94);
+      color: #24262a;
+    }
+
+    .record-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .trust-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .trust-item {
+      min-height: 116px;
+      padding: 27px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .trust-item + .trust-item { border-left: 1px solid var(--line); }
+    .trust-item svg { flex: 0 0 auto; width: 22px; height: 22px; color: var(--accent); }
+    .trust-item strong { display: block; font-size: 14px; }
+    .trust-item span { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
+
+    .section { padding: 132px 0; }
+
+    .section-heading {
+      max-width: 690px;
+      margin-bottom: 54px;
+    }
+
+    .section-kicker {
+      margin-bottom: 14px;
+      color: var(--accent-dark);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin-bottom: 18px;
+      font-size: clamp(39px, 5vw, 62px);
+      line-height: 1.08;
+      letter-spacing: -.057em;
+      font-weight: 760;
+      text-wrap: balance;
+    }
+
+    .section-lead {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.65;
+      text-wrap: balance;
+    }
+
+    .bento {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+    }
+
+    .feature-card {
+      position: relative;
+      min-height: 430px;
+      overflow: hidden;
+      padding: 36px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .feature-card h3 {
+      margin-bottom: 10px;
+      font-size: 25px;
+      line-height: 1.2;
+      letter-spacing: -.045em;
+    }
+
+    .feature-card p {
+      max-width: 460px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .feature-card-wide { grid-column: 1 / -1; min-height: 390px; }
+
+    .mode-visual {
+      position: absolute;
+      right: 35px;
+      bottom: 34px;
+      left: 35px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .mode-tile {
+      aspect-ratio: 1.45;
+      padding: 13px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid #dfe1da;
+      border-radius: 15px;
+      color: #4f534e;
+      background: #f3f4ef;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .mode-tile.active {
+      border-color: rgba(255, 91, 69, .38);
+      color: #a93627;
+      background: #fff0ec;
+    }
+
+    .mode-icon {
+      width: 100%;
+      height: 55px;
+      display: grid;
+      place-items: center;
+    }
+
+    .mode-icon span {
+      position: relative;
+      width: 70%;
+      height: 70%;
+      border: 2px solid currentColor;
+      border-radius: 6px;
+    }
+
+    .mode-tile:first-child .mode-icon span { border-style: dashed; }
+    .mode-tile:last-child .mode-icon span::before {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      left: 5px;
+      height: 2px;
+      border-radius: 2px;
+      background: currentColor;
+      content: "";
+    }
+
+    .audio-visual {
+      position: absolute;
+      right: 36px;
+      bottom: 38px;
+      left: 36px;
+      height: 164px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      border-radius: 18px;
+      color: var(--accent);
+      background: #f5f5f0;
+    }
+
+    .audio-visual i {
+      width: 5px;
+      height: var(--h);
+      min-height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      opacity: var(--o, .7);
+    }
+
+    .editor-visual {
+      position: absolute;
+      right: 34px;
+      bottom: 30px;
+      left: 34px;
+      height: 180px;
+      padding: 18px;
+      border-radius: 17px;
+      color: #fff;
+      background: var(--night-soft);
+      box-shadow: 0 22px 50px rgba(27,29,28,.15);
+    }
+
+    .editor-top {
+      height: 82px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: rgba(255,255,255,.65);
+      background: linear-gradient(140deg, #364b67, #342d51);
+      font-size: 11px;
+    }
+
+    .timeline {
+      position: relative;
+      height: 45px;
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      overflow: hidden;
+      border-radius: 7px;
+    }
+
+    .timeline span { background: #45556b; border-right: 1px solid rgba(255,255,255,.06); }
+    .timeline span:nth-child(3n) { background: #55486a; }
+
+    .trim-range {
+      position: absolute;
+      inset: -3px 13% -3px 18%;
+      border: 3px solid #f7c843;
+      border-radius: 8px;
+      box-shadow: 0 0 18px rgba(247,200,67,.24);
+    }
+
+    .trim-range::before, .trim-range::after {
+      position: absolute;
+      top: -3px;
+      bottom: -3px;
+      width: 10px;
+      background: #f7c843;
+      content: "";
+    }
+
+    .trim-range::before { left: -7px; border-radius: 7px 0 0 7px; }
+    .trim-range::after { right: -7px; border-radius: 0 7px 7px 0; }
+
+    .privacy-section {
+      padding-top: 0;
+    }
+
+    .privacy-panel {
+      position: relative;
+      overflow: hidden;
+      min-height: 510px;
+      padding: 70px;
+      display: flex;
+      align-items: center;
+      border-radius: 30px;
+      color: #fff;
+      background: var(--night);
+    }
+
+    .privacy-panel::after {
+      position: absolute;
+      right: -110px;
+      bottom: -180px;
+      width: 500px;
+      height: 500px;
+      border: 110px solid var(--accent);
+      border-radius: 50%;
+      content: "";
+      opacity: .95;
+    }
+
+    .privacy-copy { position: relative; z-index: 2; max-width: 600px; }
+    .privacy-copy .section-kicker { color: #ff9d90; }
+    .privacy-copy h2 { margin-bottom: 22px; }
+    .privacy-copy p { max-width: 550px; color: rgba(255,255,255,.65); font-size: 18px; }
+
+    .privacy-list {
+      margin: 31px 0 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      list-style: none;
+    }
+
+    .privacy-list li {
+      padding: 9px 13px;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 999px;
+      color: rgba(255,255,255,.82);
+      background: rgba(255,255,255,.06);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .download-section { padding-top: 30px; }
+
+    .download-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .download-main, .install-card {
+      padding: 42px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .download-main {
+      min-height: 440px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-lockup {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .app-icon {
+      width: 66px;
+      height: 66px;
+      padding: 14px;
+      border: 1px solid #ebece7;
+      border-radius: 17px;
+      background: #f7f7f4;
+      box-shadow: 0 8px 24px rgba(31,33,29,.08);
+    }
+
+    .app-icon img { width: 100%; height: 100%; }
+    .app-lockup h3 { margin: 0 0 3px; font-size: 22px; }
+    .app-lockup p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .release-copy {
+      margin: 42px 0 26px;
+    }
+
+    .release-copy h2 { margin-bottom: 13px; font-size: 37px; }
+    .release-copy p { color: var(--muted); }
+
+    .download-button {
+      width: 100%;
+      min-height: 58px;
+      margin-top: auto;
+      border-radius: 14px;
+    }
+
+    .release-meta {
+      margin: 13px 0 0;
+      color: #858982;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .install-card h3 {
+      margin-bottom: 9px;
+      font-size: 25px;
+      letter-spacing: -.04em;
+    }
+
+    .install-intro { margin-bottom: 28px; color: var(--muted); font-size: 14px; }
+
+    .steps {
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0;
+      list-style: none;
+      counter-reset: install;
+    }
+
+    .steps li {
+      position: relative;
+      min-height: 78px;
+      padding: 3px 0 22px 48px;
+      counter-increment: install;
+    }
+
+    .steps li:not(:last-child)::after {
+      position: absolute;
+      top: 32px;
+      bottom: 0;
+      left: 15px;
+      width: 1px;
+      background: var(--line);
+      content: "";
+    }
+
+    .steps li::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      width: 31px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: #525650;
+      background: var(--surface);
+      content: counter(install);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .steps strong { display: block; margin-bottom: 3px; font-size: 14px; }
+    .steps span { display: block; color: var(--muted); font-size: 13px; }
+
+    details {
+      margin-top: 6px;
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+    }
+
+    summary {
+      color: #4e524d;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    details p { margin: 12px 0 0; color: var(--muted); font-size: 12px; }
+
+    .source-note {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border-radius: 14px;
+      color: #525650;
+      background: var(--soft);
+      font-size: 13px;
+    }
+
+    .source-note a { font-weight: 700; text-underline-offset: 3px; }
+
+    footer {
+      padding: 34px 0 44px;
+      border-top: 1px solid var(--line);
+    }
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-content .brand { margin-right: auto; font-size: 16px; }
+    .footer-content .brand img { width: 22px; height: 22px; }
+    .footer-content a:not(.brand) { text-decoration: none; }
+    .footer-content a:not(.brand):hover { color: var(--ink); }
+
+    @media (max-width: 900px) {
+      .hero { padding-top: 82px; }
+      .product-stage { min-height: 440px; }
+      .trust-strip { grid-template-columns: 1fr 1fr; }
+      .trust-item:nth-child(3) { border-left: 0; border-top: 1px solid var(--line); }
+      .trust-item:nth-child(4) { border-top: 1px solid var(--line); }
+      .bento, .download-grid { grid-template-columns: 1fr; }
+      .feature-card-wide { grid-column: auto; }
+      .privacy-panel { padding: 54px 42px; }
+      .privacy-panel::after { right: -230px; opacity: .62; }
+    }
+
+    @media (max-width: 660px) {
+      .container { width: min(100% - 30px, 1180px); }
+      .nav { min-height: 64px; gap: 16px; }
+      .nav-links { gap: 14px; }
+      .nav-links a:not(.nav-download):not(.github-link) { display: none; }
+      .github-link span { display: none; }
+      .nav-download { min-height: 37px; padding: 0 13px; }
+      .hero { padding: 67px 0 51px; }
+      .hero-copy { margin-bottom: 45px; }
+      h1 { letter-spacing: -.065em; }
+      .hero-lead { font-size: 17px; }
+      .hero-actions { align-items: stretch; flex-direction: column; }
+      .button { width: 100%; }
+      .product-shell { margin-inline: -8px; padding: 7px; border-radius: 21px; }
+      .product-stage { min-height: 420px; aspect-ratio: auto; border-radius: 15px; }
+      .selection { top: 19%; left: 9%; width: 80%; height: 46%; }
+      .product-stage[data-mode="window"] .selection { top: 17%; left: 12%; width: 76%; height: 48%; }
+      .capture-bar { bottom: 25px; gap: 2px; padding: 6px; }
+      .mode-button { width: 39px; }
+      .bar-divider { margin: 0 2px; }
+      .option-button { display: none; }
+      .record-button { padding: 0 12px; }
+      .demo-hint { bottom: 87px; font-size: 11px; }
+      .trust-strip { grid-template-columns: 1fr; }
+      .trust-item { min-height: 92px; justify-content: flex-start; padding: 22px 8px; }
+      .trust-item + .trust-item { border-top: 1px solid var(--line); border-left: 0; }
+      .section { padding: 90px 0; }
+      .section-heading { margin-bottom: 36px; }
+      .section-lead { font-size: 16px; }
+      .feature-card { min-height: 395px; padding: 27px; }
+      .feature-card-wide { min-height: 400px; }
+      .mode-visual, .audio-visual, .editor-visual { right: 22px; left: 22px; }
+      .mode-visual { grid-template-columns: 1fr; }
+      .mode-tile { min-height: 56px; aspect-ratio: auto; flex-direction: row; align-items: center; }
+      .mode-icon { width: 58px; height: 34px; }
+      .mode-icon span { width: 38px; height: 27px; }
+      .privacy-panel { min-height: 560px; padding: 44px 28px; align-items: flex-start; }
+      .privacy-panel::after { right: -245px; bottom: -245px; }
+      .privacy-copy p { font-size: 16px; }
+      .download-main, .install-card { padding: 29px; }
+      .release-copy h2 { font-size: 32px; }
+      .footer-content { align-items: flex-start; flex-wrap: wrap; }
+      .footer-content .brand { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 이동</a>
+
+  <header class="site-header">
+    <nav class="nav container" aria-label="주요 메뉴">
+      <a class="brand" href="#top" aria-label="Rokuga 홈">
+        <img src="../../docs/logo.png" alt="">
+        <span>Rokuga</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">기능</a>
+        <a class="github-link" href="https://github.com/evan-choi/rokuga" aria-label="Rokuga GitHub 저장소">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.59 2 12.253c0 4.53 2.865 8.373 6.839 9.729.5.095.682-.222.682-.493 0-.244-.009-.89-.014-1.747-2.782.619-3.369-1.374-3.369-1.374-.455-1.183-1.11-1.497-1.11-1.497-.908-.636.069-.623.069-.623 1.003.072 1.531 1.056 1.531 1.056.892 1.566 2.341 1.114 2.91.852.091-.662.349-1.114.635-1.37-2.221-.259-4.556-1.14-4.556-5.07 0-1.12.389-2.036 1.029-2.754-.103-.26-.446-1.303.098-2.715 0 0 .84-.275 2.75 1.052A9.356 9.356 0 0 1 12 6.954a9.36 9.36 0 0 1 2.504.346c1.909-1.327 2.747-1.052 2.747-1.052.546 1.412.203 2.455.1 2.715.64.718 1.027 1.634 1.027 2.754 0 3.94-2.339 4.808-4.566 5.061.359.317.679.943.679 1.9 0 1.372-.013 2.479-.013 2.815 0 .274.18.593.688.492C19.138 20.624 22 16.783 22 12.253 22 6.59 17.523 2 12 2Z"/></svg>
+          <span>GitHub</span>
+        </a>
+        <a class="nav-download" href="#download">다운로드</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="container">
+        <div class="hero-copy">
+          <div class="eyebrow">macOS를 위해 네이티브로 제작</div>
+          <h1>화면 녹화,<br><span class="accent">필요한 것만.</span></h1>
+          <p class="hero-lead">Rokuga는 녹화부터 다듬기까지 Mac 안에서 끝내는 무료 오픈소스 화면 녹화 앱입니다.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#download">
+              macOS용 다운로드
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            </a>
+            <a class="button button-secondary" href="https://github.com/evan-choi/rokuga">
+              소스 코드 보기
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </a>
+          </div>
+          <p class="hero-meta">macOS 13.3 이상 · 무료 · MIT License</p>
+        </div>
+
+        <div class="product-shell" aria-label="Rokuga 녹화 모드 인터랙티브 미리보기">
+          <div class="product-stage" data-mode="area">
+            <div class="mac-menu" aria-hidden="true">
+              <svg viewBox="0 0 24 28"><path d="M19.7 14.8c0-4.1 3.4-6.1 3.5-6.2-1.9-2.8-4.9-3.2-6-3.3-2.5-.3-5 1.5-6.3 1.5-1.3 0-3.3-1.5-5.5-1.4C2.6 5.5 0 7.1-1.5 9.7c-3.1 5.4-.8 13.4 2.2 17.8 1.5 2.1 3.2 4.5 5.5 4.4 2.2-.1 3.1-1.4 5.8-1.4 2.7 0 3.5 1.4 5.9 1.4 2.4 0 4-2.1 5.4-4.2 1.7-2.5 2.4-4.9 2.4-5-.1 0-4.6-1.8-4.6-7.1l-.1-.8h-1.3ZM15.6 2.7C16.8 1.2 17.6-.9 17.4-3c-1.8.1-4 1.2-5.3 2.7-1.1 1.3-2.1 3.5-1.8 5.5 2 .2 4.1-1 5.3-2.5Z" transform="translate(0 3) scale(.8)"/></svg>
+              <strong>Finder</strong><span>파일</span><span>편집</span><span>보기</span>
+              <span class="grow"></span><span>8월 16일 일요일&nbsp;&nbsp;14:23</span>
+            </div>
+            <div class="selection" aria-hidden="true">
+              <span class="dimension-label">1280 × 720</span>
+              <i class="handle"></i><i class="handle"></i><i class="handle"></i><i class="handle"></i>
+            </div>
+            <div class="demo-hint" aria-live="polite">화면 영역을 지정하세요</div>
+            <div class="capture-bar" role="group" aria-label="녹화 모드 선택">
+              <button class="mode-button" type="button" data-mode="area" aria-pressed="true" aria-label="화면 영역 녹화">
+                <svg viewBox="0 0 28 22" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1.5" y="1.5" width="25" height="19" rx="3" stroke-dasharray="3 2"/></svg>
+              </button>
+              <button class="mode-button" type="button" data-mode="screen" aria-pressed="false" aria-label="전체 화면 녹화">
+                <svg viewBox="0 0 28 22" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1.5" y="1.5" width="25" height="19" rx="3"/></svg>
+              </button>
+              <button class="mode-button" type="button" data-mode="window" aria-pressed="false" aria-label="윈도우 녹화">
+                <svg viewBox="0 0 28 22" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1.5" y="1.5" width="25" height="19" rx="3"/><path d="M4 6h20"/></svg>
+              </button>
+              <span class="bar-divider" aria-hidden="true"></span>
+              <button class="option-button" type="button" tabindex="-1">옵션&nbsp;⌄</button>
+              <button class="record-button" type="button" tabindex="-1"><span class="record-dot"></span>녹화</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="trust-strip container" aria-label="Rokuga 핵심 가치">
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 16.7A5 5 0 0 0 18 7h-1.3A8 8 0 1 0 4 15.3"/><path d="m8 17 4 4 4-4"/><path d="M12 12v9"/></svg>
+        <div><strong>완전한 로컬 처리</strong><span>녹화 파일은 Mac 밖으로 나가지 않아요</span></div>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9.2a3.2 3.2 0 1 1 3.8 3.1c-.7.2-.8.7-.8 1.2"/><path d="M12 17h.01"/></svg>
+        <div><strong>계정 없이 바로</strong><span>가입도 로그인도 필요 없어요</span></div>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3 4 7l4 4"/><path d="m16 13 4 4-4 4"/><path d="m14 3-4 18"/></svg>
+        <div><strong>오픈소스</strong><span>MIT 라이선스로 투명하게 공개해요</span></div>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v18"/><path d="M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <div><strong>무료, 제한 없이</strong><span>워터마크와 시간 제한이 없어요</span></div>
+      </div>
+    </div>
+
+    <section class="section" id="features">
+      <div class="container">
+        <div class="section-heading">
+          <p class="section-kicker">Just recording</p>
+          <h2>Mac을 쓰던 흐름 그대로.</h2>
+          <p class="section-lead">거대한 프로젝트 창 대신 익숙한 플로팅 툴바를 열고, 원하는 대상을 골라 바로 녹화하세요.</p>
+        </div>
+
+        <div class="bento">
+          <article class="feature-card">
+            <h3>세 가지 녹화 모드</h3>
+            <p>영역, 전체 화면, 윈도우 중 필요한 범위만 정확하게 선택합니다.</p>
+            <div class="mode-visual" aria-hidden="true">
+              <div class="mode-tile active"><div class="mode-icon"><span></span></div>영역</div>
+              <div class="mode-tile"><div class="mode-icon"><span></span></div>전체 화면</div>
+              <div class="mode-tile"><div class="mode-icon"><span></span></div>윈도우</div>
+            </div>
+          </article>
+
+          <article class="feature-card">
+            <h3>드라이버 없는 시스템 오디오</h3>
+            <p>별도 오디오 드라이버 설치 없이 Mac의 소리를 영상에 담습니다.</p>
+            <div class="audio-visual" aria-hidden="true">
+              <i style="--h:22%;--o:.34"></i><i style="--h:44%;--o:.48"></i><i style="--h:66%;--o:.66"></i><i style="--h:35%;--o:.45"></i>
+              <i style="--h:78%"></i><i style="--h:51%;--o:.62"></i><i style="--h:91%"></i><i style="--h:63%;--o:.74"></i>
+              <i style="--h:38%;--o:.52"></i><i style="--h:71%;--o:.82"></i><i style="--h:48%;--o:.58"></i><i style="--h:27%;--o:.4"></i>
+            </div>
+          </article>
+
+          <article class="feature-card feature-card-wide">
+            <h3>녹화가 끝나면, 바로 확인하고 다듬기</h3>
+            <p>떠 있는 썸네일에서 결과를 확인하고 필요한 구간만 빠르게 남깁니다.</p>
+            <div class="editor-visual" aria-hidden="true">
+              <div class="editor-top">미리보기</div>
+              <div class="timeline">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+                <div class="trim-range"></div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section privacy-section">
+      <div class="container">
+        <div class="privacy-panel">
+          <div class="privacy-copy">
+            <p class="section-kicker">Privacy by default</p>
+            <h2>당신의 화면은<br>당신의 Mac에만.</h2>
+            <p>Rokuga에는 계정도, 클라우드 업로드도, 분석 SDK도 없습니다. 녹화와 편집은 모두 기기 안에서 처리됩니다.</p>
+            <ul class="privacy-list">
+              <li>네트워크 전송 없음</li>
+              <li>사용자 추적 없음</li>
+              <li>로컬 파일 저장</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section download-section" id="download">
+      <div class="container">
+        <div class="section-heading">
+          <p class="section-kicker">Download</p>
+          <h2>가볍게 시작하세요.</h2>
+          <p class="section-lead">Rokuga는 무료입니다. 워터마크도, 녹화 시간 제한도 없습니다.</p>
+        </div>
+
+        <div class="download-grid">
+          <article class="download-main">
+            <div class="app-lockup">
+              <div class="app-icon"><img src="../../docs/logo.png" alt=""></div>
+              <div><h3>Rokuga</h3><p>Native screen recorder for macOS</p></div>
+            </div>
+            <div class="release-copy">
+              <h2>Rokuga 0.1.0 Preview</h2>
+              <p>Apple Silicon과 Intel Mac을 지원하는 Universal 빌드입니다.</p>
+            </div>
+            <a class="button button-primary download-button" href="https://github.com/evan-choi/rokuga/releases/latest">
+              DMG 다운로드
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            </a>
+            <p class="release-meta">macOS 13.3 Ventura 이상 · Universal · 무료</p>
+          </article>
+
+          <aside class="install-card" aria-labelledby="install-title">
+            <h3 id="install-title">처음 설치하시나요?</h3>
+            <p class="install-intro">현재 프리뷰는 Apple 공증 전 빌드이므로 최초 실행 때 한 번의 확인이 필요합니다.</p>
+            <ol class="steps">
+              <li><strong>DMG를 열고 앱을 복사</strong><span>Rokuga를 응용 프로그램 폴더로 옮깁니다.</span></li>
+              <li><strong>Rokuga를 한 번 실행</strong><span>확인되지 않은 개발자 안내가 나타날 수 있습니다.</span></li>
+              <li><strong>개인정보 보호 및 보안 열기</strong><span>시스템 설정에서 ‘그래도 열기’를 선택합니다.</span></li>
+            </ol>
+            <details>
+              <summary>왜 이런 확인이 필요한가요?</summary>
+              <p>Rokuga는 아직 Apple Developer ID로 공증되지 않은 오픈소스 프리뷰입니다. 소스와 빌드 과정은 GitHub에서 직접 확인할 수 있습니다.</p>
+            </details>
+            <div class="source-note">직접 확인하고 빌드하고 싶다면 <a href="https://github.com/evan-choi/rokuga#build-from-source">소스 빌드 안내</a>를 이용하세요.</div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content container">
+      <a class="brand" href="#top"><img src="../../docs/logo.png" alt=""><span>Rokuga</span></a>
+      <span>© 2026 Rokuga contributors</span>
+      <a href="https://github.com/evan-choi/rokuga">GitHub</a>
+      <a href="../../LICENSE">MIT License</a>
+    </div>
+  </footer>
+
+  <script>
+    const stage = document.querySelector('.product-stage');
+    const hint = document.querySelector('.demo-hint');
+    const modeLabels = {
+      area: '화면 영역을 지정하세요',
+      screen: '전체 화면을 녹화합니다',
+      window: '녹화할 윈도우를 선택하세요'
+    };
+
+    document.querySelectorAll('.mode-button').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.mode-button').forEach((item) => item.setAttribute('aria-pressed', 'false'));
+        button.setAttribute('aria-pressed', 'true');
+        stage.dataset.mode = button.dataset.mode;
+        hint.textContent = modeLabels[button.dataset.mode];
+      });
+    });
+  </script>
+</body>
+</html>
