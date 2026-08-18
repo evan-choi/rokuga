@@ -14,16 +14,33 @@ struct ToolbarView: View {
 
     var body: some View {
         HStack(spacing: 10) {
+            cancelButton
             modeButtons
-            Divider().frame(height: 22)
+            dragHandle
             optionsButton
             recordButton
         }
         .padding(.horizontal, 12)
         .frame(height: 54)
         .fixedSize()
-        .background(GlassBackground(cornerRadius: 16))
+        .background(SystemCaptureBackground(cornerRadius: 16))
         .hiddenFocusRing()
+    }
+
+    private var cancelButton: some View {
+        Button {
+            appState.dismissToolbar()
+        } label: {
+            Image(systemName: "xmark.circle.fill")
+                .symbolRenderingMode(.hierarchical)
+                .font(.system(size: 19, weight: .semibold))
+                .frame(width: 30, height: 36)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(Color.primary)
+        .help("Cancel")
+        .accessibilityLabel(Text("Cancel"))
     }
 
     private var modeButtons: some View {
@@ -39,14 +56,10 @@ struct ToolbarView: View {
             modeRaw = target.rawValue
             appState.selectionModeChanged()
         } label: {
-            VStack(spacing: 2) {
-                Image(systemName: symbol)
-                    .font(.system(size: 15, weight: .medium))
-                Text(label)
-                    .font(.system(size: 9.5))
-            }
-            .frame(width: 66, height: 40)
-            .contentShape(RoundedRectangle(cornerRadius: 9))
+            Image(systemName: symbol)
+                .font(.system(size: 17, weight: .medium))
+                .frame(width: 44, height: 36)
+                .contentShape(RoundedRectangle(cornerRadius: 9))
         }
         .buttonStyle(.plain)
         .foregroundStyle(Color.primary)
@@ -54,8 +67,19 @@ struct ToolbarView: View {
             RoundedRectangle(cornerRadius: 9)
                 .fill(mode == target ? Color(nsColor: .unemphasizedSelectedContentBackgroundColor) : .clear)
         )
+        .help(label)
         .accessibilityLabel(Text(label))
         .accessibilityAddTraits(mode == target ? .isSelected : [])
+    }
+
+    private var dragHandle: some View {
+        ZStack {
+            Rectangle()
+                .fill(Color(nsColor: .separatorColor))
+                .frame(width: 1, height: 22)
+            WindowDragHandle()
+        }
+        .frame(width: 13, height: 36)
     }
 
     private var optionsButton: some View {
@@ -69,6 +93,7 @@ struct ToolbarView: View {
         }
         .buttonStyle(.plain)
         .foregroundStyle(Color.primary)
+        .help("Options")
         .accessibilityLabel(Text("Options"))
         .popover(isPresented: $showsOptions) {
             OptionsPopoverView()
@@ -97,6 +122,47 @@ struct ToolbarView: View {
         .background(Capsule().fill(Color(nsColor: .controlBackgroundColor).opacity(0.72)))
         .keyboardShortcut(.defaultAction)
         .accessibilityLabel(Text("Record"))
+    }
+}
+
+private struct SystemCaptureBackground: View {
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
+    let cornerRadius: CGFloat
+
+    var body: some View {
+        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        if reduceTransparency {
+            shape.fill(Color(nsColor: .windowBackgroundColor))
+        } else if #available(macOS 26.0, *) {
+            shape.fill(.clear)
+                .glassEffect(.regular, in: shape)
+        } else {
+            VisualEffectView(material: .hudWindow)
+                .clipShape(shape)
+        }
+    }
+}
+
+private struct WindowDragHandle: NSViewRepresentable {
+    func makeNSView(context: Context) -> WindowDragView {
+        WindowDragView()
+    }
+
+    func updateNSView(_ view: WindowDragView, context: Context) {}
+}
+
+private final class WindowDragView: NSView {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        true
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        window?.performDrag(with: event)
+    }
+
+    override func resetCursorRects() {
+        addCursorRect(bounds, cursor: .openHand)
     }
 }
 
