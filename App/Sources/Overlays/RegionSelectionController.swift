@@ -109,7 +109,8 @@ final class RegionSelectionController {
             surface.panel.registerForCaptureExclusion()
         }
         interactionPanel.orderFrontRegardless()
-        interactionPanel.makeKey()
+        // Keep the toolbar key so its native popover retains active chrome.
+        // RegionInteractionView accepts first mouse and does not need key-window status.
         interactionPanel.registerForCaptureExclusion()
     }
 
