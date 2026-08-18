@@ -22,7 +22,6 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertTrue(store.captureSystemAudio)
         XCTAssertFalse(store.captureMicrophone)
         XCTAssertEqual(store.countdown, .three)
-        XCTAssertEqual(store.theme, .dark)
     }
 
     func testRoundTrip() {
@@ -47,23 +46,14 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertEqual(store.videoQuality, 0)
     }
 
-    func testThemeRoundTrip() {
-        for theme in [Theme.auto, .light, .dark] {
-            store.theme = theme
-            XCTAssertEqual(SettingsStore(defaults: defaults).theme, theme)
-        }
-    }
-
     func testResetAllRestoresDefaults() {
         store.videoCodec = .h264
         store.frameRateMode = .constant
         store.captureMicrophone = true
-        store.theme = .light
         store.resetAll()
         XCTAssertEqual(store.videoCodec, .hevc)
         XCTAssertEqual(store.frameRateMode, .variable)
         XCTAssertFalse(store.captureMicrophone)
-        XCTAssertEqual(store.theme, .dark)
     }
 
     func testCaptureLimitsClamp5K() {

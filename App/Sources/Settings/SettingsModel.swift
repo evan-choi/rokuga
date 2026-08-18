@@ -8,15 +8,6 @@ import SettingsKit
 final class SettingsModel: ObservableObject {
     private let store = SettingsStore.shared
 
-    var theme: Theme {
-        get { store.theme }
-        set {
-            objectWillChange.send()
-            store.theme = newValue
-            ThemeApplier.apply(newValue)
-        }
-    }
-
     var launchAtLogin: Bool {
         get { store.launchAtLogin }
         set {
@@ -131,27 +122,12 @@ final class SettingsModel: ObservableObject {
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         objectWillChange.send()
         store.resetAll()
-        ThemeApplier.apply(store.theme)
         LaunchAtLogin.set(enabled: store.launchAtLogin)
     }
 
     private func update(_ mutate: (SettingsStore) -> Void) {
         objectWillChange.send()
         mutate(store)
-    }
-}
-
-@MainActor
-enum ThemeApplier {
-    static func apply(_ theme: Theme) {
-        switch theme {
-        case .auto:
-            NSApp.appearance = nil
-        case .light:
-            NSApp.appearance = NSAppearance(named: .aqua)
-        case .dark:
-            NSApp.appearance = NSAppearance(named: .darkAqua)
-        }
     }
 }
 

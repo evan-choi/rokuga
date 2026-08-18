@@ -10,8 +10,8 @@
 | Zero-copy record path | `scripts/audit-zero-copy.sh` + xctrace recipe | ✅ CI (static) |
 | Localization (ko/ja/zh-Hans) | `scripts/lint-localization.py` + `scripts/l10n-screenshots.sh` | ✅ CI / artifacts |
 | Accessibility fallbacks | Reduce Transparency (`GlassBackground`), Reduce Motion paths, VoiceOver labels | ✅ code-level |
-| Appearance propagation | Debug app `--verify-appearance-propagation` | Pass on macOS 26.5.2 |
-| Glass contrast and accessibility palettes | Debug app `--verify-theme-rendering` | Pass on macOS 26.5.2; minimum 4.80:1 text and controls |
+| Fixed Dark inheritance | Debug app `--verify-dark-appearance` | Pass on macOS 26.5.2 |
+| Dark glass contrast and accessibility palette | Debug app `--verify-dark-rendering` | Pass on macOS 26.5.2; text ≥ 4.5:1 and controls ≥ 3:1 |
 
 The glass verifier composites the app's explicit sRGB scrim tokens and AppKit-resolved
 semantic label, selection, and control colors over `#FFFFFF`, `#000000`, and
@@ -19,12 +19,10 @@ semantic label, selection, and control colors over `#FFFFFF`, `#000000`, and
 3:1, opaque Reduce Transparency surfaces, and the stronger Increase Contrast
 scrim.
 
-The theme screenshot harness composites cached toolbar and preview pixels over
-white/`#0066FF`/black fixtures. Those pixels contain the real explicit scrim
-layer; the harness no longer synthesizes material tint. The fixtures retain
-clear pixels outside each rounded surface, with no rectangular backing or
-shadow. Live-window QA still verifies native lensing below the scrim because
-off-screen view caching omits the system glass material.
+The localized screenshot harness renders toolbar, popover, settings, and editor
+surfaces under the fixed Dark appearance. Live-window QA still verifies native
+lensing below the scrim because off-screen view caching omits the system glass
+material.
 
 ## Manual hardware passes (release checklist)
 
@@ -40,5 +38,5 @@ hardware before each tagged release. Record results in the release PR.
 | 5 | Any, VoiceOver enabled | Toolbar → record → stop → preview → trim editor fully by keyboard/VO | ☐ |
 | 6 | Any, Reduce Transparency + Reduce Motion | Solid panel fallbacks, no animated transitions | ☐ |
 | 7 | Any, 8 h soak (`rokuga-bench throughput --seconds 28800`) | Memory ≤ 400 MB steady, zero drops | ☐ |
-| 8 | macOS 13.3–15, Light / Dark / Auto | `NSVisualEffectView` remains active beneath the explicit scrim and matches the selected theme over white, black, and high-chroma content; rounded boundaries remain visible; Reduce Transparency uses the solid palette | Pending |
-| 9 | macOS 26+, Light / Dark / Auto | Untinted native Liquid Glass remains visibly active beneath the explicit scrim; Light controls remain legible over black content; Dark controls remain legible over white content | Pending |
+| 8 | macOS 13.3–15, system Light and Dark | Rokuga remains Dark; `NSVisualEffectView` stays active beneath the explicit scrim over white, black, and high-chroma content; rounded boundaries remain visible; Reduce Transparency uses the solid Dark palette | Pending |
+| 9 | macOS 26+, system Light and Dark | Rokuga remains Dark; untinted native Liquid Glass stays visibly active beneath the explicit scrim; controls remain legible over white and black content | Pending |

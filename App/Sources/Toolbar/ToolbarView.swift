@@ -23,7 +23,7 @@ struct ToolbarView: View {
         .padding(.horizontal, 12)
         .frame(height: 54)
         .fixedSize()
-        .background(SystemCaptureBackground(cornerRadius: 16))
+        .background(GlassBackground(cornerRadius: 16))
         .hiddenFocusRing()
     }
 
@@ -122,25 +122,6 @@ struct ToolbarView: View {
         .background(Capsule().fill(Color(nsColor: .controlBackgroundColor).opacity(0.72)))
         .keyboardShortcut(.defaultAction)
         .accessibilityLabel(Text("Record"))
-    }
-}
-
-private struct SystemCaptureBackground: View {
-    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
-
-    let cornerRadius: CGFloat
-
-    var body: some View {
-        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-        if reduceTransparency {
-            shape.fill(Color(nsColor: .windowBackgroundColor))
-        } else if #available(macOS 26.0, *) {
-            shape.fill(.clear)
-                .glassEffect(.regular, in: shape)
-        } else {
-            VisualEffectView(material: .hudWindow)
-                .clipShape(shape)
-        }
     }
 }
 

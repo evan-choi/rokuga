@@ -53,11 +53,6 @@ private struct GeneralPane: View {
 
     var body: some View {
         Form {
-            Picker("Appearance", selection: $model.theme) {
-                Text("Auto").tag(Theme.auto)
-                Text("Light").tag(Theme.light)
-                Text("Dark").tag(Theme.dark)
-            }
             Toggle("Launch at login", isOn: $model.launchAtLogin)
             Toggle("Show floating thumbnail after recording", isOn: $model.showFloatingThumbnail)
             Picker("Countdown", selection: $model.countdown) {

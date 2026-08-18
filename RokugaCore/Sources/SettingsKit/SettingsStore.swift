@@ -36,7 +36,6 @@ public final class SettingsStore: @unchecked Sendable {
         case outputFolderBookmark = "output.folderBookmark"
         case selectedRegions = "region.perDisplay"
         case launchAtLogin = "app.launchAtLogin"
-        case theme = "app.theme"
         case onboardingCompleted = "app.onboardingCompleted"
         case lastRecordingPath = "post.lastRecordingPath"
     }
@@ -127,11 +126,6 @@ public final class SettingsStore: @unchecked Sendable {
     public var showFloatingThumbnail: Bool {
         get { bool(.showFloatingThumbnail, default: true) }
         set { set(newValue, for: .showFloatingThumbnail) }
-    }
-
-    public var theme: Theme {
-        get { rawRepresentable(.theme) ?? .dark }
-        set { set(newValue.rawValue, for: .theme) }
     }
 
     public var launchAtLogin: Bool {

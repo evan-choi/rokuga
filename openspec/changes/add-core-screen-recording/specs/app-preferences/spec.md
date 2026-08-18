@@ -13,20 +13,20 @@ The app SHALL provide a settings window — the only persistent window besides t
 - **WHEN** a recording is in progress
 - **THEN** settings that cannot safely change mid-recording (codec, resolution, FPS, audio sources) are disabled with an explanatory note, while unrelated settings remain editable
 
-### Requirement: Appearance theme
-The app SHALL offer an appearance setting with Auto (follow system), Light, and Dark options (default: Dark). A selection MUST apply immediately to all app-owned windows and transient panel chrome, including surfaces that are already visible. Capture overlays and controls drawn over video MAY retain fixed-contrast colors when theme-dependent colors would reduce visibility.
+### Requirement: Fixed Dark appearance
+The app SHALL render all app-owned windows and transient panel chrome in Dark Aqua regardless of the macOS appearance. The Dark appearance MUST apply before the first app-owned surface becomes visible, and the app SHALL NOT expose or persist a theme selection. Capture overlays and controls drawn over video MAY retain fixed-contrast colors when semantic Dark colors would reduce visibility.
 
-#### Scenario: Fixed light theme
-- **WHEN** the user selects Light while macOS is in dark mode
-- **THEN** all app-owned window and transient panel chrome renders in light appearance without relaunching
+#### Scenario: Launch while macOS uses Light
+- **WHEN** the app launches while macOS uses Light appearance
+- **THEN** all app-owned windows and transient panels render in Dark Aqua from their first visible frame
 
-#### Scenario: Fixed dark theme
-- **WHEN** the user selects Dark while macOS is in light mode
-- **THEN** all app-owned window and transient panel chrome renders in dark appearance without relaunching
+#### Scenario: macOS appearance changes
+- **WHEN** macOS changes appearance while the app is running
+- **THEN** all open app-owned windows and transient panels remain in Dark Aqua
 
-#### Scenario: Auto follows system
-- **WHEN** Auto is selected and macOS switches appearance
-- **THEN** open app-owned windows and transient panels switch accordingly without being recreated
+#### Scenario: No appearance preference
+- **WHEN** the user opens General settings
+- **THEN** no Appearance or Theme control is available
 
 ### Requirement: Launch at login
 The app SHALL offer a "Launch at login" toggle (default: off) that registers/unregisters the app as a login item, starting it in the menu bar without opening windows.
