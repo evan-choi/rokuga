@@ -157,7 +157,6 @@ final class RegionInteractionView: ActiveCursorView {
     // MARK: Mouse
 
     override func mouseDown(with event: NSEvent) {
-        window?.makeKey()
         let point = convert(event.locationInWindow, from: nil)
         mouseAtDragStart = NSEvent.mouseLocation
         regionAtDragStart = region
