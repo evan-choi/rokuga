@@ -124,7 +124,7 @@ public final class SettingsStore: @unchecked Sendable {
     }
 
     public var theme: Theme {
-        get { rawRepresentable(.theme) ?? .auto }
+        get { rawRepresentable(.theme) ?? .dark }
         set { set(newValue.rawValue, for: .theme) }
     }
 
