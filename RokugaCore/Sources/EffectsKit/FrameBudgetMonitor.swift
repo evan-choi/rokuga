@@ -8,7 +8,7 @@ public final class FrameBudgetMonitor: @unchecked Sendable {
         case full = 0
         case noClickAnimations = 1
         case noHighlight = 2
-        case nativeCursor = 3
+        case cursorOnly = 3
 
         public static func < (lhs: Level, rhs: Level) -> Bool {
             lhs.rawValue < rhs.rawValue
