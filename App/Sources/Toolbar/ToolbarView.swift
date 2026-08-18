@@ -23,7 +23,7 @@ struct ToolbarView: View {
         .padding(.horizontal, 12)
         .frame(height: 54)
         .fixedSize()
-        .background(GlassBackground(cornerRadius: 16))
+        .captureWindowChrome()
         .hiddenFocusRing()
     }
 
@@ -199,7 +199,7 @@ final class ToolbarTooltipPresenter {
                 .foregroundStyle(Color.primary)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
-                .background(GlassBackground(cornerRadius: 7))
+                .captureWindowChrome(cornerRadius: CaptureWindowChrome.tooltipCornerRadius)
                 .fixedSize()
         )
         let size = hostingView.fittingSize
