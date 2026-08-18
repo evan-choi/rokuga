@@ -3,6 +3,9 @@ import SwiftUI
 
 @MainActor
 final class ToolbarPanelController {
+    static let windowLevel = NSWindow.Level(rawValue: NSWindow.Level.screenSaver.rawValue + 1)
+    static let popoverLevel = NSWindow.Level(rawValue: NSWindow.Level.screenSaver.rawValue + 2)
+
     private let panel: CapturePanel
     private let hostingView: NSHostingView<AnyView>
     private static let bottomMargin: CGFloat = 96
@@ -16,7 +19,7 @@ final class ToolbarPanelController {
         )
         panel = CapturePanel(
             contentRect: NSRect(origin: .zero, size: hostingView.fittingSize),
-            level: NSWindow.Level(rawValue: NSWindow.Level.screenSaver.rawValue + 1),
+            level: Self.windowLevel,
             showsWindowShadow: false
         )
         panel.contentView = hostingView

@@ -143,6 +143,11 @@ final class AppState: ObservableObject {
         refreshSelectionLayer()
     }
 
+    func refreshSelectionCursor() {
+        windowHoverController?.refreshCursor()
+        displaySelectController?.refreshCursor()
+    }
+
     private func refreshSelectionLayer() {
         teardownSelectionLayer()
         guard toolbarController?.isVisible == true else { return }
