@@ -90,92 +90,44 @@ final class WindowHitTester {
     }
 }
 
-class SelectionTrackingView: NSView {
+class SelectionTrackingView: ActiveCursorView {
     var onMouseMoved: (() -> Void)?
     var onMouseDown: (() -> Void)?
     var selectionCursor: NSCursor? {
         didSet {
-            invalidateSelectionCursorRects()
+            refreshActiveCursor()
         }
     }
 
     var selectionCursorRects: [NSRect] = [] {
         didSet {
-            invalidateSelectionCursorRects()
-        }
-    }
-
-    override func updateTrackingAreas() {
-        super.updateTrackingAreas()
-        trackingAreas.forEach(removeTrackingArea)
-        addTrackingArea(
-            NSTrackingArea(
-                rect: bounds,
-                options: [.mouseMoved, .mouseEnteredAndExited, .cursorUpdate, .activeAlways],
-                owner: self
-            )
-        )
-    }
-
-    override func resetCursorRects() {
-        super.resetCursorRects()
-        if let selectionCursor {
-            for rect in selectionCursorRects {
-                addCursorRect(rect.intersection(bounds), cursor: selectionCursor)
-            }
+            refreshActiveCursor()
         }
     }
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
     override func mouseMoved(with event: NSEvent) {
         onMouseMoved?()
-        applySelectionCursor(for: event)
+        super.mouseMoved(with: event)
     }
 
     override func mouseEntered(with event: NSEvent) {
         onMouseMoved?()
-        applySelectionCursor(for: event)
-    }
-
-    override func mouseExited(with event: NSEvent) {
-        NSCursor.arrow.set()
-    }
-
-    override func cursorUpdate(with event: NSEvent) {
-        applySelectionCursor(for: event)
+        super.mouseEntered(with: event)
     }
 
     override func mouseDown(with event: NSEvent) { onMouseDown?() }
 
     @discardableResult
     func reapplySelectionCursor() -> Bool {
-        guard let window,
-              window.isVisible,
-              NSMouseInRect(NSEvent.mouseLocation, window.frame, false)
-        else { return false }
-
-        let windowPoint = window.convertPoint(fromScreen: NSEvent.mouseLocation)
-        applySelectionCursor(at: convert(windowPoint, from: nil))
-        return true
+        refreshActiveCursor()
     }
 
-    private func invalidateSelectionCursorRects() {
-        if let window {
-            window.invalidateCursorRects(for: self)
-        }
-    }
-
-    private func applySelectionCursor(for event: NSEvent) {
-        applySelectionCursor(at: convert(event.locationInWindow, from: nil))
-    }
-
-    private func applySelectionCursor(at point: NSPoint) {
-        let isRecordTarget = selectionCursorRects.contains { $0.contains(point) }
-        if isRecordTarget, let selectionCursor {
-            selectionCursor.set()
-        } else {
-            NSCursor.arrow.set()
-        }
+    override func activeCursor(at point: NSPoint) -> NSCursor {
+        guard selectionCursorRects.contains(where: { $0.contains(point) }),
+              let selectionCursor
+        else { return .arrow }
+        return selectionCursor
     }
 }
 
@@ -219,9 +171,7 @@ final class WindowHoverController {
     }
 
     func refreshCursor() {
-        if !highlightViews.contains(where: { $0.reapplySelectionCursor() }) {
-            NSCursor.arrow.set()
-        }
+        _ = highlightViews.first { $0.reapplySelectionCursor() }
     }
 
     private func updateHover() {
@@ -310,9 +260,7 @@ final class DisplaySelectController {
     }
 
     func refreshCursor() {
-        if !panels.contains(where: { $0.view.reapplySelectionCursor() }) {
-            NSCursor.arrow.set()
-        }
+        _ = panels.first { $0.view.reapplySelectionCursor() }
     }
 
     private func updateHover() {

@@ -247,17 +247,19 @@ private struct WindowDragHandle: NSViewRepresentable {
     func updateNSView(_ view: WindowDragView, context: Context) {}
 }
 
-private final class WindowDragView: NSView {
+private final class WindowDragView: ActiveCursorView {
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
         true
     }
 
     override func mouseDown(with event: NSEvent) {
+        NSCursor.closedHand.set()
         window?.performDrag(with: event)
+        NSCursor.openHand.set()
     }
 
-    override func resetCursorRects() {
-        addCursorRect(bounds, cursor: .openHand)
+    override func activeCursor(at point: NSPoint) -> NSCursor {
+        .openHand
     }
 }
 

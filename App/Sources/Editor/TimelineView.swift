@@ -102,7 +102,7 @@ final class TimelineScrollView: NSScrollView {
     }
 }
 
-final class TimelineNSView: NSView {
+final class TimelineNSView: ActiveCursorView {
     private unowned let model: TrimEditorModel
     private var tileImages: [ThumbnailStrip.TileKey: CGImage] = [:]
     private var pendingTiles: Set<ThumbnailStrip.TileKey> = []
@@ -227,6 +227,7 @@ final class TimelineNSView: NSView {
             dragging = nil
             model.seek(to: Double(point.x) / model.pointsPerSecond)
         }
+        activeCursor(at: point).set()
     }
 
     override func mouseDragged(with event: NSEvent) {
@@ -237,21 +238,23 @@ final class TimelineNSView: NSView {
         } else {
             model.seek(to: seconds)
         }
+        activeCursor(at: point).set()
         needsDisplay = true
     }
 
     override func mouseUp(with event: NSEvent) {
         dragging = nil
+        activeCursor(at: convert(event.locationInWindow, from: nil)).set()
     }
 
-    override func resetCursorRects() {
+    override func activeCursor(at point: NSPoint) -> NSCursor {
+        if dragging != nil {
+            return .resizeLeftRight
+        }
         let startX = CGFloat(model.startSeconds) * pps
         let endX = CGFloat(model.endSeconds) * pps
-        for x in [startX, endX] {
-            addCursorRect(
-                NSRect(x: x - Self.handleWidth, y: 0, width: Self.handleWidth * 2, height: bounds.height),
-                cursor: .resizeLeftRight
-            )
-        }
+        return abs(point.x - startX) <= Self.handleWidth || abs(point.x - endX) <= Self.handleWidth
+            ? .resizeLeftRight
+            : .arrow
     }
 }

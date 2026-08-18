@@ -118,19 +118,18 @@ final class AreaSelectionView: NSView {
 /// Mouse surface for the region: move by dragging inside, resize via the 8 grips.
 /// Sized to the region plus the grip hit margin so everything outside stays click-through.
 /// Drag math uses global coordinates because this view's window moves during the drag.
-final class RegionInteractionView: NSView {
+final class RegionInteractionView: ActiveCursorView {
     var onRegionEdit: ((CGRect) -> Void)?
     var onEditEnd: (() -> Void)?
 
     /// Region in global CG (top-left) coordinates.
     var region: CGRect = .zero {
-        didSet { window?.invalidateCursorRects(for: self) }
+        didSet { refreshActiveCursor() }
     }
 
     private var dragMode: DragMode = .none
     private var mouseAtDragStart: CGPoint?
     private var regionAtDragStart: CGRect?
-    private var cursorPushed = false
 
     private enum DragMode: Equatable {
         case none
@@ -165,13 +164,12 @@ final class RegionInteractionView: NSView {
 
         if let handle = handleHit(at: point) {
             dragMode = .resizing(handle)
-            push(Self.cursor(for: handle))
         } else if regionInView.contains(point) {
             dragMode = .moving
-            push(.closedHand)
         } else {
             dragMode = .none
         }
+        activeCursor(at: point).set()
     }
 
     override func mouseDragged(with event: NSEvent) {
@@ -188,49 +186,33 @@ final class RegionInteractionView: NSView {
         case .none:
             break
         }
+        activeCursor(at: convert(event.locationInWindow, from: nil)).set()
     }
 
     override func mouseUp(with event: NSEvent) {
-        popCursorIfNeeded()
         let wasEditing = dragMode != .none
         dragMode = .none
         mouseAtDragStart = nil
         regionAtDragStart = nil
+        activeCursor(at: convert(event.locationInWindow, from: nil)).set()
         if wasEditing {
             onEditEnd?()
         }
     }
 
-    private func push(_ cursor: NSCursor) {
-        cursor.push()
-        cursorPushed = true
-    }
-
-    private func popCursorIfNeeded() {
-        if cursorPushed {
-            NSCursor.pop()
-            cursorPushed = false
-        }
-    }
-
     // MARK: Cursors
 
-    override func resetCursorRects() {
-        let inner = regionInView.insetBy(dx: RegionMetrics.handleHitRadius, dy: RegionMetrics.handleHitRadius)
-        if !inner.isEmpty {
-            addCursorRect(inner, cursor: .openHand)
-        }
-        for handle in RegionHandle.allCases {
-            let center = handle.position(in: regionInView)
-            addCursorRect(
-                CGRect(
-                    x: center.x - RegionMetrics.handleHitRadius,
-                    y: center.y - RegionMetrics.handleHitRadius,
-                    width: RegionMetrics.handleHitRadius * 2,
-                    height: RegionMetrics.handleHitRadius * 2
-                ),
-                cursor: Self.cursor(for: handle)
-            )
+    override func activeCursor(at point: NSPoint) -> NSCursor {
+        switch dragMode {
+        case .moving:
+            return .closedHand
+        case let .resizing(handle):
+            return Self.cursor(for: handle)
+        case .none:
+            if let handle = handleHit(at: point) {
+                return Self.cursor(for: handle)
+            }
+            return regionInView.contains(point) ? .openHand : .arrow
         }
     }
 

@@ -7,6 +7,67 @@ final class FirstMouseHostingView<Content: View>: NSHostingView<Content> {
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 }
 
+/// Cursor tracking that remains active for non-key capture panels.
+/// AppKit cursor rects are key-window driven, so HUD views resolve the cursor directly.
+class ActiveCursorView: NSView {
+    private var activeCursorTrackingArea: NSTrackingArea?
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        window?.acceptsMouseMovedEvents = true
+    }
+
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        if let activeCursorTrackingArea {
+            removeTrackingArea(activeCursorTrackingArea)
+        }
+        let trackingArea = NSTrackingArea(
+            rect: .zero,
+            options: [.mouseMoved, .mouseEnteredAndExited, .cursorUpdate, .activeAlways, .inVisibleRect],
+            owner: self,
+            userInfo: nil
+        )
+        addTrackingArea(trackingArea)
+        activeCursorTrackingArea = trackingArea
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        applyActiveCursor(for: event)
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        applyActiveCursor(for: event)
+    }
+
+    override func cursorUpdate(with event: NSEvent) {
+        applyActiveCursor(for: event)
+    }
+
+    func activeCursor(at point: NSPoint) -> NSCursor {
+        .arrow
+    }
+
+    @discardableResult
+    func refreshActiveCursor() -> Bool {
+        guard let window,
+              window.isVisible,
+              NSWindow.windowNumber(
+                  at: NSEvent.mouseLocation,
+                  belowWindowWithWindowNumber: 0
+              ) == window.windowNumber
+        else { return false }
+
+        let windowPoint = window.convertPoint(fromScreen: NSEvent.mouseLocation)
+        activeCursor(at: convert(windowPoint, from: nil)).set()
+        return true
+    }
+
+    private func applyActiveCursor(for event: NSEvent) {
+        activeCursor(at: convert(event.locationInWindow, from: nil)).set()
+    }
+}
+
 /// Non-activating floating panel base for all HUD surfaces (toolbar, countdown, thumbnail).
 /// Registers itself in `CaptureExcludedWindows` so it never appears in recordings, and routes Esc to `onEscape`.
 class CapturePanel: NSPanel {
