@@ -206,6 +206,7 @@ final class ToolbarTooltipPresenter {
         let tooltipPanel = panel ?? makePanel(size: size)
         tooltipPanel.contentView = hostingView
         tooltipPanel.setContentSize(size)
+        tooltipPanel.clipContent(toRoundedRect: CaptureWindowChrome.tooltipCornerRadius)
 
         let anchorRect = toolbarWindow.convertToScreen(anchor.convert(anchor.bounds, to: nil))
         guard let screen = toolbarWindow.screen ?? NSScreen.main else { return }
@@ -229,7 +230,7 @@ final class ToolbarTooltipPresenter {
         let panel = CapturePanel(
             contentRect: NSRect(origin: .zero, size: size),
             level: ToolbarPanelController.popoverLevel,
-            showsWindowShadow: true
+            showsWindowShadow: false
         )
         panel.ignoresMouseEvents = true
         panel.isMovableByWindowBackground = false
