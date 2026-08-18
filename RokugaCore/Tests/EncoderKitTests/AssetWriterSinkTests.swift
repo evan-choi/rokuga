@@ -20,16 +20,21 @@ final class AssetWriterSinkTests: XCTestCase {
 
     private func makeConfiguration(
         capturesSystemAudio: Bool = false,
-        frameRateMode: FrameRateMode = .variable
+        frameRateMode: FrameRateMode = .variable,
+        codec: VideoCodec = .h264,
+        container: ContainerFormat = .mp4,
+        width: Int = 640,
+        height: Int = 360,
+        quality: Int = 60
     ) -> EncoderConfiguration {
         EncoderConfiguration(
-            codec: .h264,
-            container: .mp4,
-            width: 640,
-            height: 360,
+            codec: codec,
+            container: container,
+            width: width,
+            height: height,
             frameRate: .fps30,
             frameRateMode: frameRateMode,
-            quality: 60,
+            quality: quality,
             audioBitrate: .kbps128,
             capturesSystemAudio: capturesSystemAudio,
             capturesMicrophone: false
@@ -140,6 +145,45 @@ final class AssetWriterSinkTests: XCTestCase {
         let size = try await videoTracks[0].load(.naturalSize)
         XCTAssertEqual(Int(size.width), 640)
         XCTAssertEqual(Int(size.height), 360)
+    }
+
+    func testMaximumQualityHEVCPreservesOddNativeDimensions() async throws {
+        let width = 321
+        let height = 181
+        guard AssetWriterSink.supportsHardwareHEVC444(width: width, height: height) else {
+            throw XCTSkip("hardware HEVC 4:4:4 is unavailable")
+        }
+        let sink = AssetWriterSink(
+            outputURL: outputURL,
+            configuration: makeConfiguration(
+                codec: .hevc,
+                container: .mov,
+                width: width,
+                height: height,
+                quality: 100
+            )
+        )
+        try await sink.start()
+
+        for frame in 0..<10 {
+            sink.append(
+                try makeVideoSampleBuffer(
+                    pts: CMTime(value: CMTimeValue(frame), timescale: 30),
+                    width: width,
+                    height: height
+                ),
+                of: .video
+            )
+            try await Task.sleep(nanoseconds: 33_000_000)
+        }
+
+        let url = try await sink.finish()
+        let tracks = try await AVAsset(url: url).loadTracks(withMediaType: .video)
+        let size = try await XCTUnwrap(tracks.first).load(.naturalSize)
+        XCTAssertEqual(Int(size.width), width)
+        XCTAssertEqual(Int(size.height), height)
+        let presentationTimes = try await videoPresentationTimes(at: url)
+        XCTAssertFalse(presentationTimes.isEmpty)
     }
 
     func testVariableFrameRateDoesNotSynthesizeFrames() async throws {

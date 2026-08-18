@@ -74,9 +74,14 @@ public enum CaptureLimits {
     /// Auto-stop when free space drops below this while recording.
     public static let autoStopFreeBytes: Int64 = 500_000_000 // 500 MB
 
-    /// Clamp an arbitrary source size to the 5K envelope, preserving aspect ratio and rounding to even pixel dimensions (encoder requirement).
+    /// Clamp an arbitrary source size to the 5K envelope, preserving native dimensions unless downscaling is required.
     public static func clamped(width: Int, height: Int) -> (width: Int, height: Int) {
+        guard width > 0, height > 0 else { return (2, 2) }
         let scale = min(1.0, Double(maxPixelsWide) / Double(width), Double(maxPixelsHigh) / Double(height))
+        guard scale < 1 else { return (width, height) }
+
+        // Only scaled output needs encoder-friendly even dimensions. Rounding an
+        // unscaled odd source makes ScreenCaptureKit resample every source pixel.
         let w = Int(Double(width) * scale) & ~1
         let h = Int(Double(height) * scale) & ~1
         return (max(w, 2), max(h, 2))
