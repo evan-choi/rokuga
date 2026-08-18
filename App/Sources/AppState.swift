@@ -115,6 +115,7 @@ final class AppState: ObservableObject {
             // Pause is not surfaced in the UI; the state remains only as a core capability.
             break
         }
+        Hotkeys.update(for: state)
     }
 
     // MARK: Toolbar
