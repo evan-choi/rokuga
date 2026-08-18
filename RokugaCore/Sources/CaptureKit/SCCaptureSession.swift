@@ -241,7 +241,7 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         if configuration.captureSystemAudio {
             config.capturesAudio = true
             config.excludesCurrentProcessAudio = true
-            config.sampleRate = 48_000
+            config.sampleRate = 48000
             config.channelCount = 2
         }
         return config
