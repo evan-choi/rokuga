@@ -7,6 +7,30 @@ final class FirstMouseHostingView<Content: View>: NSHostingView<Content> {
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 }
 
+/// WindowServer drops `NSCursor.set()` from apps that are not frontmost, and every
+/// HUD panel here is non-activating, so custom cursors only appeared while Rokuga
+/// happened to be the active app. This private CGS connection flag (the one Ice and
+/// Mac Mouse Fix rely on) lets the process set the cursor while inactive; if the
+/// symbols ever disappear the app just falls back to active-only cursor behavior.
+private enum BackgroundCursorAccess {
+    private typealias MainConnectionID = @convention(c) () -> Int32
+    private typealias SetConnectionProperty = @convention(c) (Int32, Int32, CFString, CFTypeRef) -> Int32
+
+    static let enableOnce: Void = {
+        guard let handle = dlopen(nil, RTLD_LAZY),
+              let mainSymbol = dlsym(handle, "CGSMainConnectionID"),
+              let setSymbol = dlsym(handle, "CGSSetConnectionProperty")
+        else { return }
+        let connection = unsafeBitCast(mainSymbol, to: MainConnectionID.self)()
+        _ = unsafeBitCast(setSymbol, to: SetConnectionProperty.self)(
+            connection,
+            connection,
+            "SetsCursorInBackground" as CFString,
+            kCFBooleanTrue
+        )
+    }()
+}
+
 /// Cursor tracking that remains active for non-key capture panels.
 /// `cursorUpdate` cannot be combined with `activeAlways`, so inactive HUDs use
 /// the supported mouse-enter/move path and keep all cursor writes here.
@@ -16,6 +40,7 @@ class ActiveCursorView: NSView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         window?.acceptsMouseMovedEvents = true
+        _ = BackgroundCursorAccess.enableOnce
     }
 
     override func updateTrackingAreas() {
