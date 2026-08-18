@@ -10,23 +10,32 @@ public struct FrameGeometry: Equatable, Sendable {
     public var contentRect: CGRect
     /// Output frame size in pixels.
     public var pixelSize: CGSize
+    /// Location of captured content within the output pixel surface. This differs
+    /// from the full surface when ScreenCaptureKit preserves a resized window's aspect ratio.
+    public var pixelContentRect: CGRect
 
-    public init(contentRect: CGRect, pixelSize: CGSize) {
+    public init(contentRect: CGRect, pixelSize: CGSize, pixelContentRect: CGRect? = nil) {
         self.contentRect = contentRect
         self.pixelSize = pixelSize
+        self.pixelContentRect = pixelContentRect ?? CGRect(origin: .zero, size: pixelSize)
     }
 
     public var scale: CGFloat {
         guard contentRect.width > 0 else { return 1 }
-        return pixelSize.width / contentRect.width
+        return pixelContentRect.width / contentRect.width
+    }
+
+    private var verticalScale: CGFloat {
+        guard contentRect.height > 0 else { return 1 }
+        return pixelContentRect.height / contentRect.height
     }
 
     /// Frame pixel position (top-left origin) for a global point; nil when outside the frame.
     public func pixelPosition(of globalPoint: CGPoint) -> CGPoint? {
         guard contentRect.insetBy(dx: -64, dy: -64).contains(globalPoint) else { return nil }
         return CGPoint(
-            x: (globalPoint.x - contentRect.minX) * scale,
-            y: (globalPoint.y - contentRect.minY) * scale
+            x: pixelContentRect.minX + (globalPoint.x - contentRect.minX) * scale,
+            y: pixelContentRect.minY + (globalPoint.y - contentRect.minY) * verticalScale
         )
     }
 }
@@ -40,24 +49,24 @@ public final class CursorCompositor: @unchecked Sendable {
     private let geometry: FrameGeometry
     private let sampler: CursorStateSampling
     private let budget: FrameBudgetMonitor
-    private let onDegradeToNativeCursor: @Sendable () -> Void
+    private let onDegradeToCursorOnly: @Sendable () -> Void
 
     private let context: CIContext
     private var pool: CVPixelBufferPool?
-    private var notifiedNativeFallback = false
+    private var notifiedCursorOnly = false
 
     public init(
         options: CursorEffectOptions,
         geometry: FrameGeometry,
         sampler: CursorStateSampling,
         budget: FrameBudgetMonitor = FrameBudgetMonitor(),
-        onDegradeToNativeCursor: @escaping @Sendable () -> Void = {}
+        onDegradeToCursorOnly: @escaping @Sendable () -> Void = {}
     ) {
         self.options = options
         self.geometry = geometry
         self.sampler = sampler
         self.budget = budget
-        self.onDegradeToNativeCursor = onDegradeToNativeCursor
+        self.onDegradeToCursorOnly = onDegradeToCursorOnly
         if let device = MTLCreateSystemDefaultDevice() {
             context = CIContext(mtlDevice: device, options: [.cacheIntermediates: false])
         } else {
@@ -67,16 +76,13 @@ public final class CursorCompositor: @unchecked Sendable {
 
     /// Composite cursor layers over the frame; returns the original buffer untouched
     /// on the passthrough path or after full degradation.
-    public func composite(_ sampleBuffer: CMSampleBuffer) -> CMSampleBuffer {
+    public func composite(_ sampleBuffer: CMSampleBuffer, geometry frameGeometry: FrameGeometry? = nil) -> CMSampleBuffer {
         guard !options.isPassthrough else { return sampleBuffer }
 
         let level = budget.currentLevel
-        if level == .nativeCursor {
-            if !notifiedNativeFallback {
-                notifiedNativeFallback = true
-                onDegradeToNativeCursor()
-            }
-            return sampleBuffer
+        if level == .cursorOnly, !notifiedCursorOnly {
+            notifiedCursorOnly = true
+            onDegradeToCursorOnly()
         }
 
         guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return sampleBuffer }
@@ -88,7 +94,7 @@ public final class CursorCompositor: @unchecked Sendable {
         let overlays = CursorOverlayRenderer.render(
             snapshot: snapshot,
             options: options,
-            geometry: geometry,
+            geometry: frameGeometry ?? geometry,
             level: level,
             now: ProcessInfo.processInfo.systemUptime
         )
@@ -228,7 +234,9 @@ enum CursorOverlayRenderer {
         level: FrameBudgetMonitor.Level,
         scale: CGFloat
     ) -> Overlay? {
-        guard options.showCursor || (options.highlight && level < .noHighlight),
+        let drawsPointer = options.compositesPointer
+        let drawsHighlight = options.highlight && level < .noHighlight
+        guard drawsPointer || drawsHighlight,
               let center = geometry.pixelPosition(of: snapshot.location)
         else { return nil }
 
@@ -240,7 +248,7 @@ enum CursorOverlayRenderer {
 
         let local = CGPoint(x: tileSide / 2, y: tileSide / 2)
 
-        if options.highlight, level < .noHighlight {
+        if drawsHighlight {
             let radius = 22 * scale
             ctx.setFillColor(CGColor(red: 1, green: 0.9, blue: 0.25, alpha: 0.3))
             ctx.fillEllipse(in: CGRect(
@@ -251,46 +259,22 @@ enum CursorOverlayRenderer {
             ))
         }
 
-        if options.showCursor {
-            drawCursor(snapshot: snapshot, options: options, local: local, scale: scale, context: ctx)
+        if drawsPointer {
+            drawDotCursor(local: local, scale: scale, context: ctx)
         }
 
         return makeOverlay(context: ctx, origin: tileOrigin, dimension: tileDimension)
     }
 
-    private static func drawCursor(
-        snapshot: CursorSnapshot,
-        options: CursorEffectOptions,
-        local: CGPoint,
-        scale: CGFloat,
-        context ctx: CGContext
-    ) {
-        switch options.pointerStyle {
-        case .dot:
-            let radius = 7 * scale
-            ctx.setFillColor(CGColor(red: 1, green: 0.23, blue: 0.19, alpha: 0.95))
-            ctx.fillEllipse(in: CGRect(
-                x: local.x - radius,
-                y: local.y - radius,
-                width: radius * 2,
-                height: radius * 2
-            ))
-        case .system:
-            guard let image = snapshot.image else { return }
-            let size = CGSize(
-                width: snapshot.imagePointSize.width * scale,
-                height: snapshot.imagePointSize.height * scale
-            )
-            let origin = CGPoint(
-                x: local.x - snapshot.imageHotSpot.x * scale,
-                y: local.y - snapshot.imageHotSpot.y * scale
-            )
-            ctx.saveGState()
-            ctx.translateBy(x: origin.x, y: origin.y + size.height)
-            ctx.scaleBy(x: 1, y: -1)
-            ctx.draw(image, in: CGRect(origin: .zero, size: size))
-            ctx.restoreGState()
-        }
+    private static func drawDotCursor(local: CGPoint, scale: CGFloat, context ctx: CGContext) {
+        let radius = 7 * scale
+        ctx.setFillColor(CGColor(red: 1, green: 0.23, blue: 0.19, alpha: 0.95))
+        ctx.fillEllipse(in: CGRect(
+            x: local.x - radius,
+            y: local.y - radius,
+            width: radius * 2,
+            height: radius * 2
+        ))
     }
 
     private static func makeContext(tileDimension: Int) -> CGContext? {

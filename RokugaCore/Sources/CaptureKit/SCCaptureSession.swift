@@ -7,14 +7,18 @@ import SettingsKit
 
 public struct CaptureConfiguration: Equatable, Sendable {
     public var frameRate: FrameRate
-    public var showsCursor: Bool
     public var captureSystemAudio: Bool
     public var exclusion: ExclusionOptions
     public var cursorEffects: CursorEffectOptions
 
+    /// ScreenCaptureKit owns the system pointer for the entire stream. Custom dot
+    /// pointers remain owned by EffectsKit for the entire stream.
+    public var showsCursor: Bool {
+        cursorEffects.usesNativeSystemCursor
+    }
+
     public init(
         frameRate: FrameRate,
-        showsCursor: Bool,
         captureSystemAudio: Bool,
         exclusion: ExclusionOptions,
         cursorEffects: CursorEffectOptions = CursorEffectOptions(
@@ -22,7 +26,6 @@ public struct CaptureConfiguration: Equatable, Sendable {
         )
     ) {
         self.frameRate = frameRate
-        self.showsCursor = showsCursor
         self.captureSystemAudio = captureSystemAudio
         self.exclusion = exclusion
         self.cursorEffects = cursorEffects
@@ -31,9 +34,6 @@ public struct CaptureConfiguration: Equatable, Sendable {
     public static func fromSettings(_ settings: SettingsStore) -> Self {
         .init(
             frameRate: settings.frameRate,
-            // The system cursor stays visible in the capture only on the zero-cost passthrough path; EffectsKit composites it otherwise (task 6.1).
-            showsCursor: settings.showCursor && settings.pointerStyle == .system
-                && !settings.highlightCursor && !settings.animateClicks,
             captureSystemAudio: settings.captureSystemAudio,
             exclusion: ExclusionOptions(
                 excludeDesktopIcons: settings.excludeDesktopIcons
@@ -89,25 +89,37 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
             try stream.addStreamOutput(self, type: .audio, sampleHandlerQueue: sampleQueue)
         }
 
-        try await sink.start()
-        try await stream.startCapture()
-        stateLock.withLock { self.stream = stream }
+        await prepareCursorEffects(configuration: streamConfiguration)
 
-        if !configuration.cursorEffects.isPassthrough {
-            let sampler = CursorStateSampler()
-            await sampler.start()
-            let compositor = CursorCompositor(
-                options: configuration.cursorEffects,
-                geometry: frameGeometry(configuration: streamConfiguration),
-                sampler: sampler
-            ) { [weak self] in
-                // GPU budget exhausted (task 6.2): fall back to the native cursor mid-stream.
-                self?.fallBackToNativeCursor()
-            }
-            stateLock.withLock {
-                self.cursorSampler = sampler
-                self.compositor = compositor
-            }
+        do {
+            try await sink.start()
+            try await stream.startCapture()
+            stateLock.withLock { self.stream = stream }
+        } catch {
+            try? await stream.stopCapture()
+            await stopCursorSampling()
+            await sink.cancel()
+            throw error
+        }
+    }
+
+    private func prepareCursorEffects(configuration streamConfiguration: SCStreamConfiguration) async {
+        guard configuration.cursorEffects.needsCompositor else { return }
+
+        let sampler = CursorStateSampler(
+            framesPerSecond: configuration.frameRate.rawValue
+        )
+        await sampler.start()
+        let compositor = CursorCompositor(
+            options: configuration.cursorEffects,
+            geometry: frameGeometry(configuration: streamConfiguration),
+            sampler: sampler
+        ) { [weak self] in
+            self?.finishCursorEffectDegradation()
+        }
+        stateLock.withLock {
+            cursorSampler = sampler
+            self.compositor = compositor
         }
     }
 
@@ -128,20 +140,19 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         )
     }
 
-    private func fallBackToNativeCursor() {
-        guard let stream = stateLock.withLock({ self.stream }) else { return }
-        let config = makeStreamConfiguration()
-        config.showsCursor = true
-        Task {
-            try? await stream.updateConfiguration(config)
-            let sampler = self.stateLock.withLock { () -> CursorStateSampler? in
-                self.compositor = nil
-                defer { self.cursorSampler = nil }
-                return self.cursorSampler
-            }
-            if let sampler {
-                await sampler.stop()
-            }
+    private func finishCursorEffectDegradation() {
+        // A custom dot still needs the compositor at the cursor-only level. Native
+        // system pointers are already present in every SCStream frame, so all custom
+        // effects can be detached without a cursor-ownership handoff.
+        guard !configuration.cursorEffects.compositesPointer else { return }
+
+        let sampler = stateLock.withLock { () -> CursorStateSampler? in
+            compositor = nil
+            defer { cursorSampler = nil }
+            return cursorSampler
+        }
+        if let sampler {
+            Task { await sampler.stop() }
         }
     }
 
@@ -253,7 +264,8 @@ extension SCCaptureSession: SCStreamOutput {
         case .screen:
             guard isCompleteVideoFrame(sampleBuffer) else { return }
             let compositor = stateLock.withLock { self.compositor }
-            sink.append(compositor?.composite(sampleBuffer) ?? sampleBuffer, of: .video)
+            let geometry = Self.frameGeometry(from: sampleBuffer)
+            sink.append(compositor?.composite(sampleBuffer, geometry: geometry) ?? sampleBuffer, of: .video)
         case .audio:
             sink.append(sampleBuffer, of: .systemAudio)
         default:
@@ -268,6 +280,49 @@ extension SCCaptureSession: SCStreamOutput {
             let status = SCFrameStatus(rawValue: statusRaw)
         else { return false }
         return status == .complete
+    }
+
+    private static func frameGeometry(from sampleBuffer: CMSampleBuffer) -> FrameGeometry? {
+        guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer),
+              let attachments = CMSampleBufferGetSampleAttachmentsArray(sampleBuffer, createIfNecessary: false)
+              as? [[SCStreamFrameInfo: Any]],
+              let frameInfo = attachments.first
+        else { return nil }
+
+        return frameGeometry(
+            frameInfo: frameInfo,
+            pixelSize: CGSize(
+                width: CVPixelBufferGetWidth(imageBuffer),
+                height: CVPixelBufferGetHeight(imageBuffer)
+            )
+        )
+    }
+
+    static func frameGeometry(
+        frameInfo: [SCStreamFrameInfo: Any],
+        pixelSize: CGSize
+    ) -> FrameGeometry? {
+        guard let screenRect = frameInfo[.screenRect] as? CGRect,
+              let surfaceRect = frameInfo[.contentRect] as? CGRect,
+              let scaleFactor = frameInfo[.scaleFactor] as? CGFloat,
+              screenRect.width > 0,
+              screenRect.height > 0,
+              scaleFactor > 0
+        else { return nil }
+
+        let pixelContentRect = CGRect(
+            x: surfaceRect.minX * scaleFactor,
+            y: surfaceRect.minY * scaleFactor,
+            width: surfaceRect.width * scaleFactor,
+            height: surfaceRect.height * scaleFactor
+        ).intersection(CGRect(origin: .zero, size: pixelSize))
+        guard !pixelContentRect.isNull, !pixelContentRect.isEmpty else { return nil }
+
+        return FrameGeometry(
+            contentRect: screenRect,
+            pixelSize: pixelSize,
+            pixelContentRect: pixelContentRect
+        )
     }
 }
 

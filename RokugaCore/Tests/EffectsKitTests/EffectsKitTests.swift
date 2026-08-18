@@ -25,7 +25,7 @@ final class FrameBudgetMonitorTests: XCTestCase {
         for _ in 0 ..< 10 {
             monitor.record(frameSeconds: 0.01)
         }
-        XCTAssertEqual(monitor.currentLevel, .nativeCursor)
+        XCTAssertEqual(monitor.currentLevel, .cursorOnly)
     }
 
     func testNeverRecoversWithinRecording() {
@@ -38,6 +38,32 @@ final class FrameBudgetMonitorTests: XCTestCase {
             monitor.record(frameSeconds: 0.0001)
         }
         XCTAssertEqual(monitor.currentLevel, .noClickAnimations)
+    }
+}
+
+final class CursorEffectOptionsTests: XCTestCase {
+    func testSystemPointerRemainsNativeWhenEffectsNeedCompositing() {
+        let options = CursorEffectOptions(showCursor: true, pointerStyle: .system, highlight: true, animateClicks: true)
+
+        XCTAssertTrue(options.usesNativeSystemCursor)
+        XCTAssertFalse(options.compositesPointer)
+        XCTAssertTrue(options.needsCompositor)
+        XCTAssertFalse(options.isPassthrough)
+    }
+
+    func testDotPointerHasSingleEffectsKitOwner() {
+        let options = CursorEffectOptions(showCursor: true, pointerStyle: .dot, highlight: false, animateClicks: false)
+
+        XCTAssertFalse(options.usesNativeSystemCursor)
+        XCTAssertTrue(options.compositesPointer)
+        XCTAssertTrue(options.needsCompositor)
+    }
+
+    func testHiddenCursorWithoutEffectsBypassesCompositor() {
+        let options = CursorEffectOptions(showCursor: false, pointerStyle: .system, highlight: false, animateClicks: false)
+
+        XCTAssertFalse(options.usesNativeSystemCursor)
+        XCTAssertTrue(options.isPassthrough)
     }
 }
 
@@ -91,6 +117,45 @@ final class FrameGeometryTests: XCTestCase {
         )
         XCTAssertNil(geometry.pixelPosition(of: CGPoint(x: 500, y: 500)))
     }
+
+    func testMapsNonUniformlyScaledWindowAfterResize() {
+        let geometry = FrameGeometry(
+            contentRect: CGRect(x: 200, y: 300, width: 100, height: 50),
+            pixelSize: CGSize(width: 240, height: 280),
+            pixelContentRect: CGRect(x: 20, y: 40, width: 200, height: 200)
+        )
+
+        let pixel = geometry.pixelPosition(of: CGPoint(x: 250, y: 325))
+        XCTAssertEqual(pixel?.x ?? -1, 120, accuracy: 0.001)
+        XCTAssertEqual(pixel?.y ?? -1, 140, accuracy: 0.001)
+    }
+}
+
+final class CursorStateSamplerTests: XCTestCase {
+    private final class SampleSource: @unchecked Sendable {
+        private let lock = NSLock()
+        private var _location = CGPoint.zero
+
+        var location: CGPoint {
+            get { lock.withLock { _location } }
+            set { lock.withLock { _location = newValue } }
+        }
+    }
+
+    func testSamplesPositionAtConfiguredRate() {
+        let source = SampleSource()
+        source.location = CGPoint(x: 320, y: 240)
+        let sampler = CursorStateSampler(
+            framesPerSecond: 60,
+            locationProvider: { source.location }
+        )
+
+        sampler.sampleNow()
+        let snapshot = sampler.snapshot()
+
+        XCTAssertEqual(sampler.samplingInterval, 1.0 / 60.0, accuracy: 0.000_001)
+        XCTAssertEqual(snapshot.location, source.location)
+    }
 }
 
 final class CursorCompositorTests: XCTestCase {
@@ -106,7 +171,7 @@ final class CursorCompositorTests: XCTestCase {
         let compositor = CursorCompositor(
             options: options,
             geometry: FrameGeometry(contentRect: CGRect(x: 0, y: 0, width: 64, height: 64), pixelSize: CGSize(width: 64, height: 64)),
-            sampler: FakeSampler(sampledSnapshot: CursorSnapshot(location: .zero, image: nil))
+            sampler: FakeSampler(sampledSnapshot: CursorSnapshot(location: .zero))
         )
         let input = try makeSampleBuffer(width: 64, height: 64)
         let output = compositor.composite(input)
@@ -118,7 +183,7 @@ final class CursorCompositorTests: XCTestCase {
         let compositor = CursorCompositor(
             options: options,
             geometry: FrameGeometry(contentRect: CGRect(x: 0, y: 0, width: 128, height: 128), pixelSize: CGSize(width: 128, height: 128)),
-            sampler: FakeSampler(sampledSnapshot: CursorSnapshot(location: CGPoint(x: 64, y: 64), image: nil))
+            sampler: FakeSampler(sampledSnapshot: CursorSnapshot(location: CGPoint(x: 64, y: 64)))
         )
         let input = try makeSampleBuffer(width: 128, height: 128)
         let output = compositor.composite(input)
@@ -144,7 +209,6 @@ final class CursorCompositorTests: XCTestCase {
         )
         let snapshot = CursorSnapshot(
             location: CGPoint(x: 128, y: 128),
-            image: nil,
             clicks: [(time: 99.9, location: CGPoint(x: 128, y: 128))]
         )
 
@@ -210,7 +274,6 @@ final class CursorCompositorTests: XCTestCase {
         )
         let snapshot = CursorSnapshot(
             location: CGPoint(x: 1000, y: 1000),
-            image: nil,
             clicks: [
                 (time: 99.8, location: CGPoint(x: 64, y: 64)),
                 (time: 99.9, location: CGPoint(x: 128, y: 128))
@@ -231,26 +294,48 @@ final class CursorCompositorTests: XCTestCase {
         XCTAssertEqual(clickOverlay.rect.midY, 128, accuracy: 0.001)
     }
 
-    func testBudgetExhaustionTriggersNativeFallbackOnce() throws {
+    func testPerFrameWindowGeometryPlacesDotInsideSurfaceContentRect() throws {
+        let options = CursorEffectOptions(showCursor: true, pointerStyle: .dot, highlight: false, animateClicks: false)
+        let snapshot = CursorSnapshot(
+            location: CGPoint(x: 250, y: 350)
+        )
+        let overlays = CursorOverlayRenderer.render(
+            snapshot: snapshot,
+            options: options,
+            geometry: FrameGeometry(
+                contentRect: CGRect(x: 200, y: 300, width: 100, height: 100),
+                pixelSize: CGSize(width: 140, height: 180),
+                pixelContentRect: CGRect(x: 20, y: 40, width: 100, height: 100)
+            ),
+            level: .full,
+            now: 100
+        )
+
+        let cursor = try XCTUnwrap(overlays.first)
+        XCTAssertEqual(cursor.rect.midX, 70, accuracy: 0.001)
+        XCTAssertEqual(cursor.rect.midY, 90, accuracy: 0.001)
+    }
+
+    func testBudgetExhaustionKeepsDotVisibleAndSignalsCursorOnlyOnce() throws {
         let options = CursorEffectOptions(showCursor: true, pointerStyle: .dot, highlight: true, animateClicks: true)
         let budget = FrameBudgetMonitor(budgetSeconds: 0.000000001, windowSize: 1)
         for _ in 0 ..< 3 {
             budget.record(frameSeconds: 1)
         }
-        XCTAssertEqual(budget.currentLevel, .nativeCursor)
+        XCTAssertEqual(budget.currentLevel, .cursorOnly)
 
         let expectation = expectation(description: "fallback")
         expectation.expectedFulfillmentCount = 1
         let compositor = CursorCompositor(
             options: options,
             geometry: FrameGeometry(contentRect: CGRect(x: 0, y: 0, width: 64, height: 64), pixelSize: CGSize(width: 64, height: 64)),
-            sampler: FakeSampler(sampledSnapshot: CursorSnapshot(location: .zero, image: nil)),
+            sampler: FakeSampler(sampledSnapshot: CursorSnapshot(location: CGPoint(x: 32, y: 32))),
             budget: budget,
-            onDegradeToNativeCursor: { expectation.fulfill() }
+            onDegradeToCursorOnly: { expectation.fulfill() }
         )
         let input = try makeSampleBuffer(width: 64, height: 64)
-        XCTAssertTrue(compositor.composite(input) === input)
-        XCTAssertTrue(compositor.composite(input) === input)
+        XCTAssertFalse(compositor.composite(input) === input)
+        XCTAssertFalse(compositor.composite(input) === input)
         wait(for: [expectation], timeout: 1)
     }
 

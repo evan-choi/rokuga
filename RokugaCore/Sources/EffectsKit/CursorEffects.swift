@@ -25,8 +25,22 @@ public struct CursorEffectOptions: Equatable, Sendable {
         )
     }
 
-    /// True when frames can bypass the compositor entirely (zero-cost path).
+    /// ScreenCaptureKit owns the system pointer for the full recording. EffectsKit
+    /// only owns custom dot rendering, so cursor ownership never changes mid-stream.
+    public var usesNativeSystemCursor: Bool {
+        showCursor && pointerStyle == .system
+    }
+
+    public var compositesPointer: Bool {
+        showCursor && pointerStyle == .dot
+    }
+
+    public var needsCompositor: Bool {
+        compositesPointer || highlight || animateClicks
+    }
+
+    /// True when frames can bypass the effects compositor entirely.
     public var isPassthrough: Bool {
-        showCursor && pointerStyle == .system && !highlight && !animateClicks
+        !needsCompositor
     }
 }
