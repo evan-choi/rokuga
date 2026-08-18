@@ -54,6 +54,8 @@ The automated verifier uses sRGB scrim compositing because off-screen view cachi
 
 The explicit scrim provides the contrast floor, but it must leave enough backdrop contribution for the system material's lensing and highlights to remain perceptible. Raw system glass alone is not sufficient for a panel that can be placed over arbitrary content. Dynamically sampling the desktop was rejected because it can cause visible color changes as the panel moves and would complicate multi-display rendering.
 
+The recording toolbar is the deliberate exception: it uses raw system material without an app-defined scrim or border so its backdrop effect matches the system capture toolbar. On macOS 26 it uses untinted `.glassEffect(.regular)`; macOS 13.3–15 use the native HUD visual effect. Reduce Transparency replaces either renderer with the system window background. Other glass surfaces keep the explicit contrast treatment above.
+
 Toolbar and preview hosting views will use a transparent layer masked to the same continuous corner radius as the SwiftUI glass shape. Their native window shadow remains disabled. This prevents the rectangular window backing or a stale shadow mask from appearing outside the rounded surface.
 
 ### Use semantic colors for app chrome
@@ -85,7 +87,7 @@ Appearance changes do not affect capture configuration or encoded output. The Ap
 4. Update the active core-screen-recording design, app-preferences requirement, and task status to describe adaptive rather than forced-dark surfaces.
 5. Run persistence tests, build the app, and complete the appearance and accessibility visual matrix.
 
-No stored-data migration is required. Existing `Theme` raw values and the default Auto value remain unchanged. Rollback consists of reverting the appearance and palette changes; saved preferences remain compatible.
+No stored-data migration is required. Existing saved `Theme` values remain unchanged; users without a stored value now start in Dark. Rollback consists of reverting the default; saved preferences remain compatible.
 
 ## Open Questions
 

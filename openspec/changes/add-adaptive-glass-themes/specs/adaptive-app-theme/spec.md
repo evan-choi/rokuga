@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Appearance selection and persistence
-The app SHALL provide Auto, Light, and Dark appearance options, default to Auto, apply a selection immediately, and persist it across launches. Auto SHALL follow the effective macOS appearance.
+The app SHALL provide Auto, Light, and Dark appearance options, default to Dark, apply a selection immediately, and persist it across launches. Auto SHALL follow the effective macOS appearance.
 
 #### Scenario: Fixed light appearance
 - **WHEN** the user selects Light while macOS uses Dark appearance
@@ -24,18 +24,18 @@ The app SHALL provide Auto, Light, and Dark appearance options, default to Auto,
 - **THEN** the Appearance control remains enabled and a theme change does not alter the recording configuration
 
 ### Requirement: Theme-aware glass surfaces
-The recording toolbar, options popover, preview panel, and other app-owned glass chrome SHALL resolve their contrast scrim, border, and foreground colors from the effective appearance. With transparency enabled, an identically clipped scrim SHALL be alpha-composited above the native material. The macOS 26 glass implementation and the macOS 13.3–15 visual-effect fallback MUST provide equivalent theme behavior and MUST NOT rely on `.glassEffect.tint` as the contrast guarantee.
+The recording toolbar SHALL match the system capture toolbar by using untinted native material without an app-defined scrim or border. Options popovers, preview panels, and other app-owned glass chrome SHALL resolve their contrast scrim, border, and foreground colors from the effective appearance. With transparency enabled, an identically clipped scrim SHALL be alpha-composited above those surfaces' native material. The macOS 26 glass implementation and the macOS 13.3–15 visual-effect fallback MUST provide equivalent theme behavior and MUST NOT rely on `.glassEffect.tint` as the contrast guarantee.
 
 #### Scenario: Light glass over bright content
-- **WHEN** a light glass surface appears over a white or near-white background
+- **WHEN** a scrimmed light glass surface appears over a white or near-white background
 - **THEN** its boundary remains distinguishable and its normal text reaches a contrast ratio of at least 4.5:1 while graphical controls reach at least 3:1
 
 #### Scenario: Light glass over black content
-- **WHEN** a light glass surface appears over a black or near-black background
+- **WHEN** a scrimmed light glass surface appears over a black or near-black background
 - **THEN** its explicit light scrim establishes a readable surface while the native material remains active underneath, normal text reaches at least 4.5:1, and graphical controls reach at least 3:1
 
 #### Scenario: Dark glass over bright content
-- **WHEN** a dark glass surface appears over a white or near-white background
+- **WHEN** a scrimmed dark glass surface appears over a white or near-white background
 - **THEN** its explicit dark scrim prevents the background from washing out its text, icons, and selected state
 
 #### Scenario: Older macOS fallback
@@ -55,7 +55,7 @@ App-owned chrome SHALL use appearance-aware semantic foreground and surface colo
 
 #### Scenario: Open toolbar changes theme
 - **WHEN** the user changes from Dark to Light while the recording toolbar is visible
-- **THEN** the toolbar background, border, labels, icons, selected mode, and record-button chrome update in place
+- **THEN** the toolbar's native background, icons, selected mode, and record-button chrome update in place
 
 #### Scenario: Open preview changes theme
 - **WHEN** the effective appearance changes while the preview panel is visible
@@ -89,7 +89,7 @@ App-owned glass surfaces SHALL honor Reduce Transparency and Increase Contrast w
 
 #### Scenario: Increase Contrast
 - **WHEN** Increase Contrast is enabled
-- **THEN** each glass surface strengthens its contrast scrim and boundary while meeting or exceeding the normal appearance contrast ratios
+- **THEN** the system toolbar material follows the accessibility setting, while scrimmed glass surfaces strengthen their contrast scrim and boundary
 
 #### Scenario: Accessibility settings change while visible
 - **WHEN** Reduce Transparency or Increase Contrast changes while an app-owned glass surface is visible

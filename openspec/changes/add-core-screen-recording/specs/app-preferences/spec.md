@@ -14,7 +14,7 @@ The app SHALL provide a settings window — the only persistent window besides t
 - **THEN** settings that cannot safely change mid-recording (codec, resolution, FPS, audio sources) are disabled with an explanatory note, while unrelated settings remain editable
 
 ### Requirement: Appearance theme
-The app SHALL offer an appearance setting with Auto (follow system), Light, and Dark options (default: Auto). A selection MUST apply immediately to all app-owned windows and transient panel chrome, including surfaces that are already visible. Capture overlays and controls drawn over video MAY retain fixed-contrast colors when theme-dependent colors would reduce visibility.
+The app SHALL offer an appearance setting with Auto (follow system), Light, and Dark options (default: Dark). A selection MUST apply immediately to all app-owned windows and transient panel chrome, including surfaces that are already visible. Capture overlays and controls drawn over video MAY retain fixed-contrast colors when theme-dependent colors would reduce visibility.
 
 #### Scenario: Fixed light theme
 - **WHEN** the user selects Light while macOS is in dark mode

@@ -16,7 +16,7 @@
 
 ## 3. Automated coverage
 
-- [x] 3.1 Add SettingsStore tests for the Auto default, Light and Dark round trips, and Reset returning to Auto
+- [x] 3.1 Add SettingsStore tests for the Dark default, Auto/Light/Dark round trips, and Reset returning to Dark
 - [x] 3.2 Add a focused appearance propagation harness that verifies an existing window, panel, and SwiftUI hosting view update in place
 - [x] 3.3 Extend the screenshot harness to render toolbar, preview, and editor chrome in both Light and Dark appearances
 
@@ -44,3 +44,8 @@
 - [x] 7.1 Separate the native material from an alpha-composited contrast scrim so Light chrome remains legible over black content
 - [x] 7.2 Update the screenshot and contrast harnesses to model the explicit scrim contract
 - [x] 7.3 Build the app and verify Light, Dark, accessibility, and appearance propagation paths
+
+## 8. System capture toolbar alignment
+
+- [x] 8.1 Use native system material without a custom toolbar scrim or border
+- [x] 8.2 Add the system-style cancel action, divider-only dragging, and icon tooltips

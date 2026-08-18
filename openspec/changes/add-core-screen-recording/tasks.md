@@ -32,7 +32,7 @@
 ## 4. UI shell (windowless, Liquid Glass)
 
 - [x] 4.1 Menu bar controls: idle `MenuBarExtra` menu (toolbar, last recording, output folder, settings, quit) and recording status item with `M:SS` plus one-click stop
-- [x] 4.2 Recording toolbar: non-activating `NSPanel` HUD at bottom-center of the mouse-pointer display; summon via menu bar or ⇧⌘6; Esc and record dismiss
+- [x] 4.2 Recording toolbar: non-activating `NSPanel` HUD at bottom-center of the mouse-pointer display, movable only from its divider handle; summon via menu bar or ⇧⌘6; Esc and record dismiss
 - [x] 4.3 Mode buttons ×3 (area/full screen/window) + options popover (save location, countdown, FPS, audio, mouse, thumbnail toggles) + record button
 - [x] 4.4 Liquid Glass materials on HUD and transient preview panels with `NSVisualEffectView` fallback (13.3–15) + Reduce Transparency path
 - [ ] 4.5 Region selection overlay: drag-select, resizable edges/corners, Retina pixel dimensions, pixel-loupe magnifier, per-display persistence
