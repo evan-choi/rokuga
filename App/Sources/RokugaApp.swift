@@ -29,13 +29,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var recordingStatusItem: RecordingStatusItemController?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
-        ThemeApplier.apply(SettingsStore.shared.theme)
+        NSApp.appearance = NSAppearance(named: .darkAqua)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
-        if AppearanceVerificationRunner.runIfRequested() { return }
-        if ThemeRenderingVerificationRunner.runIfRequested() { return }
+        if DarkAppearanceVerificationRunner.runIfRequested() { return }
+        if DarkRenderingVerificationRunner.runIfRequested() { return }
         recordingStatusItem = RecordingStatusItemController(appState: .shared)
         _ = L10nScreenshotRunner.runIfRequested()
     }

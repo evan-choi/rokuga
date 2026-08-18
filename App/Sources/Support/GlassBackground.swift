@@ -17,11 +17,10 @@ struct VisualEffectView: NSViewRepresentable {
     }
 }
 
-/// Panel background per task 4.4: Liquid Glass on macOS 26+, `NSVisualEffectView` on 13.3–15, solid color under Reduce Transparency.
-/// A separate contrast scrim keeps chrome legible without changing the native material contract.
+/// Fixed-Dark panel background: Liquid Glass on macOS 26+, `NSVisualEffectView` on 13.3–15,
+/// and a solid fallback under Reduce Transparency.
 struct GlassBackground: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
-    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
 
     var cornerRadius: CGFloat = 16
@@ -47,22 +46,14 @@ struct GlassBackground: View {
     }
 
     private var palette: GlassPalette {
-        Self.palette(colorScheme: colorScheme, increasedContrast: colorSchemeContrast == .increased)
+        Self.palette(increasedContrast: colorSchemeContrast == .increased)
     }
 
-    static func palette(colorScheme: ColorScheme, increasedContrast: Bool) -> GlassPalette {
-        if colorScheme == .dark {
-            return GlassPalette(
-                tintColor: NSColor(srgbRed: 0.118, green: 0.118, blue: 0.137, alpha: 1),
-                scrimOpacity: increasedContrast ? 0.84 : 0.70,
-                borderColor: NSColor.white.withAlphaComponent(increasedContrast ? 0.26 : 0.14)
-            )
-        }
-
-        return GlassPalette(
-            tintColor: NSColor(srgbRed: 0.910, green: 0.910, blue: 0.925, alpha: 1),
-            scrimOpacity: increasedContrast ? 0.92 : 0.56,
-            borderColor: NSColor.black.withAlphaComponent(increasedContrast ? 0.22 : 0.12)
+    static func palette(increasedContrast: Bool) -> GlassPalette {
+        GlassPalette(
+            tintColor: NSColor(srgbRed: 0.118, green: 0.118, blue: 0.137, alpha: 1),
+            scrimOpacity: increasedContrast ? 0.84 : 0.70,
+            borderColor: NSColor.white.withAlphaComponent(increasedContrast ? 0.26 : 0.14)
         )
     }
 }
