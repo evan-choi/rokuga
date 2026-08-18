@@ -29,6 +29,7 @@ struct ToolbarView: View {
 
     private var cancelButton: some View {
         Button {
+            ToolbarTooltipPresenter.shared.hide()
             appState.dismissToolbar()
         } label: {
             Image(systemName: "xmark.circle.fill")
@@ -39,7 +40,7 @@ struct ToolbarView: View {
         }
         .buttonStyle(.plain)
         .foregroundStyle(Color.primary)
-        .help("Cancel")
+        .captureTooltip("Cancel")
         .accessibilityLabel(Text("Cancel"))
     }
 
@@ -53,6 +54,7 @@ struct ToolbarView: View {
 
     private func modeButton(_ target: RecordingMode, symbol: String, label: LocalizedStringKey) -> some View {
         Button {
+            ToolbarTooltipPresenter.shared.hide()
             modeRaw = target.rawValue
             appState.selectionModeChanged()
         } label: {
@@ -67,7 +69,7 @@ struct ToolbarView: View {
             RoundedRectangle(cornerRadius: 9)
                 .fill(mode == target ? Color(nsColor: .unemphasizedSelectedContentBackgroundColor) : .clear)
         )
-        .help(label)
+        .captureTooltip(label)
         .accessibilityLabel(Text(label))
         .accessibilityAddTraits(mode == target ? .isSelected : [])
     }
@@ -84,6 +86,7 @@ struct ToolbarView: View {
 
     private var optionsButton: some View {
         Button {
+            ToolbarTooltipPresenter.shared.hide()
             showsOptions.toggle()
         } label: {
             Image(systemName: "slider.horizontal.3")
@@ -93,7 +96,7 @@ struct ToolbarView: View {
         }
         .buttonStyle(.plain)
         .foregroundStyle(Color.primary)
-        .help("Options")
+        .captureTooltip("Options")
         .accessibilityLabel(Text("Options"))
         .popover(isPresented: $showsOptions) {
             OptionsPopoverView()
@@ -106,6 +109,7 @@ struct ToolbarView: View {
 
     private var recordButton: some View {
         Button {
+            ToolbarTooltipPresenter.shared.hide()
             appState.requestRecord()
         } label: {
             HStack(spacing: 7) {
@@ -122,6 +126,82 @@ struct ToolbarView: View {
         .background(Capsule().fill(Color(nsColor: .controlBackgroundColor).opacity(0.72)))
         .keyboardShortcut(.defaultAction)
         .accessibilityLabel(Text("Record"))
+    }
+}
+
+private extension View {
+    func captureTooltip(_ label: LocalizedStringKey) -> some View {
+        onHover { isHovering in
+            Task { @MainActor in
+                ToolbarTooltipPresenter.shared.update(label: label, isHovering: isHovering)
+            }
+        }
+    }
+}
+
+@MainActor
+final class ToolbarTooltipPresenter {
+    static let shared = ToolbarTooltipPresenter()
+
+    private var showTask: Task<Void, Never>?
+    private var panel: CapturePanel?
+
+    func update(label: LocalizedStringKey, isHovering: Bool) {
+        hide()
+        guard isHovering else { return }
+
+        showTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 700_000_000)
+            guard !Task.isCancelled else { return }
+            self?.show(label)
+        }
+    }
+
+    func hide() {
+        showTask?.cancel()
+        showTask = nil
+        panel?.orderOut(nil)
+    }
+
+    private func show(_ label: LocalizedStringKey) {
+        let hostingView = NSHostingView(
+            rootView: Text(label)
+                .font(.system(size: 12))
+                .foregroundStyle(Color.primary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(GlassBackground(cornerRadius: 7))
+                .fixedSize()
+        )
+        let size = hostingView.fittingSize
+        let tooltipPanel = panel ?? makePanel(size: size)
+        tooltipPanel.contentView = hostingView
+        tooltipPanel.setContentSize(size)
+
+        let mouse = NSEvent.mouseLocation
+        guard let screen = NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) ?? NSScreen.main
+        else { return }
+        let visible = screen.visibleFrame.insetBy(dx: 4, dy: 4)
+        let gap: CGFloat = 12
+        let x = min(max(mouse.x - size.width / 2, visible.minX), visible.maxX - size.width)
+        let preferredY = mouse.y + gap
+        let y = preferredY + size.height <= visible.maxY ? preferredY : mouse.y - size.height - gap
+
+        tooltipPanel.setFrameOrigin(NSPoint(x: x, y: y))
+        tooltipPanel.orderFrontRegardless()
+    }
+
+    private func makePanel(size: NSSize) -> CapturePanel {
+        let panel = CapturePanel(
+            contentRect: NSRect(origin: .zero, size: size),
+            level: ToolbarPanelController.popoverLevel,
+            showsWindowShadow: true
+        )
+        panel.ignoresMouseEvents = true
+        panel.isMovableByWindowBackground = false
+        panel.registerForCaptureExclusion()
+        self.panel = panel
+        return panel
     }
 }
 
