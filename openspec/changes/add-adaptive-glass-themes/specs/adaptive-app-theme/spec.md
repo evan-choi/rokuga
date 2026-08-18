@@ -16,7 +16,7 @@ The app SHALL set Dark Aqua before creating app-owned surfaces and SHALL NOT exp
 - **THEN** no appearance or theme control is shown
 
 ### Requirement: Fixed-Dark glass surfaces
-App-owned glass chrome SHALL render native material beneath an identically clipped Dark contrast scrim. The palette SHALL NOT depend on the desktop or system appearance. The macOS 26 glass implementation and macOS 13.3–15 visual-effect fallback MUST provide equivalent Dark behavior and MUST NOT rely on `.glassEffect.tint` as the contrast guarantee.
+App-owned glass chrome SHALL render native material beneath an identically clipped Dark contrast scrim. The toolbar, toolbar tooltip, preview panel, and trim editor MUST share this visual contract; only their corner radii MAY differ. The palette SHALL NOT depend on the desktop or system appearance. The macOS 26 glass implementation and macOS 13.3–15 visual-effect fallback MUST provide equivalent Dark behavior and MUST NOT rely on `.glassEffect.tint` as the contrast guarantee.
 
 #### Scenario: Glass over bright content
 - **WHEN** a glass surface appears over white or near-white content
@@ -31,8 +31,12 @@ App-owned glass chrome SHALL render native material beneath an identically clipp
 - **THEN** it uses the visual-effect fallback with the same Dark palette and contrast requirements as macOS 26
 
 #### Scenario: Rounded glass boundary
-- **WHEN** a toolbar or preview glass surface is visible
-- **THEN** no rectangular window backing, material edge, or window shadow appears outside its rounded boundary
+- **WHEN** a toolbar, tooltip, or preview glass surface is visible
+- **THEN** no rectangular window backing, black outline, material edge, or window shadow appears outside its rounded boundary
+
+#### Scenario: Shared window chrome
+- **WHEN** the toolbar, its tooltip, the preview panel, or the trim editor is shown
+- **THEN** each surface uses the same Dark material, scrim, border, and accessibility behavior
 
 #### Scenario: Native material remains perceptible
 - **WHEN** transparency is enabled and Increase Contrast is disabled

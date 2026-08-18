@@ -6,7 +6,7 @@ Selectable Auto, Light, and Dark appearances add state without improving the cap
 
 - Remove the Appearance setting, stored theme value, and runtime theme switching.
 - Apply Dark Aqua before any app-owned surface is created.
-- Use one fixed Dark glass palette with an explicit contrast scrim so toolbar and preview controls remain readable over bright, dark, and high-chroma content.
+- Use one fixed Dark glass palette and shared chrome contract so the toolbar, tooltip, preview, and trim editor remain readable over bright, dark, and high-chroma content.
 - Retain Increase Contrast and Reduce Transparency behavior.
 - Keep capture overlays and video-overlay controls fixed-contrast where required.
 - Align the active core-screen-recording design, requirements, tasks, and QA commands with the fixed-Dark policy.
@@ -25,5 +25,5 @@ _None. The repository has no archived baseline specs; the related `app-preferenc
 
 - App startup and Settings UI/model.
 - SettingsKit models, persistence, and tests.
-- Glass rendering and Dark-only visual verification.
+- Shared glass rendering and Dark-only visual verification across the toolbar, tooltip, preview, and trim editor.
 - The active core-screen-recording design, app-preferences spec, task list, and QA matrix.

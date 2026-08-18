@@ -30,7 +30,7 @@ While the toolbar is visible, the active mode SHALL present its selection layer 
 
 #### Scenario: Click-to-record cursor
 - **WHEN** Window or Full Screen mode is active and the pointer is over a target selection layer
-- **THEN** the pointer uses a camera-shaped cursor to indicate that clicking starts recording, and returns to the standard arrow when the selection layer closes
+- **THEN** the pointer uses a camera-shaped cursor to indicate that clicking starts recording, remains stable while the non-key selection panel tracks the pointer, and returns to the standard arrow when the selection layer closes
 
 ### Requirement: Recording-time area punch-through
 Once a Selected Area recording starts, the selection chrome (resize grips, outline, size badge) SHALL disappear; only a click-through dimming overlay remains outside the captured region, keeping the recorded area visually punched out for the whole recording. The overlay MUST never appear in the recording and MUST NOT intercept clicks.
@@ -64,7 +64,7 @@ In Selected Area mode, the app SHALL let the user draw a rectangular region on a
 
 #### Scenario: Resize cursor matches the handle direction
 - **WHEN** the pointer moves over a horizontal, vertical, or diagonal resize handle
-- **THEN** the pointer uses the corresponding bundled 32×32 resize cursor and keeps the cursor centered on the handle
+- **THEN** the pointer uses the corresponding bundled 32×32 resize cursor, keeps the cursor centered on the handle, and preserves that cursor throughout the drag without requiring key-window status
 
 #### Scenario: Moving a region across displays
 - **WHEN** the user drags from inside the selected rectangle and crosses a display boundary

@@ -3,7 +3,7 @@
 ## ADDED Requirements
 
 ### Requirement: Settings window
-The app SHALL provide a settings window — the only persistent window besides the trim editor — opened exclusively from the menu bar icon menu (or ⌘, while any app surface is focused), organized into panes: General, Recording, Audio, Mouse, Shortcuts, and Output. All changes MUST apply immediately (no Save button) and persist across app restarts. The recording HUD, options popover, floating thumbnail, preview panel, and trim editor SHALL use native system glass materials with the older-macOS blur fallback. Settings, onboarding, menus, and alerts SHALL retain their standard AppKit or SwiftUI appearance.
+The app SHALL provide a settings window — the only persistent window besides the trim editor — opened exclusively from the menu bar icon menu (or ⌘, while any app surface is focused), organized into panes: General, Recording, Audio, Mouse, Shortcuts, and Output. All changes MUST apply immediately (no Save button) and persist across app restarts. The recording toolbar, its tooltips, preview panel, and trim editor SHALL use one shared native system glass contract with the older-macOS blur fallback. Settings, onboarding, menus, and alerts SHALL retain their standard AppKit or SwiftUI appearance.
 
 #### Scenario: Immediate apply
 - **WHEN** the user changes any setting and closes the window
