@@ -3,7 +3,7 @@
 ## ADDED Requirements
 
 ### Requirement: Save to output folder
-When a recording stops, the app SHALL finalize the file directly into the configured output folder with an auto-generated name containing the date and time (e.g., `Rokuga 2026-08-15 at 14.22.31.mp4`). No import step, no app-internal library, and no database SHALL exist — the output folder in Finder is the single source of truth for recordings.
+When a recording stops, the app SHALL finalize the file directly into the configured output folder with an auto-generated name containing the date and time (e.g., `Rokuga 2026-08-15 at 14.22.31.mov` for the default container). No import step, no app-internal library, and no database SHALL exist — the output folder in Finder is the single source of truth for recordings.
 
 #### Scenario: File lands in the folder
 - **WHEN** a recording stops
@@ -14,7 +14,7 @@ When a recording stops, the app SHALL finalize the file directly into the config
 - **THEN** the app appends a numeric suffix and never overwrites an existing file
 
 ### Requirement: Floating thumbnail
-After a recording stops, the app SHALL show a small floating thumbnail of the recording in the bottom-right corner of the screen (matching the native screenshot thumbnail behavior). Clicking it expands it in place into the preview panel; swiping it right or waiting for the timeout (default 5 seconds) dismisses it and leaves the file in place. The thumbnail MUST be excludable from subsequent captures per capture-exclusion, and a settings toggle SHALL disable it entirely.
+After a recording stops, the app SHALL show a small floating thumbnail of the recording in the bottom-right corner of the screen. Clicking it expands it in place into the preview panel; swiping it right or waiting for the timeout (default 6 seconds) dismisses it and leaves the file in place. The thumbnail MUST be excluded from subsequent captures per capture-exclusion, and a settings toggle SHALL disable it entirely.
 
 #### Scenario: Thumbnail opens the preview
 - **WHEN** the user clicks the floating thumbnail after stopping a recording
