@@ -1,3 +1,4 @@
+import AppKit
 import CoreGraphics
 import Foundation
 
@@ -18,6 +19,7 @@ enum RokugaPerf {
                 guard CGPreflightScreenCaptureAccess() else {
                     throw PerfError.screenRecordingPermission
                 }
+                await initializeHeadlessApplication()
                 try await printJSON(RecordCommand.run(arguments: arguments))
             case "workload":
                 try await WorkloadCommand.run(arguments: arguments)
@@ -29,6 +31,13 @@ enum RokugaPerf {
             FileHandle.standardError.write(Data(message.utf8))
             exit((error as? PerfError)?.exitCode ?? 1)
         }
+    }
+
+    @MainActor
+    private static func initializeHeadlessApplication() {
+        let app = NSApplication.shared
+        app.setActivationPolicy(.prohibited)
+        app.finishLaunching()
     }
 
     static func printJSON(_ value: some Encodable, pretty: Bool = true) throws {
