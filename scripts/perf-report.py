@@ -39,6 +39,19 @@ METRICS = (
 
 HIGHER_IS_BETTER = {"derived.outputFPS"}
 COMPARABLE_METRICS = set(METRICS) - {"output.fileSizeBytes"}
+RECORDING_CONFIGURATION = (
+    "target", "width", "height", "fps", "seconds", "codec",
+    "frameRateMode", "systemAudio", "effects",
+)
+WORKLOAD_CONFIGURATION = (
+    "widthPoints", "heightPoints", "backingScale", "widthPixels",
+    "heightPixels", "motion", "audio",
+)
+HOST_CONFIGURATION = (
+    "hardwareModel", "logicalCPUCount", "physicalCPUCount",
+    "physicalMemoryBytes", "machine", "macOSProductVersion",
+    "macOSBuildVersion", "kernel", "xcode", "signingRequirement",
+)
 
 
 def read_json(path):
@@ -124,6 +137,17 @@ def value_at_path(value, path):
     return value if isinstance(value, (int, float)) and not isinstance(value, bool) else None
 
 
+def experiment_signature(run):
+    workload = run.get("workload", {})
+    environment_value = run.get("environment", {})
+    return {
+        "scenario": run.get("scenario"),
+        "recording": {key: run.get(key) for key in RECORDING_CONFIGURATION},
+        "workload": {key: workload.get(key) for key in WORKLOAD_CONFIGURATION},
+        "host": {key: environment_value.get(key) for key in HOST_CONFIGURATION},
+    }
+
+
 def percentile(values, fraction):
     ordered = sorted(values)
     if len(ordered) == 1:
@@ -138,6 +162,14 @@ def percentile(values, fraction):
 
 def summarize(args):
     runs = [read_json(path) for path in args.results]
+    signature = experiment_signature(runs[0])
+    if any(experiment_signature(run) != signature for run in runs[1:]):
+        raise ValueError("result configurations differ")
+    git_commit = runs[0].get("environment", {}).get("gitCommit")
+    if not git_commit or any(
+        run.get("environment", {}).get("gitCommit") != git_commit for run in runs[1:]
+    ):
+        raise ValueError("results come from different git commits")
     metrics = {}
     for path in METRICS:
         values = [value_at_path(run, path) for run in runs]
@@ -153,6 +185,9 @@ def summarize(args):
     write_json(args.output, {
         "scenario": runs[0].get("scenario") if runs else None,
         "runCount": len(runs),
+        "experiment": signature,
+        "gitCommit": git_commit,
+        "gitDirty": any(run.get("environment", {}).get("gitDirty", True) for run in runs),
         "results": [str(Path(path).resolve()) for path in args.results],
         "metrics": metrics,
     })
@@ -165,6 +200,8 @@ def compare(args):
         raise ValueError(
             f"scenario mismatch: {baseline.get('scenario')} != {candidate.get('scenario')}"
         )
+    if not baseline.get("experiment") or baseline["experiment"] != candidate.get("experiment"):
+        raise ValueError("experiment configuration mismatch")
     for name, summary in (("baseline", baseline), ("candidate", candidate)):
         if summary.get("runCount", 0) < 5:
             raise ValueError(f"{name} requires at least 5 runs")
