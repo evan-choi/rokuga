@@ -19,6 +19,8 @@ enum RokugaPerf {
                     throw PerfError.screenRecordingPermission
                 }
                 try printJSON(try await RecordCommand.run(arguments: arguments))
+            case "workload":
+                try await WorkloadCommand.run(arguments: arguments)
             default:
                 throw PerfError.invalidArgument("unknown command: \(command)")
             }
@@ -29,9 +31,11 @@ enum RokugaPerf {
         }
     }
 
-    private static func printJSON<T: Encodable>(_ value: T) throws {
+    static func printJSON<T: Encodable>(_ value: T, pretty: Bool = true) throws {
         let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+        encoder.outputFormatting = pretty
+            ? [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+            : [.sortedKeys, .withoutEscapingSlashes]
         let data = try encoder.encode(value)
         FileHandle.standardOutput.write(data)
         FileHandle.standardOutput.write(Data("\n".utf8))
@@ -48,6 +52,7 @@ enum PerfError: Error, CustomStringConvertible {
     case screenRecordingPermission
     case captureTargetNotFound
     case firstFrameTimeout
+    case workloadUnavailable(String)
 
     var exitCode: Int32 {
         switch self {
@@ -60,7 +65,7 @@ enum PerfError: Error, CustomStringConvertible {
     var description: String {
         switch self {
         case .usage:
-            "usage: RokugaPerf <check-permission|permission|record> [options]"
+            "usage: RokugaPerf <check-permission|permission|record|workload> [options]"
         case let .invalidArgument(message):
             message
         case .screenRecordingPermission:
@@ -69,6 +74,8 @@ enum PerfError: Error, CustomStringConvertible {
             "capture target not found"
         case .firstFrameTimeout:
             "no complete video frame arrived within 5 seconds"
+        case let .workloadUnavailable(message):
+            message
         }
     }
 }
