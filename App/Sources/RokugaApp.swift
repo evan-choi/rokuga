@@ -34,6 +34,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+#if ROKUGA_PERF
+        if ToolbarLatencyRunner.runIfRequested() { return }
+#endif
         if DarkAppearanceVerificationRunner.runIfRequested() { return }
         if DarkRenderingVerificationRunner.runIfRequested() { return }
         recordingStatusItem = RecordingStatusItemController(appState: .shared)
@@ -123,3 +126,60 @@ private struct ModernSettingsMenuItem: View {
         .keyboardShortcut(",", modifiers: .command)
     }
 }
+
+#if ROKUGA_PERF
+@MainActor
+private enum ToolbarLatencyRunner {
+    private static let repetitions = 5
+
+    static func runIfRequested() -> Bool {
+        guard CommandLine.arguments.contains("--perf-toolbar-latency") else { return false }
+        Task { await run() }
+        return true
+    }
+
+    private static func run() async {
+        let appState = AppState.shared
+        var seconds: [Double] = []
+
+        for _ in 0..<repetitions {
+            appState.dismissToolbar()
+            await nextMainQueueTurn()
+
+            let started = DispatchTime.now().uptimeNanoseconds
+            appState.summonToolbar()
+            await nextMainQueueTurn()
+            guard appState.toolbarController?.isVisible == true else {
+                FileHandle.standardError.write(Data("error: toolbar did not become visible\n".utf8))
+                exit(1)
+            }
+            seconds.append(Double(DispatchTime.now().uptimeNanoseconds - started) / 1_000_000_000)
+        }
+
+        appState.dismissToolbar()
+        let result = ToolbarLatencyResult(
+            command: "toolbar-latency",
+            mode: String(describing: appState.settings.recordingMode),
+            seconds: seconds
+        )
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let data = try! encoder.encode(result)
+        FileHandle.standardOutput.write(data)
+        FileHandle.standardOutput.write(Data("\n".utf8))
+        exit(0)
+    }
+
+    private static func nextMainQueueTurn() async {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.main.async { continuation.resume() }
+        }
+    }
+}
+
+private struct ToolbarLatencyResult: Encodable {
+    let command: String
+    let mode: String
+    let seconds: [Double]
+}
+#endif
