@@ -39,6 +39,9 @@ final class AppState: ObservableObject {
             guard let plan = box.take() else { throw RecordingError.captureSourceLost }
             return plan.makeSession()
         }
+#if ROKUGA_PERF
+        if CommandLine.arguments.contains("--perf-toolbar-latency") { return }
+#endif
         if let path = settings.lastRecordingPath {
             lastRecordingURL = URL(fileURLWithPath: path)
         }

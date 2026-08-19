@@ -6,6 +6,8 @@ ARTIFACT_ROOT="$REPO_ROOT/artifacts/perf"
 DERIVED_DATA="$ARTIFACT_ROOT/DerivedData"
 APP_PATH="$DERIVED_DATA/Build/Products/Release/RokugaPerf.app"
 EXECUTABLE="$APP_PATH/Contents/MacOS/RokugaPerf"
+TOOLBAR_DERIVED_DATA="$ARTIFACT_ROOT/ToolbarDerivedData"
+TOOLBAR_BUILD_APP_PATH="$TOOLBAR_DERIVED_DATA/Build/Products/Release/Rokuga.app"
 IDENTITY="Rokuga Dev"
 IDENTIFIER="io.rokuga.Rokuga.Perf"
 REQUIREMENT_FILE="$ARTIFACT_ROOT/signature.requirement"
@@ -35,10 +37,10 @@ require_identity() {
 }
 
 verify_signature() {
-    local identifier authority requirement previous
-    identifier="$(codesign -dvv "$APP_PATH" 2>&1 | sed -n 's/^Identifier=//p')"
-    authority="$(codesign -dvv "$APP_PATH" 2>&1 | sed -n 's/^Authority=//p' | head -1)"
-    requirement="$(codesign -dr - "$APP_PATH" 2>&1 | sed -n 's/^designated => //p')"
+    local app_path="${1:-$APP_PATH}" identifier authority requirement previous
+    identifier="$(codesign -dvv "$app_path" 2>&1 | sed -n 's/^Identifier=//p')"
+    authority="$(codesign -dvv "$app_path" 2>&1 | sed -n 's/^Authority=//p' | head -1)"
+    requirement="$(codesign -dr - "$app_path" 2>&1 | sed -n 's/^designated => //p')"
 
     [[ "$identifier" == "$IDENTIFIER" ]] || fail "unexpected bundle identifier: $identifier"
     [[ "$authority" == "$IDENTITY" ]] || fail "RokugaPerf must not use ad-hoc signing: $authority"
@@ -52,8 +54,32 @@ verify_signature() {
         printf '%s\n' "$requirement" > "$REQUIREMENT_FILE"
     fi
 
-    echo "APP_PATH=$APP_PATH"
+    echo "APP_PATH=$app_path"
     echo "SIGNING_REQUIREMENT=$requirement"
+}
+
+build_toolbar_harness() {
+    local app_path="$1"
+    require_identity
+    mkdir -p "$ARTIFACT_ROOT"
+    xcodebuild build \
+        -project "$REPO_ROOT/Rokuga.xcodeproj" \
+        -scheme Rokuga \
+        -configuration Release \
+        -derivedDataPath "$TOOLBAR_DERIVED_DATA" \
+        CODE_SIGNING_ALLOWED=NO \
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS=ROKUGA_PERF
+    [[ -d "$TOOLBAR_BUILD_APP_PATH" ]] || fail "build did not produce $TOOLBAR_BUILD_APP_PATH"
+
+    ditto "$TOOLBAR_BUILD_APP_PATH" "$app_path"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $IDENTIFIER" "$app_path/Contents/Info.plist"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName RokugaPerf" "$app_path/Contents/Info.plist"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleName RokugaPerf" "$app_path/Contents/Info.plist"
+    codesign --force --deep --options runtime \
+        --entitlements "$REPO_ROOT/Perf/RokugaPerf.entitlements" \
+        --sign "$IDENTITY" \
+        "$app_path"
+    verify_signature "$app_path"
 }
 
 build() {
@@ -517,6 +543,36 @@ capture_gate() {
     python3 "$BENCH_GATE_TOOL" "${gate_arguments[@]}"
 }
 
+toolbar_latency() {
+    local directory environment status toolbar_app toolbar_executable
+    directory="$(artifact_directory toolbar-latency)"
+    toolbar_app="$directory/RokugaPerf.app"
+    toolbar_executable="$toolbar_app/Contents/MacOS/Rokuga"
+    build_toolbar_harness "$toolbar_app"
+    environment="$directory/environment.json"
+    collect_environment "$environment"
+
+    if "$toolbar_executable" --perf-toolbar-latency \
+        > "$directory/result.json" 2> "$directory/toolbar.stderr"; then
+        status=0
+    else
+        status=$?
+    fi
+    [[ "$status" -eq 0 ]] || fail "toolbar benchmark failed with exit $status; see $directory/toolbar.stderr"
+
+    python3 -c '
+import json, statistics, sys
+values = json.load(open(sys.argv[1])).get("seconds")
+if not isinstance(values, list) or len(values) != 5 or any(not isinstance(v, (int, float)) or v <= 0 for v in values):
+    raise SystemExit("invalid toolbar latency result")
+worst = max(values)
+print(f"toolbar summon: median {statistics.median(values) * 1000:.2f} ms; max {worst * 1000:.2f} ms")
+if worst > 0.150:
+    raise SystemExit(f"toolbar summon exceeded 150 ms budget: {worst * 1000:.2f} ms")
+' "$directory/result.json" || fail "toolbar latency gate failed"
+    echo "ARTIFACT_PATH=$directory"
+}
+
 usage() {
     cat >&2 <<'EOF'
 usage:
@@ -525,6 +581,7 @@ usage:
   ./scripts/perf.sh permission
   ./scripts/perf.sh record [--scenario NAME] [--seconds N] [--repeats N] [--warmup on|off]
   ./scripts/perf.sh profile time|metal|allocations|file [--scenario NAME] [--seconds N]
+  ./scripts/perf.sh toolbar
   ./scripts/perf.sh compare BASELINE_ARTIFACT CANDIDATE_ARTIFACT
   ./scripts/perf.sh gate RESULT_OR_ARTIFACT [...]
   ./scripts/perf.sh scenarios
@@ -542,6 +599,10 @@ case "${1:-}" in
     permission)
         build
         "$EXECUTABLE" permission
+        ;;
+    toolbar)
+        [[ "$#" -eq 1 ]] || fail "toolbar takes no arguments"
+        toolbar_latency
         ;;
     record)
         shift
