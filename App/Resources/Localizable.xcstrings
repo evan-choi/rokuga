@@ -111,50 +111,6 @@
         }
       }
     },
-    "1920×1080 · 1 min" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1920×1080・1分"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1920×1080 · 1분"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1920×1080 · 1 分钟"
-          }
-        }
-      }
-    },
-    "Actual size varies with screen activity." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "実際のサイズは画面の動きによって変わります。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "실제 크기는 화면 움직임에 따라 달라집니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "实际大小会因画面变化而异。"
-          }
-        }
-      }
-    },
     "After Recording" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -702,6 +658,28 @@
         }
       }
     },
+    "Display" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ディスプレイ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모니터"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示器"
+          }
+        }
+      }
+    },
     "Done" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -788,28 +766,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "按 Esc 取消"
-          }
-        }
-      }
-    },
-    "Estimated size" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "推定ファイルサイズ"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "예상 파일 크기"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "预计文件大小"
           }
         }
       }
@@ -1176,6 +1132,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "macOS 要求您在系统设置中允许屏幕录制，然后重新启动 Rokuga。"
+          }
+        }
+      }
+    },
+    "Match Display" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ディスプレイに合わせる"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모니터에 맞춤"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匹配显示器"
           }
         }
       }

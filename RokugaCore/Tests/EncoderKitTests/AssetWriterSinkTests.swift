@@ -32,7 +32,7 @@ final class AssetWriterSinkTests: XCTestCase {
             container: container,
             width: width,
             height: height,
-            frameRate: .fps30,
+            frameRate: 30,
             frameRateMode: frameRateMode,
             quality: quality,
             audioBitrate: .kbps128,

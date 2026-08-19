@@ -24,10 +24,20 @@ public enum ContainerFormat: String, CaseIterable, Codable, Sendable {
     public var fileExtension: String { rawValue }
 }
 
-/// Target frame rate. VFR treats it as a cap; CFR emits frames at this cadence.
+/// Frame-rate preference. Match-display is resolved once the capture target is known.
 public enum FrameRate: Int, CaseIterable, Codable, Sendable {
     case fps30 = 30
     case fps60 = 60
+    case matchDisplay = 0
+
+    public func resolved(displayRefreshRate: Double?) -> Int {
+        guard self == .matchDisplay else { return rawValue }
+        guard let displayRefreshRate,
+              displayRefreshRate.isFinite,
+              displayRefreshRate >= 1
+        else { return Self.fps60.rawValue }
+        return Int(displayRefreshRate.rounded())
+    }
 }
 
 /// Controls whether captured timestamps are preserved or frames are emitted on a fixed cadence.
@@ -67,8 +77,6 @@ public enum CaptureLimits {
     /// Resolution cap — sources above 5K are downscaled preserving aspect ratio.
     public static let maxPixelsWide = 5120
     public static let maxPixelsHigh = 2880
-    /// Hard FPS ceiling.
-    public static let maxFrameRate = 60
     /// Disk-full guard: refuse to start below this threshold.
     public static let minFreeBytesToStart: Int64 = 1_000_000_000 // 1 GB
     /// Auto-stop when free space drops below this while recording.

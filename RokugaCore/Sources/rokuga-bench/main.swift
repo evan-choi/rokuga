@@ -41,7 +41,7 @@ func makeConfiguration(_ args: BenchArgs) -> EncoderConfiguration {
         container: .mp4,
         width: args.width,
         height: args.height,
-        frameRate: args.fps >= 60 ? .fps60 : .fps30,
+        frameRate: args.fps,
         frameRateMode: .variable,
         quality: 60,
         audioBitrate: .kbps192,

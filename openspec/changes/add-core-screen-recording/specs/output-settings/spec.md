@@ -14,7 +14,7 @@ The app SHALL let the user choose the output container — MP4 or MOV (default: 
 - **THEN** the file is encoded with HEVC and is at a visibly smaller size than an equivalent H.264 recording at the same quality setting
 
 ### Requirement: Quality and rate control
-The app SHALL provide a quality control from 0 to 100 (default: 80) and a rate-control mode of VBR (default) or CBR. Higher quality values MUST produce higher bitrates without changing the selected codec profile or bypassing rate control at quality 100. The app MUST NOT fractionally rescale native source dimensions merely to make them even. The settings UI MUST show an estimated file size per minute for the current combination of resolution, FPS, codec, and quality.
+The app SHALL provide a quality control from 0 to 100 (default: 80) and a rate-control mode of VBR (default) or CBR. Higher quality values MUST produce higher bitrates without changing the selected codec profile or bypassing rate control at quality 100. The app MUST NOT fractionally rescale native source dimensions merely to make them even.
 
 #### Scenario: Quality affects bitrate
 - **WHEN** the same content is recorded at quality 40 and quality 90
@@ -27,10 +27,6 @@ The app SHALL provide a quality control from 0 to 100 (default: 80) and a rate-c
 #### Scenario: Odd-sized captures preserve the native pixel grid
 - **WHEN** an odd-sized native screen region containing text and one-pixel lines is recorded
 - **THEN** the captured pixel grid is not fractionally rescaled or cropped and fine edges remain visually faithful at 100% playback size
-
-#### Scenario: Size estimate shown
-- **WHEN** the user changes quality, FPS, or codec in settings
-- **THEN** the estimated MB/minute figure updates immediately
 
 #### Scenario: CBR bounded bitrate
 - **WHEN** CBR mode is selected and highly dynamic content is recorded
@@ -48,7 +44,7 @@ The capture stream SHALL be color-matched to sRGB at the source, and every outpu
 - **THEN** the decoded pixel values match the authored sRGB values within encoder rounding, independent of the monitor's ICC profile
 
 ### Requirement: Resolution and frame rate
-The app SHALL record at the source's native pixel resolution by default, with a user-selectable maximum resolution cap of 1080p, 1440p, 4K, or 5K (5120×2880; default: native up to 5K). Downscaling MUST preserve aspect ratio. Frame rate SHALL be selectable from 15, 24, 30, and 60 FPS (default: 60), and the encoder MUST tolerate source frame delivery below the target without audio desync.
+The app SHALL record at the source's native pixel resolution by default, with a user-selectable maximum resolution cap of 1080p, 1440p, 4K, or 5K (5120×2880; default: native up to 5K). Downscaling MUST preserve aspect ratio. Frame rate SHALL be selectable as 30 FPS, 60 FPS (default), or Match Display. Match Display MUST resolve once at recording start to the capture target display's current refresh rate, rounded to the nearest whole FPS, and MUST fall back to 60 FPS when the refresh rate is unavailable. A window target MUST use the display containing the largest portion of the window at recording start. The encoder MUST tolerate source frame delivery below the target without audio desync.
 
 #### Scenario: Retina capture
 - **WHEN** a Retina display region of 1280×720 points is recorded with no cap
@@ -96,12 +92,12 @@ The app SHALL provide built-in output presets — "Maximum Quality", "Balanced" 
 - **THEN** the preset selector displays "Custom" without altering the user's other values
 
 ### Requirement: Toolbar FPS quick selection
-The recording toolbar's options popover SHALL offer a quick frame-rate choice of 30 fps and 60 fps, two-way synced with the frame-rate setting in the Settings window. Selecting a value in either place updates both. When Settings holds a value outside {30, 60} (15 or 24), the popover SHALL show that custom value as an additional checked row.
+The recording toolbar's options popover SHALL offer 30 FPS, 60 FPS, and Match Display, two-way synced with the frame-rate setting in the Settings window. Selecting a value in either place updates both.
 
 #### Scenario: Quick switch from the toolbar
 - **WHEN** the user picks 30 fps in the toolbar options popover
 - **THEN** the next recording captures at 30 fps and Settings shows 30 FPS
 
-#### Scenario: Custom value surfaced
-- **WHEN** Settings is set to 24 FPS and the user opens the toolbar options popover
-- **THEN** the popover shows "24 fps" checked alongside the unchecked 30/60 options
+#### Scenario: Display refresh rate resolved at recording start
+- **WHEN** Match Display is selected and recording starts on a 180 Hz display
+- **THEN** capture and encoding use 180 FPS for that recording

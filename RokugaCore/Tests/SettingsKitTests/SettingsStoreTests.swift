@@ -27,16 +27,22 @@ final class SettingsStoreTests: XCTestCase {
     func testRoundTrip() {
         store.recordingMode = .window
         store.videoCodec = .h264
-        store.frameRate = .fps30
+        store.frameRate = .matchDisplay
         store.frameRateMode = .constant
         store.videoQuality = 55
 
         let reread = SettingsStore(defaults: defaults)
         XCTAssertEqual(reread.recordingMode, .window)
         XCTAssertEqual(reread.videoCodec, .h264)
-        XCTAssertEqual(reread.frameRate, .fps30)
+        XCTAssertEqual(reread.frameRate, .matchDisplay)
         XCTAssertEqual(reread.frameRateMode, .constant)
         XCTAssertEqual(reread.videoQuality, 55)
+    }
+
+    func testMatchDisplayFrameRateResolution() {
+        XCTAssertEqual(FrameRate.matchDisplay.resolved(displayRefreshRate: 179.8), 180)
+        XCTAssertEqual(FrameRate.matchDisplay.resolved(displayRefreshRate: nil), 60)
+        XCTAssertEqual(FrameRate.fps30.resolved(displayRefreshRate: 180), 30)
     }
 
     func testQualityClamped() {

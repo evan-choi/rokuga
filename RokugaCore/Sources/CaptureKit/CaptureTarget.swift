@@ -49,24 +49,31 @@ public struct WindowTarget: Equatable, Sendable {
 
 /// Backing scale of the display a rect actually sits on — a 1x-display window captured at an assumed 2x produces a quarter-size image in a black frame.
 public enum DisplayScale {
-    public static func scale(forCGRect rect: CGRect) -> CGFloat {
+    static func displayID(forCGRect rect: CGRect) -> CGDirectDisplayID? {
         var displays = [CGDirectDisplayID](repeating: 0, count: 16)
         var count: UInt32 = 0
         CGGetDisplaysWithRect(rect, 16, &displays, &count)
-        guard count > 0 else { return 2 }
+        guard count > 0 else { return nil }
 
         var bestArea: CGFloat = -1
-        var bestScale: CGFloat = 2
+        var bestDisplayID: CGDirectDisplayID?
         for index in 0..<Int(count) {
             let bounds = CGDisplayBounds(displays[index])
             let intersection = bounds.intersection(rect)
             let area = intersection.width * intersection.height
-            guard area > bestArea, bounds.width > 0 else { continue }
-            let pixelWidth = CGDisplayCopyDisplayMode(displays[index])?.pixelWidth ?? Int(bounds.width)
+            guard area > bestArea else { continue }
             bestArea = area
-            bestScale = CGFloat(pixelWidth) / bounds.width
+            bestDisplayID = displays[index]
         }
-        return bestScale
+        return bestDisplayID
+    }
+
+    public static func scale(forCGRect rect: CGRect) -> CGFloat {
+        guard let displayID = displayID(forCGRect: rect) else { return 2 }
+        let bounds = CGDisplayBounds(displayID)
+        guard bounds.width > 0 else { return 2 }
+        let pixelWidth = CGDisplayCopyDisplayMode(displayID)?.pixelWidth ?? Int(bounds.width)
+        return CGFloat(pixelWidth) / bounds.width
     }
 }
 
@@ -83,6 +90,23 @@ public enum CaptureTarget: Equatable, Sendable {
         case let .window(window):
             return window.frame
         }
+    }
+
+    private var displayID: CGDirectDisplayID? {
+        switch self {
+        case let .display(display, _):
+            return display.displayID
+        case let .window(window):
+            return DisplayScale.displayID(forCGRect: window.frame)
+        }
+    }
+
+    public var displayRefreshRate: Double? {
+        guard let displayID,
+              let refreshRate = CGDisplayCopyDisplayMode(displayID)?.refreshRate,
+              refreshRate > 0
+        else { return nil }
+        return refreshRate
     }
 
     /// Output pixel dimensions before the 5K clamp.

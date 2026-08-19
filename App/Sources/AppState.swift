@@ -283,8 +283,9 @@ final class AppState: ObservableObject {
         }
         let outputURL = OutputFolderStore.newRecordingURL(settings: settings)
         activeRecordingURL = outputURL
-        let encoderConfiguration = makeEncoderConfiguration(for: target)
-        let captureConfiguration = CaptureConfiguration.fromSettings(settings)
+        let frameRate = settings.frameRate.resolved(displayRefreshRate: target.displayRefreshRate)
+        let encoderConfiguration = makeEncoderConfiguration(for: target, frameRate: frameRate)
+        let captureConfiguration = CaptureConfiguration.fromSettings(settings, frameRate: frameRate)
         let coordinator = self.coordinator
 
         targetBox.fill(
@@ -377,9 +378,14 @@ final class AppState: ObservableObject {
 
     // MARK: Helpers
 
-    private func makeEncoderConfiguration(for target: CaptureTarget) -> EncoderConfiguration {
+    private func makeEncoderConfiguration(for target: CaptureTarget, frameRate: Int) -> EncoderConfiguration {
         let size = target.sourcePixelSize
-        return EncoderConfiguration.fromSettings(settings, sourceWidth: size.width, sourceHeight: size.height)
+        return EncoderConfiguration.fromSettings(
+            settings,
+            sourceWidth: size.width,
+            sourceHeight: size.height,
+            frameRate: frameRate
+        )
     }
 
     func displayUnderMouse() -> DisplayTarget {
