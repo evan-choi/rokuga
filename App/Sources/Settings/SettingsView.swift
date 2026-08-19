@@ -1,4 +1,5 @@
 import AppKit
+import EncoderKit
 import KeyboardShortcuts
 import SettingsKit
 import SwiftUI
@@ -161,12 +162,27 @@ private struct OutputPane: View {
                 Text("Variable (VFR)").tag(FrameRateMode.variable)
                 Text("Constant (CFR)").tag(FrameRateMode.constant)
             }
-            Slider(value: qualityBinding, in: 0...100, step: 5) {
-                Text("Quality")
-            } minimumValueLabel: {
-                Text(verbatim: "0")
-            } maximumValueLabel: {
-                Text(verbatim: "100")
+            LabeledContent("Quality") {
+                HStack(spacing: 8) {
+                    Slider(value: qualityBinding, in: 0...100, step: 5) {
+                        Text("Quality")
+                    }
+                    .labelsHidden()
+                    Text(verbatim: "\(model.videoQuality)")
+                        .monospacedDigit()
+                        .frame(width: 24, alignment: .trailing)
+                }
+            }
+            LabeledContent("Estimated size") {
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("1920×1080 · 1 min")
+                    Text(verbatim: "30 fps ≈ \(estimatedSize(fps: 30))")
+                    Text(verbatim: "60 fps ≈ \(estimatedSize(fps: 60))")
+                    Text("Actual size varies with screen activity.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.trailing)
+                }
             }
         }
         .padding(20)
@@ -177,6 +193,21 @@ private struct OutputPane: View {
             get: { Double(model.videoQuality) },
             set: { model.videoQuality = Int($0) }
         )
+    }
+
+    private func estimatedSize(fps: Int) -> String {
+        let videoBitrate = RateControl.averageVideoBitrate(
+            width: 1920,
+            height: 1080,
+            fps: fps,
+            quality: model.videoQuality,
+            codec: model.videoCodec
+        )
+        let audioBitrate = model.captureSystemAudio || model.captureMicrophone
+            ? model.audioBitrate.rawValue * 1_000
+            : 0
+        let bytesPerMinute = Int64(videoBitrate + audioBitrate) * 60 / 8
+        return ByteCountFormatter.string(fromByteCount: bytesPerMinute, countStyle: .file)
     }
 }
 
