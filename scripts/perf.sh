@@ -141,22 +141,21 @@ cleanup_workload() {
 }
 
 cleanup_profile() {
-    if [[ -n "$PROFILE_NOTIFY_PID" ]] && kill -0 "$PROFILE_NOTIFY_PID" 2>/dev/null; then
-        kill "$PROFILE_NOTIFY_PID" 2>/dev/null || true
-        wait "$PROFILE_NOTIFY_PID" 2>/dev/null || true
-    fi
-    PROFILE_NOTIFY_PID=""
     if [[ -n "$PROFILE_RECORDING_PID" ]] && kill -0 "$PROFILE_RECORDING_PID" 2>/dev/null; then
         kill -CONT "$PROFILE_RECORDING_PID" 2>/dev/null || true
         kill "$PROFILE_RECORDING_PID" 2>/dev/null || true
-        wait "$PROFILE_RECORDING_PID" 2>/dev/null || true
     fi
-    PROFILE_RECORDING_PID=""
     if [[ -n "$PROFILE_TRACE_PID" ]] && kill -0 "$PROFILE_TRACE_PID" 2>/dev/null; then
         kill "$PROFILE_TRACE_PID" 2>/dev/null || true
-        wait "$PROFILE_TRACE_PID" 2>/dev/null || true
     fi
+    if [[ -n "$PROFILE_NOTIFY_PID" ]] && kill -0 "$PROFILE_NOTIFY_PID" 2>/dev/null; then
+        kill "$PROFILE_NOTIFY_PID" 2>/dev/null || true
+    fi
+    sleep 0.1
+    kill -KILL "$PROFILE_RECORDING_PID" "$PROFILE_TRACE_PID" "$PROFILE_NOTIFY_PID" 2>/dev/null || true
+    PROFILE_RECORDING_PID=""
     PROFILE_TRACE_PID=""
+    PROFILE_NOTIFY_PID=""
 }
 
 start_workload() {
@@ -333,12 +332,11 @@ profile_recording() {
     template="$(profile_template "$profile")"
     time_limit="$(python3 -c 'import sys; print(f"{float(sys.argv[1]) + 20:g}s")' "$RECORD_SECONDS")"
 
-    "$EXECUTABLE" "${RECORD_ARGUMENTS[@]}" \
+    ROKUGA_PERF_SUSPEND_FOR_PROFILING=1 \
+        "$EXECUTABLE" "${RECORD_ARGUMENTS[@]}" \
         > "$directory/result.json" \
         2> "$directory/record.stderr" &
     PROFILE_RECORDING_PID=$!
-    kill -STOP "$PROFILE_RECORDING_PID" \
-        || fail "recording exited before xctrace could attach; see $directory/record.stderr"
 
     notification="$IDENTIFIER.xctrace-started.$$"
     notifyutil -q -1 "$notification" &
@@ -358,8 +356,8 @@ profile_recording() {
         kill -0 "$PROFILE_TRACE_PID" 2>/dev/null \
             || fail "xctrace exited before tracing started; see $directory/xctrace.stderr"
         attempts=$((attempts + 1))
-        [[ "$attempts" -lt 100 ]] \
-            || fail "xctrace did not start within 10 seconds; see $directory/xctrace.stderr"
+        [[ "$attempts" -lt 300 ]] \
+            || fail "xctrace did not start within 30 seconds; see $directory/xctrace.stderr"
         sleep 0.1
     done
     wait "$PROFILE_NOTIFY_PID"
@@ -397,6 +395,14 @@ profile_recording() {
         --input "$directory/$profile.trace" \
         --toc \
         --output "$directory/trace-toc.xml"
+    python3 -c '
+import sys, xml.etree.ElementTree as ET
+process = ET.parse(sys.argv[1]).find(".//target/process")
+if process is None or process.get("type") != "attached" or process.get("name") != "RokugaPerf":
+    raise SystemExit("trace did not attach to RokugaPerf")
+if process.get("return-exit-status") != "0":
+    raise SystemExit("profiled recording did not exit successfully")
+' "$directory/trace-toc.xml" || fail "trace target validation failed; see $directory/trace-toc.xml"
     if [[ "$profile" == time ]]; then
         xcrun xctrace export --quiet \
             --input "$directory/time.trace" \
