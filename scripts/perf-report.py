@@ -165,21 +165,35 @@ def compare(args):
         raise ValueError(
             f"scenario mismatch: {baseline.get('scenario')} != {candidate.get('scenario')}"
         )
+    for name, summary in (("baseline", baseline), ("candidate", candidate)):
+        if summary.get("runCount", 0) < 5:
+            raise ValueError(f"{name} requires at least 5 runs")
     comparisons = {}
     for path in sorted(set(baseline["metrics"]) & set(candidate["metrics"]) & COMPARABLE_METRICS):
         before = baseline["metrics"][path]["median"]
         after = candidate["metrics"][path]["median"]
+        before_p95 = baseline["metrics"][path]["p95"]
+        after_p95 = candidate["metrics"][path]["p95"]
         higher_is_better = path in HIGHER_IS_BETTER
-        delta = after - before if higher_is_better else before - after
-        improvement = delta / abs(before) * 100 if before else (0 if after == before else None)
-        worse = after < before if higher_is_better else after > before
+
+        def change(reference, current):
+            delta = current - reference if higher_is_better else reference - current
+            improvement = delta / abs(reference) * 100 if reference else (0 if current == reference else None)
+            worse = current < reference if higher_is_better else current > reference
+            return improvement, worse and (improvement is None or improvement < -10)
+
+        improvement, median_regression = change(before, after)
+        p95_improvement, p95_regression = change(before_p95, after_p95)
         comparisons[path] = {
             "baselineMedian": before,
             "candidateMedian": after,
+            "baselineP95": before_p95,
+            "candidateP95": after_p95,
             "higherIsBetter": higher_is_better,
             "improvementPercent": improvement,
-            "meaningfulImprovement": improvement is not None and improvement >= 3,
-            "regressionOver10Percent": worse and (improvement is None or improvement < -10),
+            "p95ImprovementPercent": p95_improvement,
+            "meaningfulImprovement": improvement is not None and improvement >= 3 and not p95_regression,
+            "regressionOver10Percent": median_regression or p95_regression,
         }
     output = {
         "baseline": str(Path(args.baseline).resolve()),
@@ -189,8 +203,13 @@ def compare(args):
     write_json(args.output, output)
     for path, value in comparisons.items():
         percent = value["improvementPercent"]
-        change = "n/a" if percent is None else f"{percent:+.2f}%"
-        print(f"{path}: {value['baselineMedian']:.6g} -> {value['candidateMedian']:.6g} ({change})")
+        p95_percent = value["p95ImprovementPercent"]
+        median_change = "n/a" if percent is None else f"{percent:+.2f}%"
+        p95_change = "n/a" if p95_percent is None else f"{p95_percent:+.2f}%"
+        print(
+            f"{path}: median {value['baselineMedian']:.6g} -> {value['candidateMedian']:.6g} ({median_change}); "
+            f"p95 {value['baselineP95']:.6g} -> {value['candidateP95']:.6g} ({p95_change})"
+        )
 
 
 def local_name(element):
