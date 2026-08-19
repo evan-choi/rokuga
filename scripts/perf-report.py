@@ -23,15 +23,18 @@ METRICS = (
     "recordToFirstFrameSeconds",
     "stopToPlayableSeconds",
     "derived.dropRate",
+    "derived.outputIntegrityRate",
     "derived.outputFPS",
     "capture.incompleteVideoFrames",
     "capture.gapPTS",
+    "capture.missingVideoFrames",
     "capture.duplicatePTS",
     "capture.averageCompositeSeconds",
     "capture.maxCompositeSeconds",
     "writer.averageQueueWaitSeconds",
     "writer.maxQueueWaitSeconds",
     "output.gapPTS",
+    "output.missingVideoFrames",
     "output.duplicatePTS",
     "output.audioVideoDriftSeconds",
     "output.audioVideoEndpointSkewSeconds",
@@ -114,6 +117,8 @@ def finalize(args):
     attempts = writer["videoFramesAppended"] + writer["videoFramesDropped"]
     output = result["output"]
     duration = output["durationSeconds"]
+    expected_frames = output["videoFrames"] - output["duplicatePTS"] + output["missingVideoFrames"]
+    measures_continuity = workload["motion"] or result["frameRateMode"] == "constant"
     result.update({
         "scenario": args.scenario,
         "outputPath": str(destination),
@@ -121,6 +126,10 @@ def finalize(args):
         "environment": environment_value,
         "derived": {
             "dropRate": writer["videoFramesDropped"] / attempts if attempts else 0,
+            "outputIntegrityRate": (
+                (output["missingVideoFrames"] + output["duplicatePTS"]) / expected_frames
+                if measures_continuity and expected_frames else None
+            ),
             "outputFPS": output["videoFrames"] / duration if duration > 0 else 0,
             "incompleteFrameRate": (
                 result["capture"]["incompleteVideoFrames"] / result["capture"]["videoCallbacks"]
@@ -185,6 +194,15 @@ def summarize(args):
             all(value is None for value in values)
             and path in {"output.audioVideoDriftSeconds", "output.audioVideoEndpointSkewSeconds"}
             and not signature["recording"]["systemAudio"]
+        ):
+            continue
+        if (
+            all(value is None for value in values)
+            and path == "derived.outputIntegrityRate"
+            and not (
+                signature["workload"]["motion"]
+                or signature["recording"]["frameRateMode"] == "constant"
+            )
         ):
             continue
         if any(value is None for value in values):

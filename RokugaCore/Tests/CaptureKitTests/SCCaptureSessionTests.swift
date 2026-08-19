@@ -42,6 +42,7 @@ final class SCCaptureSessionTests: XCTestCase {
         XCTAssertEqual(snapshot.audioCallbacks, 1)
         XCTAssertEqual(snapshot.duplicatePTS, 1)
         XCTAssertEqual(snapshot.gapPTS, 1)
+        XCTAssertEqual(snapshot.missingVideoFrames, 5)
         XCTAssertEqual(snapshot.maxPTSGapSeconds, 0.1, accuracy: 0.001)
         XCTAssertEqual(snapshot.compositeCalls, 2)
         XCTAssertEqual(snapshot.compositeSeconds, 0.003, accuracy: 0.000_001)

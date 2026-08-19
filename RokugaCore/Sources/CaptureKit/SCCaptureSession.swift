@@ -52,6 +52,7 @@ public final class CaptureMetrics: @unchecked Sendable {
         public var audioCallbacks = 0
         public var duplicatePTS = 0
         public var gapPTS = 0
+        public var missingVideoFrames = 0
         public var maxPTSGapSeconds = 0.0
         public var compositeCalls = 0
         public var compositeSeconds = 0.0
@@ -97,6 +98,7 @@ public final class CaptureMetrics: @unchecked Sendable {
                     snapshot.duplicatePTS += 1
                 } else if delta > expectedFrameSeconds * 1.5 {
                     snapshot.gapPTS += 1
+                    snapshot.missingVideoFrames += max(Int((delta / expectedFrameSeconds).rounded()) - 1, 1)
                     snapshot.maxPTSGapSeconds = max(snapshot.maxPTSGapSeconds, delta)
                 }
             }
