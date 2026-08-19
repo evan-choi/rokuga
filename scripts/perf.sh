@@ -312,14 +312,22 @@ profile_recording() {
         --template "$template" \
         --time-limit "$time_limit" \
         --output "$directory/$profile.trace" \
-        --target-stdout "$directory/result.json" \
-        --launch -- "$EXECUTABLE" "${RECORD_ARGUMENTS[@]}" \
+        --launch -- /bin/zsh -c \
+        'result_path=$1; shift; exec "$@" > "$result_path"' \
+        rokuga-perf "$directory/result.json" "$EXECUTABLE" "${RECORD_ARGUMENTS[@]}" \
         2> "$directory/record.stderr"; then
         status=0
     else
         status=$?
     fi
-    [[ "$status" -eq 0 ]] || fail "xctrace failed with exit $status; see $directory/record.stderr"
+    if [[ "$status" -ne 0 ]]; then
+        grep -Fq 'Fatal logging system error: The log archive is corrupt or incomplete' \
+            "$directory/record.stderr" \
+            || fail "xctrace failed with exit $status; see $directory/record.stderr"
+        python3 -c 'import json, sys; json.load(open(sys.argv[1]))' "$directory/result.json" \
+            || fail "xctrace failed with exit $status before recording completed; see $directory/record.stderr"
+        echo "warning: xctrace exited with $status after producing a result; validating the trace export" >&2
+    fi
     finalize_result "$directory" "$SCENARIO" "$environment"
     xcrun xctrace export --quiet \
         --input "$directory/$profile.trace" \
