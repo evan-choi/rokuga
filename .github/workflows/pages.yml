@@ -35,6 +35,10 @@ jobs:
         working-directory: website
         run: bun install --frozen-lockfile
 
+      - name: Test
+        working-directory: website
+        run: bun test
+
       - name: Lint
         working-directory: website
         run: bun run lint
