@@ -131,6 +131,7 @@ Use the existing Carbon `RegisterEventHotKey` wrapper for the configurable toolb
 ### D12. Performance budget and frame transport
 
 - **Existing pipeline**: SCK IOSurface frames → optional Core Image/Metal cursor composition → incremental `AVAssetWriter` writes. There is no full-frame CPU readback; the compositor rasterizes only its small overlay tile on the CPU.
+- **Optimization acceptance**: zero-copy is the default transport, not an independent success metric. A candidate that adds a buffer copy or CPU readback may replace it only when the same recording output contract is preserved and warm-up plus five untraced runs show at least 3% median improvement in CPU or memory without regressing drop rate, A/V drift, latency, memory growth, or the other resource. The artifact comparison records the exception. Software video encoding remains prohibited.
 - **Existing degradation**: effect quality falls back stepwise to cursor-only rendering without changing cursor ownership. The capture delivery path does not yet lower runtime FPS.
 - **Planned**: require a hardware encoder, add runtime FPS degradation, and report applied degradation after recording.
 - **Budgets** (baseline M1, 8 GB): ≤ 0.1% dropped frames over 10 min at up to 4K60; < 40 ms A/V drift per hour; app CPU ≤ 20% of one core at 1080p60 (≤ 35% at 4K60); steady-state memory ≤ 400 MB regardless of duration; toolbar summon ≤ 150 ms; record→first frame ≤ 500 ms; stop→playable ≤ 2 s; passthrough trim ≤ 3 s.
