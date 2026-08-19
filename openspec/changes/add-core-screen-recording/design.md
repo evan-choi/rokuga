@@ -134,7 +134,7 @@ Use the existing Carbon `RegisterEventHotKey` wrapper for the configurable toolb
 - **Existing degradation**: effect quality falls back stepwise to cursor-only rendering without changing cursor ownership. The capture delivery path does not yet lower runtime FPS.
 - **Planned**: require a hardware encoder, add runtime FPS degradation, and report applied degradation after recording.
 - **Budgets** (baseline M1, 8 GB): ≤ 0.1% dropped frames over 10 min at up to 4K60; < 40 ms A/V drift per hour; app CPU ≤ 20% of one core at 1080p60 (≤ 35% at 4K60); steady-state memory ≤ 400 MB regardless of duration; toolbar summon ≤ 150 ms; record→first frame ≤ 500 ms; stop→playable ≤ 2 s; passthrough trim ≤ 3 s.
-- **Current enforcement**: CI runs an encoder microbenchmark with synthesized video frames. It does not yet cover ScreenCaptureKit, audio, effects, long-run memory growth, A/V drift, or toolbar latency. The complete gates remain planned in `tasks.md`.
+- **Current enforcement**: the local `RokugaPerf` harness runs the production `RecordingCoordinator → SCCaptureSession → CursorCompositor → AssetWriterSink` path against deterministic 4K workloads and records capture, writer, latency, CPU, memory, thermal, and output metrics. Its audio workload emits host-clock-synchronized visual/audio markers; output A/V drift is the change in marker offset, while track endpoint skew is reported separately. CI still runs only the encoder microbenchmark; actual capture, effects, long-run memory, A/V drift, and toolbar gates remain planned in `tasks.md`.
 
 ### D13. Localization: String Catalogs, en base + ko/ja/zh-Hans
 

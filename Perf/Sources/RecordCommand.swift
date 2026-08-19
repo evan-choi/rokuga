@@ -185,6 +185,7 @@ enum RecordCommand {
         let videoTracks = try await asset.loadTracks(withMediaType: .video)
         guard let videoTrack = videoTracks.first else { throw PerfError.captureTargetNotFound }
         let size = try await videoTrack.load(.naturalSize)
+        let videoTimeRange = try await videoTrack.load(.timeRange)
         let reader = try AVAssetReader(asset: asset)
         let output = AVAssetReaderTrackOutput(track: videoTrack, outputSettings: nil)
         reader.add(output)
@@ -214,8 +215,16 @@ enum RecordCommand {
             throw reader.error ?? PerfError.captureTargetNotFound
         }
 
-        let audioTracks = try await asset.loadTracks(withMediaType: .audio)
-        let audioDuration = try await audioTracks.first?.load(.timeRange).duration.seconds
+        let audioTrack = try await asset.loadTracks(withMediaType: .audio).first
+        let audioTimeRange = try await audioTrack?.load(.timeRange)
+        let audioVideoSync = try audioTrack.flatMap {
+            try inspectAudioVideoSync(
+                asset: asset,
+                videoTrack: videoTrack,
+                audioTrack: $0,
+                durationSeconds: duration
+            )
+        }
         let fileSize = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
         return OutputResult(
             durationSeconds: duration,
@@ -225,11 +234,215 @@ enum RecordCommand {
             duplicatePTS: duplicatePTS,
             gapPTS: gapPTS,
             maxPTSGapSeconds: maxPTSGapSeconds,
-            audioDurationSeconds: audioDuration,
-            audioVideoDriftSeconds: audioDuration.map { abs($0 - duration) },
+            audioDurationSeconds: audioTimeRange?.duration.seconds,
+            audioVideoEndpointSkewSeconds: audioTimeRange.map {
+                abs(CMTimeSubtract(CMTimeRangeGetEnd($0), CMTimeRangeGetEnd(videoTimeRange)).seconds)
+            },
+            audioVideoSyncMarkers: audioVideoSync?.markerCount,
+            audioVideoObservedSeconds: audioVideoSync?.observedSeconds,
+            audioVideoStartOffsetSeconds: audioVideoSync?.startOffsetSeconds,
+            audioVideoEndOffsetSeconds: audioVideoSync?.endOffsetSeconds,
+            audioVideoDriftSeconds: audioVideoSync?.driftSeconds,
+            audioVideoDriftSecondsPerHour: audioVideoSync?.driftSecondsPerHour,
             fileSizeBytes: fileSize
         )
     }
+
+    private static func inspectAudioVideoSync(
+        asset: AVAsset,
+        videoTrack: AVAssetTrack,
+        audioTrack: AVAssetTrack,
+        durationSeconds: Double
+    ) throws -> AudioVideoSyncResult? {
+        let ranges = syncInspectionRanges(durationSeconds: durationSeconds)
+        let videoMarkers = try videoSyncMarkers(asset: asset, track: videoTrack, ranges: ranges)
+        let audioMarkers = try audioSyncMarkers(asset: asset, track: audioTrack, ranges: ranges)
+        var matches: [(video: Double, audio: Double)] = []
+        var audioIndex = 0
+
+        for video in videoMarkers {
+            while audioIndex + 1 < audioMarkers.count,
+                  abs(audioMarkers[audioIndex + 1] - video) < abs(audioMarkers[audioIndex] - video)
+            {
+                audioIndex += 1
+            }
+            guard audioIndex < audioMarkers.count else { break }
+            if abs(audioMarkers[audioIndex] - video) < AVSyncMarker.periodSeconds * 0.45 {
+                matches.append((video, audioMarkers[audioIndex]))
+                audioIndex += 1
+            }
+        }
+
+        guard matches.count >= 2,
+              let first = matches.first,
+              let last = matches.last,
+              last.video > first.video
+        else { return nil }
+
+        let meanVideo = matches.reduce(0) { $0 + $1.video } / Double(matches.count)
+        let meanOffset = matches.reduce(0) { $0 + $1.audio - $1.video } / Double(matches.count)
+        let denominator = matches.reduce(0) { $0 + pow($1.video - meanVideo, 2) }
+        guard denominator > 0 else { return nil }
+        let slope = matches.reduce(0) {
+            $0 + ($1.video - meanVideo) * (($1.audio - $1.video) - meanOffset)
+        } / denominator
+        let observedSeconds = last.video - first.video
+        let startOffsetSeconds = meanOffset + slope * (first.video - meanVideo)
+        let endOffsetSeconds = meanOffset + slope * (last.video - meanVideo)
+        return AudioVideoSyncResult(
+            markerCount: matches.count,
+            observedSeconds: observedSeconds,
+            startOffsetSeconds: startOffsetSeconds,
+            endOffsetSeconds: endOffsetSeconds,
+            driftSeconds: abs(endOffsetSeconds - startOffsetSeconds),
+            driftSecondsPerHour: durationSeconds >= 600 ? abs(slope) * 3600 : nil
+        )
+    }
+
+    private static func syncInspectionRanges(durationSeconds: Double) -> [CMTimeRange] {
+        let timescale: CMTimeScale = 600
+        let duration = CMTime(seconds: durationSeconds, preferredTimescale: timescale)
+        guard durationSeconds > 120 else {
+            return [CMTimeRange(start: .zero, duration: duration)]
+        }
+        let window = CMTime(seconds: 30, preferredTimescale: timescale)
+        return [
+            CMTimeRange(start: .zero, duration: window),
+            CMTimeRange(start: CMTimeSubtract(duration, window), duration: window),
+        ]
+    }
+
+    private static func videoSyncMarkers(
+        asset: AVAsset,
+        track: AVAssetTrack,
+        ranges: [CMTimeRange]
+    ) throws -> [Double] {
+        var markers: [Double] = []
+        for range in ranges {
+            let reader = try AVAssetReader(asset: asset)
+            reader.timeRange = range
+            let output = AVAssetReaderTrackOutput(
+                track: track,
+                outputSettings: [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
+            )
+            output.alwaysCopiesSampleData = false
+            reader.add(output)
+            guard reader.startReading() else {
+                throw reader.error ?? PerfError.outputInspection("cannot decode video sync markers")
+            }
+
+            var markerWasOn = false
+            while let sample = output.copyNextSampleBuffer() {
+                guard let pixelBuffer = CMSampleBufferGetImageBuffer(sample) else { continue }
+                CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly)
+                let markerIsOn = centerPixelIsWhite(pixelBuffer)
+                CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly)
+                let time = CMSampleBufferGetPresentationTimeStamp(sample).seconds
+                if markerIsOn,
+                   !markerWasOn,
+                   time > range.start.seconds + AVSyncMarker.periodSeconds * 0.5
+                {
+                    markers.append(time)
+                }
+                markerWasOn = markerIsOn
+            }
+            if reader.status == .failed {
+                throw reader.error ?? PerfError.outputInspection("video sync marker decoding failed")
+            }
+        }
+        return markers
+    }
+
+    private static func centerPixelIsWhite(_ pixelBuffer: CVPixelBuffer) -> Bool {
+        guard let baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer) else { return false }
+        let x = CVPixelBufferGetWidth(pixelBuffer) / 2
+        let y = CVPixelBufferGetHeight(pixelBuffer) / 2
+        let pixel = baseAddress
+            .advanced(by: y * CVPixelBufferGetBytesPerRow(pixelBuffer) + x * 4)
+            .assumingMemoryBound(to: UInt8.self)
+        return Int(pixel[0]) + Int(pixel[1]) + Int(pixel[2]) > 690
+    }
+
+    private static func audioSyncMarkers(
+        asset: AVAsset,
+        track: AVAssetTrack,
+        ranges: [CMTimeRange]
+    ) throws -> [Double] {
+        var markers: [Double] = []
+        for range in ranges {
+            let reader = try AVAssetReader(asset: asset)
+            reader.timeRange = range
+            let output = AVAssetReaderTrackOutput(track: track, outputSettings: [
+                AVFormatIDKey: kAudioFormatLinearPCM,
+                AVLinearPCMIsFloatKey: true,
+                AVLinearPCMBitDepthKey: 32,
+                AVLinearPCMIsNonInterleaved: false,
+            ])
+            output.alwaysCopiesSampleData = false
+            reader.add(output)
+            guard reader.startReading() else {
+                throw reader.error ?? PerfError.outputInspection("cannot decode audio sync markers")
+            }
+
+            while let sample = output.copyNextSampleBuffer() {
+                guard let format = CMSampleBufferGetFormatDescription(sample),
+                      let stream = CMAudioFormatDescriptionGetStreamBasicDescription(format),
+                      let data = CMSampleBufferGetDataBuffer(sample)
+                else { continue }
+                let frameCount = CMSampleBufferGetNumSamples(sample)
+                let channelCount = Int(stream.pointee.mChannelsPerFrame)
+                let sampleRate = stream.pointee.mSampleRate
+                guard frameCount > 0, channelCount > 0, sampleRate > 0 else { continue }
+
+                var lengthAtOffset = 0
+                var totalLength = 0
+                var pointer: UnsafeMutablePointer<Int8>?
+                let status = CMBlockBufferGetDataPointer(
+                    data,
+                    atOffset: 0,
+                    lengthAtOffsetOut: &lengthAtOffset,
+                    totalLengthOut: &totalLength,
+                    dataPointerOut: &pointer
+                )
+                guard status == kCMBlockBufferNoErr,
+                      lengthAtOffset == totalLength,
+                      let pointer,
+                      totalLength >= frameCount * channelCount * MemoryLayout<Float>.size
+                else {
+                    throw PerfError.outputInspection("audio sync marker buffer is not contiguous float PCM")
+                }
+
+                let samples = UnsafeRawPointer(pointer).assumingMemoryBound(to: Float.self)
+                let start = CMSampleBufferGetPresentationTimeStamp(sample).seconds
+                for frame in 0 ..< frameCount {
+                    var peak: Float = 0
+                    for channel in 0 ..< channelCount {
+                        peak = max(peak, abs(samples[frame * channelCount + channel]))
+                    }
+                    let time = start + Double(frame) / sampleRate
+                    if peak > 0.1,
+                       time > range.start.seconds + AVSyncMarker.periodSeconds * 0.5,
+                       markers.last.map({ time - $0 > AVSyncMarker.periodSeconds * 0.5 }) ?? true
+                    {
+                        markers.append(time)
+                    }
+                }
+            }
+            if reader.status == .failed {
+                throw reader.error ?? PerfError.outputInspection("audio sync marker decoding failed")
+            }
+        }
+        return markers
+    }
+}
+
+private struct AudioVideoSyncResult {
+    let markerCount: Int
+    let observedSeconds: Double
+    let startOffsetSeconds: Double
+    let endOffsetSeconds: Double
+    let driftSeconds: Double
+    let driftSecondsPerHour: Double?
 }
 
 private struct RecordOptions {
@@ -518,6 +731,12 @@ struct OutputResult: Codable {
     let gapPTS: Int
     let maxPTSGapSeconds: Double
     let audioDurationSeconds: Double?
+    let audioVideoEndpointSkewSeconds: Double?
+    let audioVideoSyncMarkers: Int?
+    let audioVideoObservedSeconds: Double?
+    let audioVideoStartOffsetSeconds: Double?
+    let audioVideoEndOffsetSeconds: Double?
     let audioVideoDriftSeconds: Double?
+    let audioVideoDriftSecondsPerHour: Double?
     let fileSizeBytes: Int
 }
