@@ -17,8 +17,8 @@ enum WorkloadCommand {
 
         let contentSize = CGSize(width: 1920, height: 1080)
         let origin = CGPoint(
-            x: screen.frame.midX - contentSize.width / 2,
-            y: screen.frame.midY - contentSize.height / 2
+            x: (screen.frame.midX - contentSize.width / 2).rounded(),
+            y: (screen.frame.midY - contentSize.height / 2).rounded()
         )
         let window = NSWindow(
             contentRect: CGRect(origin: origin, size: contentSize),
