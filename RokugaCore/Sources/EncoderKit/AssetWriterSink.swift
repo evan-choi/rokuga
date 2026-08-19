@@ -180,7 +180,7 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     }
 
     private func startConstantFrameTimer() {
-        let nanoseconds = max(1, 1_000_000_000 / configuration.frameRate.rawValue)
+        let nanoseconds = max(1, 1_000_000_000 / configuration.frameRate)
         let timer = DispatchSource.makeTimerSource(queue: queue)
         timer.schedule(
             deadline: .now() + .nanoseconds(nanoseconds),
@@ -212,7 +212,7 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     }
 
     private var constantFrameDuration: CMTime {
-        CMTime(value: 1, timescale: CMTimeScale(configuration.frameRate.rawValue))
+        CMTime(value: 1, timescale: CMTimeScale(configuration.frameRate))
     }
 
     // MARK: Audio path
@@ -296,7 +296,7 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     }
 
     private func videoOutputSettings() -> [String: Any] {
-        let fps = configuration.frameRate.rawValue
+        let fps = configuration.frameRate
         let averageBitrate = RateControl.averageVideoBitrate(
             width: configuration.width,
             height: configuration.height,

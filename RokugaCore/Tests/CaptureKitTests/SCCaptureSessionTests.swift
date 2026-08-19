@@ -32,7 +32,7 @@ final class SCCaptureSessionTests: XCTestCase {
                     ),
                     crop: nil
                 ),
-                configuration: CaptureConfiguration.fromSettings(settings),
+                configuration: CaptureConfiguration.fromSettings(settings, frameRate: 144),
                 sink: NullSink(),
                 onInterruption: { _ in }
             )
@@ -43,6 +43,7 @@ final class SCCaptureSessionTests: XCTestCase {
             XCTAssertEqual(config.colorSpaceName as String, CGColorSpace.sRGB as String)
             XCTAssertEqual(config.width, 1600)
             XCTAssertEqual(config.height, 1200)
+            XCTAssertEqual(config.minimumFrameInterval, CMTime(value: 1, timescale: 144))
         }
     }
 

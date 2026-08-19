@@ -24,8 +24,8 @@
 - [ ] 3.3b Connected mic capture via AVCaptureSession → 48 kHz mixer → the same AAC track
 - [x] 3.4a Quality 0–100 and AAC 128–320 kbps mapping; quality remains on one bounded bitrate curve and codec profile through 100 while clean aperture preserves odd native dimensions
 - [x] 3.4c sRGB-matched color pipeline: capture in sRGB (`colorSpaceName`), tag output BT.709 primaries + sRGB transfer + BT.709 matrix, propagate color attachments through the cursor compositor
-- [ ] 3.4b Selectable VBR/capped-VBR UI and MB/min estimate
-- [x] 3.5 Resolution cap (≤ 5K) & FPS cap (≤ 60) with automatic downscale of oversized sources
+- [ ] 3.4b Selectable VBR/capped-VBR UI
+- [x] 3.5 Resolution cap (≤ 5K), 30/60 FPS, and capture-display refresh matching with automatic downscale of oversized sources
 - [x] 3.6 Disk-full preflight + 30 s watermark + auto-stop below 500 MB free
 - [ ] 3.7 Crash/power-loss recovery: MOV and MP4 partial handling plus next-launch recovery scan and user notification
 - [ ] 3.8 Require hardware encoding at runtime and report an actionable error when no hardware encoder is available

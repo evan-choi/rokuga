@@ -7,7 +7,7 @@ public struct EncoderConfiguration: Equatable, Sendable {
     public var container: ContainerFormat
     public var width: Int
     public var height: Int
-    public var frameRate: FrameRate
+    public var frameRate: Int
     public var frameRateMode: FrameRateMode
     /// VBR quality 0...100 → codec quality mapping (see output-settings spec).
     public var quality: Int
@@ -20,7 +20,7 @@ public struct EncoderConfiguration: Equatable, Sendable {
         container: ContainerFormat,
         width: Int,
         height: Int,
-        frameRate: FrameRate,
+        frameRate: Int,
         frameRateMode: FrameRateMode,
         quality: Int,
         audioBitrate: AudioBitrate,
@@ -32,7 +32,7 @@ public struct EncoderConfiguration: Equatable, Sendable {
         let clamped = CaptureLimits.clamped(width: width, height: height)
         self.width = clamped.width
         self.height = clamped.height
-        self.frameRate = frameRate
+        self.frameRate = max(frameRate, 1)
         self.frameRateMode = frameRateMode
         self.quality = min(max(quality, 0), 100)
         self.audioBitrate = audioBitrate
@@ -41,13 +41,18 @@ public struct EncoderConfiguration: Equatable, Sendable {
     }
 
     /// Snapshot the user's current preferences for a source of the given size.
-    public static func fromSettings(_ settings: SettingsStore, sourceWidth: Int, sourceHeight: Int) -> Self {
+    public static func fromSettings(
+        _ settings: SettingsStore,
+        sourceWidth: Int,
+        sourceHeight: Int,
+        frameRate: Int? = nil
+    ) -> Self {
         .init(
             codec: settings.videoCodec,
             container: settings.containerFormat,
             width: sourceWidth,
             height: sourceHeight,
-            frameRate: settings.frameRate,
+            frameRate: frameRate ?? settings.frameRate.resolved(displayRefreshRate: nil),
             frameRateMode: settings.frameRateMode,
             quality: settings.videoQuality,
             audioBitrate: settings.audioBitrate,

@@ -1,5 +1,4 @@
 import AppKit
-import EncoderKit
 import KeyboardShortcuts
 import SettingsKit
 import SwiftUI
@@ -157,6 +156,7 @@ private struct OutputPane: View {
             Picker("Frame rate", selection: $model.frameRate) {
                 Text(verbatim: "30 fps").tag(FrameRate.fps30)
                 Text(verbatim: "60 fps").tag(FrameRate.fps60)
+                Text("Match Display").tag(FrameRate.matchDisplay)
             }
             Picker("Frame rate mode", selection: $model.frameRateMode) {
                 Text("Variable (VFR)").tag(FrameRateMode.variable)
@@ -174,22 +174,6 @@ private struct OutputPane: View {
                         .frame(minWidth: 30, alignment: .trailing)
                 }
             }
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text("Estimated size")
-                        .font(.headline)
-                    Spacer()
-                    Text(verbatim: "≈ \(estimatedSize)")
-                        .font(.title3.weight(.semibold))
-                        .monospacedDigit()
-                }
-                Text("Actual size varies with screen activity.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .padding(12)
-            .background(.quaternary, in: RoundedRectangle(cornerRadius: 9))
-            .padding(.top, 8)
         }
         .padding(20)
     }
@@ -200,22 +184,6 @@ private struct OutputPane: View {
             set: { model.videoQuality = Int($0) }
         )
     }
-
-    private var estimatedSize: String {
-        let videoBitrate = RateControl.averageVideoBitrate(
-            width: 1920,
-            height: 1080,
-            fps: model.frameRate.rawValue,
-            quality: model.videoQuality,
-            codec: model.videoCodec
-        )
-        let audioBitrate = model.captureSystemAudio || model.captureMicrophone
-            ? model.audioBitrate.rawValue * 1_000
-            : 0
-        let bytesPerMinute = Int64(videoBitrate + audioBitrate) * 60 / 8
-        return ByteCountFormatter.string(fromByteCount: bytesPerMinute, countStyle: .file)
-    }
-
 }
 
 /// Legacy Settings opener for macOS 13 only.

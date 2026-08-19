@@ -47,6 +47,7 @@ struct OptionsPopoverView: View {
                 Picker("Frame Rate", selection: $frameRate) {
                     Text("30 fps").tag(FrameRate.fps30.rawValue)
                     Text("60 fps").tag(FrameRate.fps60.rawValue)
+                    Text("Display").tag(FrameRate.matchDisplay.rawValue)
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()

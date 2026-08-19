@@ -6,7 +6,7 @@ import ScreenCaptureKit
 import SettingsKit
 
 public struct CaptureConfiguration: Equatable, Sendable {
-    public var frameRate: FrameRate
+    public var frameRate: Int
     public var captureSystemAudio: Bool
     public var exclusion: ExclusionOptions
     public var cursorEffects: CursorEffectOptions
@@ -18,22 +18,22 @@ public struct CaptureConfiguration: Equatable, Sendable {
     }
 
     public init(
-        frameRate: FrameRate,
+        frameRate: Int,
         captureSystemAudio: Bool,
         exclusion: ExclusionOptions,
         cursorEffects: CursorEffectOptions = CursorEffectOptions(
             showCursor: true, pointerStyle: .system, highlight: false, animateClicks: false
         )
     ) {
-        self.frameRate = frameRate
+        self.frameRate = max(frameRate, 1)
         self.captureSystemAudio = captureSystemAudio
         self.exclusion = exclusion
         self.cursorEffects = cursorEffects
     }
 
-    public static func fromSettings(_ settings: SettingsStore) -> Self {
+    public static func fromSettings(_ settings: SettingsStore, frameRate: Int? = nil) -> Self {
         .init(
-            frameRate: settings.frameRate,
+            frameRate: frameRate ?? settings.frameRate.resolved(displayRefreshRate: nil),
             captureSystemAudio: settings.captureSystemAudio,
             exclusion: ExclusionOptions(
                 excludeDesktopIcons: settings.excludeDesktopIcons
@@ -107,7 +107,7 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         guard configuration.cursorEffects.needsCompositor else { return }
 
         let sampler = CursorStateSampler(
-            framesPerSecond: configuration.frameRate.rawValue
+            framesPerSecond: configuration.frameRate
         )
         await sampler.start()
         let compositor = CursorCompositor(
@@ -225,7 +225,7 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         let clamped = CaptureLimits.clamped(width: source.width, height: source.height)
         config.width = clamped.width
         config.height = clamped.height
-        config.minimumFrameInterval = CMTime(value: 1, timescale: CMTimeScale(configuration.frameRate.rawValue))
+        config.minimumFrameInterval = CMTime(value: 1, timescale: CMTimeScale(configuration.frameRate))
         config.pixelFormat = kCVPixelFormatType_32BGRA
         // Without an explicit color space, SCStream delivers buffers in the display's
         // ICC color space, which no standard video color tag can describe — the file
