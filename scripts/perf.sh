@@ -298,6 +298,8 @@ profile_recording() {
     local profile="$1" directory environment template time_limit status
     shift
     parse_profile_options "$@"
+    DevToolsSecurity -status 2>&1 | grep -Fq 'Developer mode is currently enabled.' \
+        || fail "Developer Tools access is disabled; run sudo DevToolsSecurity -enable after explicit approval"
     build
     directory="$(artifact_directory "$SCENARIO-$profile")"
     environment="$directory/environment.json"
