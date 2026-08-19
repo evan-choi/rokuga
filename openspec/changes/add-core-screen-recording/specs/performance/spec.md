@@ -16,6 +16,8 @@ The capture-to-encoder path SHALL be zero-copy on the GPU: frames travel as IOSu
 ### Requirement: Frame integrity
 Recordings SHALL be lag-free: at the configured FPS, dropped or duplicated frames MUST stay below 0.1% over any 10-minute window on Apple Silicon baseline hardware (M1, 8 GB) at up to 4K60, and A/V drift MUST stay below 40 ms over one hour. If the encoder cannot keep up, the app SHALL degrade mouse-effect quality first (per design D4) and only then lower capture rate — never freeze, stutter, or silently corrupt the file.
 
+A/V drift is the change in relative offset between synchronized audio and visual content markers over the measured interval. Track start/end or duration differences SHALL be reported separately as endpoint skew and MUST NOT be labeled as clock drift.
+
 #### Scenario: Sustained 4K60
 - **WHEN** a 10-minute 4K60 recording runs on baseline hardware
 - **THEN** dropped/duplicated frames are below 0.1% and audio stays in sync (< 40 ms drift)

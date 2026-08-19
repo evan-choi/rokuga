@@ -3,6 +3,12 @@ import AVFoundation
 import Foundation
 import QuartzCore
 
+enum AVSyncMarker {
+    static let periodSeconds = 1.0
+    static let pulseSeconds = 0.2
+    static let sizePoints: CGFloat = 160
+}
+
 enum WorkloadCommand {
     @MainActor
     static func run(arguments: [String]) throws {
@@ -35,12 +41,17 @@ enum WorkloadCommand {
         window.level = .normal
         window.sharingType = .readOnly
         window.title = "RokugaPerf Workload"
-        window.contentView = WorkloadView(frame: CGRect(origin: .zero, size: contentSize), motion: options.motion)
+        let syncMarkerEpoch = options.audio ? CACurrentMediaTime() + 1 : nil
+        window.contentView = WorkloadView(
+            frame: CGRect(origin: .zero, size: contentSize),
+            motion: options.motion,
+            syncMarkerEpoch: syncMarkerEpoch
+        )
         window.orderFrontRegardless()
         window.displayIfNeeded()
         CATransaction.flush()
 
-        let tone = options.audio ? try ToneGenerator() : nil
+        let tone = try syncMarkerEpoch.map { try ToneGenerator(syncMarkerEpoch: $0) }
         try tone?.start()
 
         let scale = window.backingScaleFactor
@@ -53,7 +64,9 @@ enum WorkloadCommand {
             widthPixels: Int(contentSize.width * scale),
             heightPixels: Int(contentSize.height * scale),
             motion: options.motion,
-            audio: options.audio
+            audio: options.audio,
+            syncMarkerPeriodSeconds: AVSyncMarker.periodSeconds,
+            syncMarkerPulseSeconds: AVSyncMarker.pulseSeconds
         ), pretty: false)
 
         withExtendedLifetime((window, tone)) {
@@ -97,7 +110,7 @@ private struct WorkloadOptions {
 
 @MainActor
 private final class WorkloadView: NSView {
-    init(frame frameRect: NSRect, motion: Bool) {
+    init(frame frameRect: NSRect, motion: Bool, syncMarkerEpoch: CFTimeInterval?) {
         super.init(frame: frameRect)
         wantsLayer = true
         let root = CALayer()
@@ -156,6 +169,32 @@ private final class WorkloadView: NSView {
         label.string = "Rokuga 4K Performance Workload"
         root.addSublayer(label)
 
+        if let syncMarkerEpoch {
+            let marker = CALayer()
+            marker.backgroundColor = NSColor.black.cgColor
+            marker.frame = CGRect(
+                x: bounds.midX - AVSyncMarker.sizePoints / 2,
+                y: bounds.midY - AVSyncMarker.sizePoints / 2,
+                width: AVSyncMarker.sizePoints,
+                height: AVSyncMarker.sizePoints
+            )
+            root.addSublayer(marker)
+
+            let flash = CAKeyframeAnimation(keyPath: "backgroundColor")
+            flash.values = [NSColor.white.cgColor, NSColor.black.cgColor, NSColor.black.cgColor]
+            flash.keyTimes = [
+                0,
+                NSNumber(value: AVSyncMarker.pulseSeconds / AVSyncMarker.periodSeconds),
+                1,
+            ]
+            flash.calculationMode = .discrete
+            flash.duration = AVSyncMarker.periodSeconds
+            flash.repeatCount = .greatestFiniteMagnitude
+            flash.beginTime = marker.convertTime(syncMarkerEpoch, from: nil)
+            flash.isRemovedOnCompletion = false
+            marker.add(flash, forKey: "audio-video-sync")
+        }
+
         guard motion else { return }
         let translation = CABasicAnimation(keyPath: "transform.translation.x")
         translation.fromValue = 0
@@ -185,16 +224,23 @@ private final class ToneGenerator {
     private let engine = AVAudioEngine()
     private let source: AVAudioSourceNode
 
-    init() throws {
+    init(syncMarkerEpoch: CFTimeInterval) throws {
         guard let format = AVAudioFormat(standardFormatWithSampleRate: 48000, channels: 2) else {
             throw PerfError.workloadUnavailable("cannot create the 48 kHz stereo audio format")
         }
         var phase = 0.0
         let increment = 2 * Double.pi * 440 / format.sampleRate
-        source = AVAudioSourceNode(format: format) { _, _, frameCount, audioBufferList in
+        source = AVAudioSourceNode(format: format) { _, timestamp, frameCount, audioBufferList in
             let buffers = UnsafeMutableAudioBufferListPointer(audioBufferList)
+            let bufferStart = timestamp.pointee.mFlags.contains(.sampleHostTimeValid)
+                ? AVAudioTime.seconds(forHostTime: timestamp.pointee.mHostTime)
+                : nil
             for frame in 0 ..< Int(frameCount) {
-                let sample = Float(sin(phase) * 0.12)
+                let elapsed = bufferStart.map { $0 + Double(frame) / format.sampleRate - syncMarkerEpoch }
+                let markerIsOn = elapsed.map {
+                    $0 >= 0 && $0.truncatingRemainder(dividingBy: AVSyncMarker.periodSeconds) < AVSyncMarker.pulseSeconds
+                } ?? false
+                let sample = markerIsOn ? Float(sin(phase) * 0.5) : 0
                 phase += increment
                 if phase >= 2 * Double.pi {
                     phase -= 2 * Double.pi
@@ -225,4 +271,6 @@ private struct WorkloadResult: Codable {
     let heightPixels: Int
     let motion: Bool
     let audio: Bool
+    let syncMarkerPeriodSeconds: Double
+    let syncMarkerPulseSeconds: Double
 }

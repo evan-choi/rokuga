@@ -66,6 +66,7 @@ enum PerfError: Error, CustomStringConvertible {
     case captureTargetNotFound
     case firstFrameTimeout
     case workloadUnavailable(String)
+    case outputInspection(String)
 
     var exitCode: Int32 {
         switch self {
@@ -88,6 +89,8 @@ enum PerfError: Error, CustomStringConvertible {
         case .firstFrameTimeout:
             "no complete video frame arrived within 5 seconds"
         case let .workloadUnavailable(message):
+            message
+        case let .outputInspection(message):
             message
         }
     }

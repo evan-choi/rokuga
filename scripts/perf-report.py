@@ -34,6 +34,7 @@ METRICS = (
     "output.gapPTS",
     "output.duplicatePTS",
     "output.audioVideoDriftSeconds",
+    "output.audioVideoEndpointSkewSeconds",
     "output.fileSizeBytes",
 )
 
@@ -45,7 +46,8 @@ RECORDING_CONFIGURATION = (
 )
 WORKLOAD_CONFIGURATION = (
     "widthPoints", "heightPoints", "backingScale", "widthPixels",
-    "heightPixels", "motion", "audio",
+    "heightPixels", "motion", "audio", "syncMarkerPeriodSeconds",
+    "syncMarkerPulseSeconds",
 )
 HOST_CONFIGURATION = (
     "hardwareModel", "logicalCPUCount", "physicalCPUCount",
@@ -181,7 +183,7 @@ def summarize(args):
         values = [value_at_path(run, path) for run in runs]
         if (
             all(value is None for value in values)
-            and path == "output.audioVideoDriftSeconds"
+            and path in {"output.audioVideoDriftSeconds", "output.audioVideoEndpointSkewSeconds"}
             and not signature["recording"]["systemAudio"]
         ):
             continue
