@@ -332,9 +332,21 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
             AVVideoCodecKey: configuration.codec == .hevc ? AVVideoCodecType.hevc : AVVideoCodecType.h264,
             AVVideoWidthKey: configuration.width,
             AVVideoHeightKey: configuration.height,
+            AVVideoColorPropertiesKey: Self.sRGBColorProperties,
             AVVideoCompressionPropertiesKey: compression
         ]
     }
+
+    /// Matches the sRGB capture buffers SCStream delivers (`colorSpaceName = sRGB`
+    /// tags them 709 primaries / sRGB transfer / 709 matrix), so AVAssetWriter tags
+    /// the output truthfully without a value-altering color conversion. The transfer
+    /// string equals `AVVideoTransferFunction_IEC_sRGB`, whose AVFoundation constant
+    /// requires macOS 15; the CoreVideo constant carries the same value on 13.3.
+    static let sRGBColorProperties: [String: String] = [
+        AVVideoColorPrimariesKey: AVVideoColorPrimaries_ITU_R_709_2,
+        AVVideoTransferFunctionKey: kCVImageBufferTransferFunction_sRGB as String,
+        AVVideoYCbCrMatrixKey: AVVideoYCbCrMatrix_ITU_R_709_2
+    ]
 
     /// VideoToolbox advertises this profile at runtime, but the SDK does not expose
     /// its otherwise-public enumeration value as a Swift constant.

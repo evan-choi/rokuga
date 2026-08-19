@@ -186,6 +186,38 @@ final class AssetWriterSinkTests: XCTestCase {
         XCTAssertFalse(presentationTimes.isEmpty)
     }
 
+    func testOutputFileCarriesSRGBColorTags() async throws {
+        for codec in [VideoCodec.h264, VideoCodec.hevc] {
+            let url = FileManager.default.temporaryDirectory
+                .appendingPathComponent("rokuga-color-test-\(UUID().uuidString).mp4")
+            defer { try? FileManager.default.removeItem(at: url) }
+
+            let sink = AssetWriterSink(outputURL: url, configuration: makeConfiguration(codec: codec))
+            try await sink.start()
+            try await appendPaced(sink, frames: 0 ..< 10)
+            _ = try await sink.finish()
+
+            let tracks = try await AVAsset(url: url).loadTracks(withMediaType: .video)
+            let formats = try await XCTUnwrap(tracks.first).load(.formatDescriptions)
+            let format = try XCTUnwrap(formats.first)
+            XCTAssertEqual(
+                CMFormatDescriptionGetExtension(format, extensionKey: kCMFormatDescriptionExtension_ColorPrimaries) as? String,
+                kCMFormatDescriptionColorPrimaries_ITU_R_709_2 as String,
+                "\(codec) primaries"
+            )
+            XCTAssertEqual(
+                CMFormatDescriptionGetExtension(format, extensionKey: kCMFormatDescriptionExtension_TransferFunction) as? String,
+                kCMFormatDescriptionTransferFunction_sRGB as String,
+                "\(codec) transfer function"
+            )
+            XCTAssertEqual(
+                CMFormatDescriptionGetExtension(format, extensionKey: kCMFormatDescriptionExtension_YCbCrMatrix) as? String,
+                kCMFormatDescriptionYCbCrMatrix_ITU_R_709_2 as String,
+                "\(codec) YCbCr matrix"
+            )
+        }
+    }
+
     func testVariableFrameRateDoesNotSynthesizeFrames() async throws {
         let sink = AssetWriterSink(
             outputURL: outputURL,

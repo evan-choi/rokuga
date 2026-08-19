@@ -23,6 +23,7 @@
 - [x] 3.3a System audio via SCStream (`capturesAudio`, `excludesCurrentProcessAudio`) → 48 kHz AAC track, covered by an asset-writer integration test
 - [ ] 3.3b Connected mic capture via AVCaptureSession → 48 kHz mixer → the same AAC track
 - [x] 3.4a Quality 0–100 and AAC 128–320 kbps mapping; quality 100 preserves the native pixel grid, removes bitrate caps, and uses hardware HEVC 4:4:4 when available
+- [x] 3.4c sRGB-matched color pipeline: capture in sRGB (`colorSpaceName`), tag output BT.709 primaries + sRGB transfer + BT.709 matrix, propagate color attachments through the cursor compositor
 - [ ] 3.4b Selectable VBR/capped-VBR UI and MB/min estimate
 - [x] 3.5 Resolution cap (≤ 5K) & FPS cap (≤ 60) with automatic downscale of oversized sources
 - [x] 3.6 Disk-full preflight + 30 s watermark + auto-stop below 500 MB free

@@ -219,7 +219,7 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
 
     // MARK: Stream configuration
 
-    private func makeStreamConfiguration() -> SCStreamConfiguration {
+    func makeStreamConfiguration() -> SCStreamConfiguration {
         let config = SCStreamConfiguration()
         let source = target.sourcePixelSize
         let clamped = CaptureLimits.clamped(width: source.width, height: source.height)
@@ -227,6 +227,12 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         config.height = clamped.height
         config.minimumFrameInterval = CMTime(value: 1, timescale: CMTimeScale(configuration.frameRate.rawValue))
         config.pixelFormat = kCVPixelFormatType_32BGRA
+        // Without an explicit color space, SCStream delivers buffers in the display's
+        // ICC color space, which no standard video color tag can describe — the file
+        // then carries no color metadata and players guess. sRGB makes ScreenCaptureKit
+        // color-match at the source and tag buffers 709 primaries / sRGB transfer /
+        // 709 matrix, which AssetWriterSink records verbatim (color-fidelity fix).
+        config.colorSpaceName = CGColorSpace.sRGB
         config.showsCursor = configuration.showsCursor
         config.queueDepth = 8
 
