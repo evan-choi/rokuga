@@ -176,10 +176,9 @@ export default function App() {
                   <h2>Rokuga 0.1.0 Preview</h2>
                   <p>{copy.download.releaseDescription}</p>
                 </div>
-                <a className="button button-primary download-button" href="https://github.com/evan-choi/rokuga/releases/latest">
+                <button className="button button-disabled download-button" type="button" disabled>
                   {copy.download.button}
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
-                </a>
+                </button>
                 <p className="release-meta">{copy.download.requirements}</p>
               </article>
 

@@ -274,6 +274,16 @@ h1 .accent {
   background: #e9e9ec;
 }
 
+.button-disabled,
+.button-disabled:hover {
+  color: var(--muted);
+  background: #dcdce0;
+  box-shadow: none;
+  opacity: 1;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .button svg { width: 18px; height: 18px; }
 
 .product-shell {
