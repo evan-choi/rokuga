@@ -54,6 +54,7 @@ type Copy = {
     title: string
     accent: string
     description: string
+    priceValue: string
     price: string
     duration: string
     watermark: string
@@ -132,6 +133,7 @@ export const translations: Record<Language, Copy> = {
       title: '무료',
       accent: '조건 없이',
       description: '시간 제한도, 워터마크도 없습니다.',
+      priceValue: '₩0',
       price: '완전 무료',
       duration: '녹화 시간',
       watermark: '워터마크',
@@ -205,6 +207,7 @@ export const translations: Record<Language, Copy> = {
       title: 'Free',
       accent: 'No strings attached',
       description: 'No time limits. No watermarks.',
+      priceValue: '$0',
       price: 'Completely free',
       duration: 'Recording time',
       watermark: 'Watermarks',
@@ -278,6 +281,7 @@ export const translations: Record<Language, Copy> = {
       title: '無料',
       accent: '条件なし',
       description: '時間制限も、ウォーターマークもありません。',
+      priceValue: '¥0',
       price: '完全無料',
       duration: '録画時間',
       watermark: 'ウォーターマーク',
@@ -351,6 +355,7 @@ export const translations: Record<Language, Copy> = {
       title: '免费',
       accent: '没有附加条件',
       description: '没有时长限制，也没有水印。',
+      priceValue: '¥0',
       price: '完全免费',
       duration: '录制时长',
       watermark: '水印',
