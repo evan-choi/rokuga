@@ -376,7 +376,14 @@ profile_template() {
         time) echo "Time Profiler" ;;
         metal) echo "Metal System Trace" ;;
         allocations) echo "Allocations" ;;
-        file) echo "File Activity" ;;
+        file)
+            if [[ "$(xcrun xctrace version)" == "xctrace version 26.0 (17C52)" ]]; then
+                # This release cannot finalize File Activity, even for /usr/bin/true.
+                echo "System Trace"
+            else
+                echo "File Activity"
+            fi
+            ;;
         *) fail "unknown profile: $1 (expected time, metal, allocations, or file)" ;;
     esac
 }
@@ -498,6 +505,11 @@ if process is None or process.get("type") != "attached" or process.get("name") !
         python3 "$REPORT_TOOL" hot-symbols \
             --input "$directory/time-profile.xml" \
             --output "$directory/hot-functions.json"
+    elif [[ "$profile" == file && "$template" == "System Trace" ]]; then
+        xcrun xctrace export --quiet \
+            --input "$directory/file.trace" \
+            --xpath '/trace-toc/run[@number="1"]/data/table[@schema="syscall"]' \
+            --output "$directory/file-activity.xml"
     fi
     cleanup_workload
     trap - EXIT INT TERM
