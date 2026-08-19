@@ -149,7 +149,7 @@ export default function App() {
                 <h2>{copy.free.title}<br />{copy.free.accent}</h2>
                 <p>{copy.free.description}</p>
                 <ul className="free-list">
-                  <li><strong>₩0</strong><span>{copy.free.price}</span></li>
+                  <li><strong>{copy.free.priceValue}</strong><span>{copy.free.price}</span></li>
                   <li><strong>∞</strong><span>{copy.free.duration}</span></li>
                   <li><strong>0</strong><span>{copy.free.watermark}</span></li>
                 </ul>
