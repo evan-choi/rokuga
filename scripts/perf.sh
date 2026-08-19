@@ -313,8 +313,8 @@ profile_recording() {
         --time-limit "$time_limit" \
         --output "$directory/$profile.trace" \
         --target-stdout "$directory/result.json" \
-        --target-stderr "$directory/record.stderr" \
-        --launch -- "$EXECUTABLE" "${RECORD_ARGUMENTS[@]}"; then
+        --launch -- "$EXECUTABLE" "${RECORD_ARGUMENTS[@]}" \
+        2> "$directory/record.stderr"; then
         status=0
     else
         status=$?
