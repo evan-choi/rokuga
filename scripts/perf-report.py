@@ -37,7 +37,8 @@ METRICS = (
     "output.fileSizeBytes",
 )
 
-LOWER_IS_BETTER = set(METRICS) - {"derived.outputFPS"}
+HIGHER_IS_BETTER = {"derived.outputFPS"}
+COMPARABLE_METRICS = set(METRICS) - {"output.fileSizeBytes"}
 
 
 def read_json(path):
@@ -165,16 +166,20 @@ def compare(args):
             f"scenario mismatch: {baseline.get('scenario')} != {candidate.get('scenario')}"
         )
     comparisons = {}
-    for path in sorted(set(baseline["metrics"]) & set(candidate["metrics"]) & LOWER_IS_BETTER):
+    for path in sorted(set(baseline["metrics"]) & set(candidate["metrics"]) & COMPARABLE_METRICS):
         before = baseline["metrics"][path]["median"]
         after = candidate["metrics"][path]["median"]
-        improvement = (before - after) / abs(before) * 100 if before else 0
+        higher_is_better = path in HIGHER_IS_BETTER
+        delta = after - before if higher_is_better else before - after
+        improvement = delta / abs(before) * 100 if before else (0 if after == before else None)
+        worse = after < before if higher_is_better else after > before
         comparisons[path] = {
             "baselineMedian": before,
             "candidateMedian": after,
+            "higherIsBetter": higher_is_better,
             "improvementPercent": improvement,
-            "meaningfulImprovement": improvement >= 3,
-            "regressionOver10Percent": improvement < -10,
+            "meaningfulImprovement": improvement is not None and improvement >= 3,
+            "regressionOver10Percent": worse and (improvement is None or improvement < -10),
         }
     output = {
         "baseline": str(Path(args.baseline).resolve()),
@@ -183,7 +188,9 @@ def compare(args):
     }
     write_json(args.output, output)
     for path, value in comparisons.items():
-        print(f"{path}: {value['baselineMedian']:.6g} -> {value['candidateMedian']:.6g} ({value['improvementPercent']:+.2f}%)")
+        percent = value["improvementPercent"]
+        change = "n/a" if percent is None else f"{percent:+.2f}%"
+        print(f"{path}: {value['baselineMedian']:.6g} -> {value['candidateMedian']:.6g} ({change})")
 
 
 def local_name(element):
