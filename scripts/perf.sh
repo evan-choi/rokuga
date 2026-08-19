@@ -16,6 +16,7 @@ WORKLOAD_PID=""
 PROFILE_RECORDING_PID=""
 PROFILE_TRACE_PID=""
 PROFILE_NOTIFY_PID=""
+PROFILE_FINISH_NOTIFY_PID=""
 WORKLOAD_MOTION=off
 WORKLOAD_AUDIO=off
 RECORD_CODEC=hevc
@@ -152,11 +153,16 @@ cleanup_profile() {
     if [[ -n "$PROFILE_NOTIFY_PID" ]] && kill -0 "$PROFILE_NOTIFY_PID" 2>/dev/null; then
         kill "$PROFILE_NOTIFY_PID" 2>/dev/null || true
     fi
+    if [[ -n "$PROFILE_FINISH_NOTIFY_PID" ]] && kill -0 "$PROFILE_FINISH_NOTIFY_PID" 2>/dev/null; then
+        kill "$PROFILE_FINISH_NOTIFY_PID" 2>/dev/null || true
+    fi
     sleep 0.1
-    kill -KILL "$PROFILE_RECORDING_PID" "$PROFILE_TRACE_PID" "$PROFILE_NOTIFY_PID" 2>/dev/null || true
+    kill -KILL "$PROFILE_RECORDING_PID" "$PROFILE_TRACE_PID" "$PROFILE_NOTIFY_PID" \
+        "$PROFILE_FINISH_NOTIFY_PID" 2>/dev/null || true
     PROFILE_RECORDING_PID=""
     PROFILE_TRACE_PID=""
     PROFILE_NOTIFY_PID=""
+    PROFILE_FINISH_NOTIFY_PID=""
 }
 
 start_workload() {
@@ -317,8 +323,8 @@ profile_template() {
 }
 
 profile_recording() {
-    local profile="$1" directory environment template time_limit notification
-    local attempts=0 record_status trace_status
+    local profile="$1" directory environment template time_limit notification finish_notification
+    local attempts=0 record_status trace_status=0
     shift
     parse_profile_options "$@"
     DevToolsSecurity -status 2>&1 | grep -Fq 'Developer mode is currently enabled.' \
@@ -333,7 +339,12 @@ profile_recording() {
     template="$(profile_template "$profile")"
     time_limit="$(python3 -c 'import sys; print(f"{float(sys.argv[1]) + 20:g}s")' "$RECORD_SECONDS")"
 
+    finish_notification="$IDENTIFIER.recording-finished.$$"
+    notifyutil -q -1 "$finish_notification" &
+    PROFILE_FINISH_NOTIFY_PID=$!
+
     ROKUGA_PERF_SUSPEND_FOR_PROFILING=1 \
+        ROKUGA_PERF_RECORDING_FINISHED_NOTIFICATION="$finish_notification" \
         "$EXECUTABLE" "${RECORD_ARGUMENTS[@]}" \
         > "$directory/result.json" \
         2> "$directory/record.stderr" &
@@ -365,18 +376,42 @@ profile_recording() {
     PROFILE_NOTIFY_PID=""
     kill -CONT "$PROFILE_RECORDING_PID"
 
+    while kill -0 "$PROFILE_FINISH_NOTIFY_PID" 2>/dev/null; do
+        kill -0 "$PROFILE_RECORDING_PID" 2>/dev/null || break
+        sleep 0.1
+    done
+    if ! kill -0 "$PROFILE_FINISH_NOTIFY_PID" 2>/dev/null; then
+        wait "$PROFILE_FINISH_NOTIFY_PID"
+        PROFILE_FINISH_NOTIFY_PID=""
+        kill -INT "$PROFILE_TRACE_PID" 2>/dev/null || true
+        if wait "$PROFILE_TRACE_PID"; then
+            trace_status=0
+        else
+            trace_status=$?
+        fi
+        PROFILE_TRACE_PID=""
+        kill -CONT "$PROFILE_RECORDING_PID"
+    fi
+
     if wait "$PROFILE_RECORDING_PID"; then
         record_status=0
     else
         record_status=$?
     fi
     PROFILE_RECORDING_PID=""
-    if wait "$PROFILE_TRACE_PID"; then
-        trace_status=0
-    else
-        trace_status=$?
+    if [[ -n "$PROFILE_FINISH_NOTIFY_PID" ]]; then
+        kill "$PROFILE_FINISH_NOTIFY_PID" 2>/dev/null || true
+        wait "$PROFILE_FINISH_NOTIFY_PID" 2>/dev/null || true
+        PROFILE_FINISH_NOTIFY_PID=""
     fi
-    PROFILE_TRACE_PID=""
+    if [[ -n "$PROFILE_TRACE_PID" ]]; then
+        if wait "$PROFILE_TRACE_PID"; then
+            trace_status=0
+        else
+            trace_status=$?
+        fi
+        PROFILE_TRACE_PID=""
+    fi
 
     if [[ "$record_status" -eq 77 ]]; then
         fail "Screen Recording permission is missing; run ./scripts/perf.sh permission after explicit approval"
@@ -401,8 +436,6 @@ import sys, xml.etree.ElementTree as ET
 process = ET.parse(sys.argv[1]).find(".//target/process")
 if process is None or process.get("type") != "attached" or process.get("name") != "RokugaPerf":
     raise SystemExit("trace did not attach to RokugaPerf")
-if process.get("return-exit-status") != "0":
-    raise SystemExit("profiled recording did not exit successfully")
 ' "$directory/trace-toc.xml" || fail "trace target validation failed; see $directory/trace-toc.xml"
     if [[ "$profile" == time ]]; then
         xcrun xctrace export --quiet \
