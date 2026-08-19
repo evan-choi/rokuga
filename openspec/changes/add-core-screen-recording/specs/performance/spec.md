@@ -19,6 +19,25 @@ A candidate MAY add a buffer copy or CPU readback only when it preserves the sam
 - **WHEN** a candidate introduces a buffer copy or CPU readback
 - **THEN** it is accepted only with a preserved output contract, at least 3% median CPU or memory improvement over five untraced runs, and no regression in the other required metrics
 
+### Requirement: Repeatable local performance experiments
+Performance experiments SHALL run without UI automation through a separately signed `io.rokuga.Rokuga.Perf` app. The harness MUST use a separate DerivedData directory and sandbox identity, preserve one designated code-signing requirement across rebuilds, and leave the production app, its container, and its settings untouched. It SHALL drive the production `RecordingCoordinator → SCCaptureSession → CursorCompositor → AssetWriterSink` path against a fixed Retina 4K window workload.
+
+Each run SHALL retain its recording, build and host metadata, capture/writer counters, output inspection, resource samples, and relevant native trace under a timestamped artifact directory. Untraced warm-up plus at least five runs SHALL determine whether a candidate is accepted. Time Profiler, Metal System Trace, Allocations, and file-I/O traces SHALL be used for diagnosis and MUST NOT supply the acceptance metrics.
+
+When an identified `xctrace` release cannot finalize the File Activity template for a trivial process, the harness MAY use the same release's System Trace syscall table as a version-bound file-I/O fallback. The artifact MUST identify the template used and retain the exported syscall data.
+
+#### Scenario: Rebuild preserves permission identity
+- **WHEN** the performance app is rebuilt in its dedicated DerivedData directory
+- **THEN** its bundle identifier and designated requirement match the previous build, so the existing Screen Recording grant remains valid
+
+#### Scenario: Candidate verdict uses untraced runs
+- **WHEN** a traced hot path suggests an optimization
+- **THEN** the change is accepted or rejected using median and p95 from at least five equivalent untraced runs
+
+#### Scenario: Broken File Activity backend
+- **WHEN** the installed `xctrace` File Activity template fails its version-bound finalize preflight
+- **THEN** the file profile records and exports System Trace syscalls without administrator privileges, and the trace metadata identifies System Trace as the template
+
 ### Requirement: Frame integrity
 Recordings SHALL be lag-free: at the configured FPS, dropped or duplicated frames MUST stay below 0.1% over any 10-minute window on Apple Silicon baseline hardware (M1, 8 GB) at up to 4K60, and A/V drift MUST stay below 40 ms over one hour. If the encoder cannot keep up, the app SHALL degrade mouse-effect quality first (per design D4) and only then lower capture rate — never freeze, stutter, or silently corrupt the file.
 
