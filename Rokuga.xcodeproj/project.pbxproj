@@ -16,11 +16,15 @@
 		417B48F5765C65ACAF3F1974 /* RokugaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4333162F241D181B98466D2E /* RokugaApp.swift */; };
 		51D79BC09766CBB6D5798C29 /* OptionsPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8363EACAA897E1BE0371FC61 /* OptionsPopoverView.swift */; };
 		5712F500502EC549E5B463BC /* RegionSelectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D42F45DB2E973748F86F890 /* RegionSelectionController.swift */; };
+		5A8967FD25213E93EC2CB1F4 /* EncoderKit in Frameworks */ = {isa = PBXBuildFile; productRef = AAF95C1C54346FC0881292E1 /* EncoderKit */; };
 		5D17B175367AE2ED862BFA25 /* Hotkeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = A23E6120208B1DF63AFF7F8A /* Hotkeys.swift */; };
 		65E195EE9291B849A4875FEA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A162BE4AB0CC49292478D1AC /* Assets.xcassets */; };
 		68768CEEFA0E47EE7CFDCE70 /* CapturePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B4579472853FA6D7E3849D /* CapturePanel.swift */; };
+		6DFAEB39B5E2FF8B3B0D89BB /* CaptureKit in Frameworks */ = {isa = PBXBuildFile; productRef = D343B70C5576AA50EE1D9F69 /* CaptureKit */; };
 		74D43A3B88D23FFB59E31B38 /* ToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 579D47990E188AF6216A548C /* ToolbarView.swift */; };
 		7651654E709DF4674A02BCB0 /* OutputFolderStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0CCD7F0B41B156B9CCCD698 /* OutputFolderStore.swift */; };
+		819B83E2523C211B951960D0 /* SettingsKit in Frameworks */ = {isa = PBXBuildFile; productRef = CC3684F2D249CD6A2CB4F9EE /* SettingsKit */; };
+		9323705A61B092027FDFB418 /* EffectsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 62C6B4ECC6FA5E04E4D89959 /* EffectsKit */; };
 		9684FC108EE37250BF66ED5A /* TrimEditorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F897B54D7B59D7BD94DC58B /* TrimEditorController.swift */; };
 		9ED5D1FD641CC280475FB358 /* L10nScreenshotRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507D5C4912E93D0B81B378FB /* L10nScreenshotRunner.swift */; };
 		A0A4B5DE7B727756BFC46C5F /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = F57946511F3AD0E1DD96C78D /* KeyboardShortcuts */; };
@@ -33,6 +37,7 @@
 		C523DA4D54A05B6F693D646B /* CountdownOverlayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C035550E70EC1750084E3C16 /* CountdownOverlayController.swift */; };
 		CD13D16E8D5C5B7E1B887F6B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A9E1D709BF31EE5D9EF6247D /* Localizable.xcstrings */; };
 		D203F943786D2F124DCEF407 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821A570732095FAEFEBDB55F /* TimelineView.swift */; };
+		DC6DA5525A681CF919456A49 /* RokugaPerf.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDEFD18BCDF334659B944B3 /* RokugaPerf.swift */; };
 		DCD7FE83C45BB95BB521E305 /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBA99597B5C4A79AA0F0957 /* SettingsModel.swift */; };
 		E31F5B6F475FD78D54A40222 /* TrimEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63805146B27CDDE73095D42F /* TrimEditorView.swift */; };
 		E3DD77C11373F432255B93CF /* SelectionOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BEBD44FF847DBD5E2F20703 /* SelectionOverlays.swift */; };
@@ -63,6 +68,7 @@
 		8363EACAA897E1BE0371FC61 /* OptionsPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsPopoverView.swift; sourceTree = "<group>"; };
 		83ADD69EF936A7768209CFEA /* Rokuga.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rokuga.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B5A2FBC1F508081A6907CD6 /* NotificationFallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationFallback.swift; sourceTree = "<group>"; };
+		9E2DCD2EB2EA9730395EC533 /* RokugaPerf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RokugaPerf.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A162BE4AB0CC49292478D1AC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A23E6120208B1DF63AFF7F8A /* Hotkeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotkeys.swift; sourceTree = "<group>"; };
 		A9E1D709BF31EE5D9EF6247D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -71,11 +77,23 @@
 		C035550E70EC1750084E3C16 /* CountdownOverlayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownOverlayController.swift; sourceTree = "<group>"; };
 		D57C77A3D1B42911392F36AF /* TrimEditorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrimEditorModel.swift; sourceTree = "<group>"; };
 		DCE0BABF205AB3C7CA53BA50 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		DEDEFD18BCDF334659B944B3 /* RokugaPerf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RokugaPerf.swift; sourceTree = "<group>"; };
 		E2ACEF749566AC4C8D31AFFE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F0CCD7F0B41B156B9CCCD698 /* OutputFolderStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputFolderStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		419A46DC04EF3A448B9B3AAC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6DFAEB39B5E2FF8B3B0D89BB /* CaptureKit in Frameworks */,
+				5A8967FD25213E93EC2CB1F4 /* EncoderKit in Frameworks */,
+				9323705A61B092027FDFB418 /* EffectsKit in Frameworks */,
+				819B83E2523C211B951960D0 /* SettingsKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E170272B4AC8091483B559BF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -127,6 +145,14 @@
 			path = Configs;
 			sourceTree = "<group>";
 		};
+		3E9508EBB70DE4CE51C3F400 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				DEDEFD18BCDF334659B944B3 /* RokugaPerf.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
 		52877974FB8CA745C8A6AF9F /* Editor */ = {
 			isa = PBXGroup;
 			children = (
@@ -142,6 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				83ADD69EF936A7768209CFEA /* Rokuga.app */,
+				9E2DCD2EB2EA9730395EC533 /* RokugaPerf.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -152,6 +179,7 @@
 				0F0853D08EE88CE47D87F625 /* App */,
 				3E10CF5824EE901971E5832F /* Configs */,
 				DCBC1169A3616CC05BF63DA8 /* Packages */,
+				C3B081727EACABF5020E8114 /* Perf */,
 				805FF15BC3F319E5FA68D917 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -164,6 +192,14 @@
 				BED5942994E90FE1451CCDE4 /* ThumbnailPanelController.swift */,
 			);
 			path = PostRecording;
+			sourceTree = "<group>";
+		};
+		C3B081727EACABF5020E8114 /* Perf */ = {
+			isa = PBXGroup;
+			children = (
+				3E9508EBB70DE4CE51C3F400 /* Sources */,
+			);
+			path = Perf;
 			sourceTree = "<group>";
 		};
 		DCBC1169A3616CC05BF63DA8 /* Packages */ = {
@@ -235,6 +271,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		A0CA07B4182A80CC1347C2D8 /* RokugaPerf */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EEF73329295E2235DEA3F3B5 /* Build configuration list for PBXNativeTarget "RokugaPerf" */;
+			buildPhases = (
+				110825683C54076EE516CB74 /* Sources */,
+				419A46DC04EF3A448B9B3AAC /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RokugaPerf;
+			packageProductDependencies = (
+				D343B70C5576AA50EE1D9F69 /* CaptureKit */,
+				AAF95C1C54346FC0881292E1 /* EncoderKit */,
+				62C6B4ECC6FA5E04E4D89959 /* EffectsKit */,
+				CC3684F2D249CD6A2CB4F9EE /* SettingsKit */,
+			);
+			productName = RokugaPerf;
+			productReference = 9E2DCD2EB2EA9730395EC533 /* RokugaPerf.app */;
+			productType = "com.apple.product-type.application";
+		};
 		BA7DE5DB27F92039C26883B8 /* Rokuga */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E98C0F8F50759731ABED03B0 /* Build configuration list for PBXNativeTarget "Rokuga" */;
@@ -269,6 +327,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
+					A0CA07B4182A80CC1347C2D8 = {
+						ProvisioningStyle = Manual;
+					};
 					BA7DE5DB27F92039C26883B8 = {
 						ProvisioningStyle = Manual;
 					};
@@ -296,6 +357,7 @@
 			projectRoot = "";
 			targets = (
 				BA7DE5DB27F92039C26883B8 /* Rokuga */,
+				A0CA07B4182A80CC1347C2D8 /* RokugaPerf */,
 			);
 		};
 /* End PBXProject section */
@@ -313,6 +375,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		110825683C54076EE516CB74 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC6DA5525A681CF919456A49 /* RokugaPerf.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F555FBE576C6573A5A91AF58 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -363,6 +433,22 @@
 				SDKROOT = macosx;
 			};
 			name = Release;
+		};
+		3C10A60299AC5A6E5627D672 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Perf/RokugaPerf.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Perf/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.rokuga.Rokuga.Perf;
+				SDKROOT = macosx;
+			};
+			name = Debug;
 		};
 		58B936B668D7636C910BD486 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -438,6 +524,22 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A12A2B96ACC1845B03A6CC75 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Perf/RokugaPerf.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Perf/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.rokuga.Rokuga.Perf;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -530,6 +632,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		EEF73329295E2235DEA3F3B5 /* Build configuration list for PBXNativeTarget "RokugaPerf" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3C10A60299AC5A6E5627D672 /* Debug */,
+				A12A2B96ACC1845B03A6CC75 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -559,9 +670,25 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = TrimKit;
 		};
+		62C6B4ECC6FA5E04E4D89959 /* EffectsKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EffectsKit;
+		};
 		9D6E3F4AB7FC7E69750DB290 /* EffectsKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EffectsKit;
+		};
+		AAF95C1C54346FC0881292E1 /* EncoderKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EncoderKit;
+		};
+		CC3684F2D249CD6A2CB4F9EE /* SettingsKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SettingsKit;
+		};
+		D343B70C5576AA50EE1D9F69 /* CaptureKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CaptureKit;
 		};
 		EAA3266BA31A31CFEF23B6DD /* EncoderKit */ = {
 			isa = XCSwiftPackageProductDependency;
