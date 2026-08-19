@@ -147,6 +147,24 @@ final class AssetWriterSinkTests: XCTestCase {
         XCTAssertEqual(Int(size.height), 360)
     }
 
+    func testDetailedStatisticsMeasureReceivedFramesAndQueueWait() async throws {
+        let sink = AssetWriterSink(
+            outputURL: outputURL,
+            configuration: makeConfiguration(),
+            collectsDetailedStatistics: true
+        )
+        try await sink.start()
+        sink.append(try makeVideoSampleBuffer(pts: .zero), of: .video)
+        try await Task.sleep(nanoseconds: 50_000_000)
+        _ = try await sink.finish()
+
+        let statistics = sink.statisticsSnapshot()
+        XCTAssertEqual(statistics.videoFramesReceived, 1)
+        XCTAssertEqual(statistics.writerQueueSamples, 1)
+        XCTAssertGreaterThanOrEqual(statistics.writerQueueWaitSeconds, 0)
+        XCTAssertGreaterThanOrEqual(statistics.maxWriterQueueWaitSeconds, 0)
+    }
+
     func testHEVCMainPreservesOddNativeDimensionsAtMaximumQuality() async throws {
         let width = 321
         let height = 181

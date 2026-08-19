@@ -24,20 +24,31 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     private var constantFrameTimer: DispatchSourceTimer?
     private var latestConstantFrame: CMSampleBuffer?
     private var nextConstantFramePTS: CMTime?
+    private let collectsDetailedStatistics: Bool
 
     /// Drop accounting feeds the perf gates (task 10.2: 4K60 drop-rate < 0.1%).
     public struct Statistics: Equatable, Sendable {
+        public var videoFramesReceived = 0
         public var videoFramesAppended = 0
         public var videoFramesDropped = 0
+        public var audioSamplesReceived = 0
+        public var writerQueueSamples = 0
+        public var writerQueueWaitSeconds = 0.0
+        public var maxWriterQueueWaitSeconds = 0.0
     }
 
     public func statisticsSnapshot() -> Statistics {
         queue.sync { statistics }
     }
 
-    public init(outputURL: URL, configuration: EncoderConfiguration) {
+    public init(
+        outputURL: URL,
+        configuration: EncoderConfiguration,
+        collectsDetailedStatistics: Bool = false
+    ) {
         self.outputURL = outputURL
         self.configuration = configuration
+        self.collectsDetailedStatistics = collectsDetailedStatistics
     }
 
     // MARK: MediaSink
@@ -75,13 +86,23 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     }
 
     public func append(_ sampleBuffer: CMSampleBuffer, of kind: MediaKind) {
+        let enqueuedAt = collectsDetailedStatistics ? DispatchTime.now().uptimeNanoseconds : nil
         queue.async { [self] in
+            if let enqueuedAt {
+                let wait = Double(DispatchTime.now().uptimeNanoseconds - enqueuedAt) / 1_000_000_000
+                statistics.writerQueueSamples += 1
+                statistics.writerQueueWaitSeconds += wait
+                statistics.maxWriterQueueWaitSeconds = max(statistics.maxWriterQueueWaitSeconds, wait)
+            }
             switch kind {
             case .video:
+                if collectsDetailedStatistics { statistics.videoFramesReceived += 1 }
                 appendVideo(sampleBuffer)
             case .systemAudio:
+                if collectsDetailedStatistics { statistics.audioSamplesReceived += 1 }
                 appendSystemAudio(sampleBuffer)
             case .microphone:
+                if collectsDetailedStatistics { statistics.audioSamplesReceived += 1 }
                 appendMicrophone(sampleBuffer)
             }
         }
