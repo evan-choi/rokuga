@@ -252,6 +252,23 @@ final class AssetWriterSinkTests: XCTestCase {
         XCTAssertEqual(CMTimeSubtract(times[1], times[0]).seconds, 0.2, accuracy: 0.001)
     }
 
+    func testVariableFrameRatePreservesStaticRecordingDuration() async throws {
+        let sink = AssetWriterSink(
+            outputURL: outputURL,
+            configuration: makeConfiguration(frameRateMode: .variable)
+        )
+        try await sink.start()
+        sink.append(try makeVideoSampleBuffer(pts: .zero), of: .video)
+        try await Task.sleep(nanoseconds: 350_000_000)
+
+        let url = try await sink.finish()
+
+        let duration = try await AVAsset(url: url).load(.duration)
+        let presentationTimes = try await videoPresentationTimes(at: url)
+        XCTAssertGreaterThan(duration.seconds, 0.25)
+        XCTAssertEqual(presentationTimes.count, 1)
+    }
+
     func testConstantFrameRateSynthesizesFramesForStaticContent() async throws {
         let sink = AssetWriterSink(
             outputURL: outputURL,

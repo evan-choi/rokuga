@@ -24,6 +24,9 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     private var constantFrameTimer: DispatchSourceTimer?
     private var latestConstantFrame: CMSampleBuffer?
     private var nextConstantFramePTS: CMTime?
+    private var lastVideoPTS: CMTime?
+    private var lastVideoUptimeNanoseconds: UInt64?
+    private var pauseUptimeNanoseconds: UInt64?
     private let collectsDetailedStatistics: Bool
 
     /// Drop accounting feeds the perf gates (task 10.2: 4K60 drop-rate < 0.1%).
@@ -111,16 +114,35 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     public func markPaused() {
         queue.async { [self] in
             stopConstantFrameOutput(clearFrame: false)
+            pauseUptimeNanoseconds = DispatchTime.now().uptimeNanoseconds
             spliceClock.markPaused()
         }
     }
 
-    public func markResumed() {}
+    public func markResumed() {
+        queue.async { [self] in
+            if let pauseUptimeNanoseconds, let lastVideoUptimeNanoseconds {
+                self.lastVideoUptimeNanoseconds = lastVideoUptimeNanoseconds
+                    + DispatchTime.now().uptimeNanoseconds - pauseUptimeNanoseconds
+            }
+            pauseUptimeNanoseconds = nil
+        }
+    }
 
     public func finish() async throws -> URL {
         let writer: AVAssetWriter? = await withCheckedContinuation { continuation in
             queue.async { [self] in
                 stopConstantFrameOutput(clearFrame: true)
+                if let lastVideoPTS, let lastVideoUptimeNanoseconds {
+                    let endUptimeNanoseconds = pauseUptimeNanoseconds ?? DispatchTime.now().uptimeNanoseconds
+                    let elapsed = endUptimeNanoseconds > lastVideoUptimeNanoseconds
+                        ? endUptimeNanoseconds - lastVideoUptimeNanoseconds
+                        : 0
+                    self.writer?.endSession(atSourceTime: CMTimeAdd(
+                        lastVideoPTS,
+                        CMTime(value: CMTimeValue(elapsed), timescale: 1_000_000_000)
+                    ))
+                }
                 videoInput?.markAsFinished()
                 audioInput?.markAsFinished()
                 continuation.resume(returning: self.writer)
@@ -158,6 +180,8 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
         let sourcePTS = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
         let adjustedPTS = spliceClock.adjusted(sourcePTS)
         spliceClock.observe(pts: sourcePTS, duration: CMSampleBufferGetDuration(sampleBuffer))
+        lastVideoPTS = adjustedPTS
+        lastVideoUptimeNanoseconds = pauseUptimeNanoseconds ?? DispatchTime.now().uptimeNanoseconds
 
         if !sessionStarted {
             writer.startSession(atSourceTime: adjustedPTS)
