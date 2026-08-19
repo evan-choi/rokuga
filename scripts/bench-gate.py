@@ -27,9 +27,8 @@ ABSOLUTE_BUDGETS = {
     },
 }
 
-# spec: CPU ≤ 20% @1080p60, ≤ 35% @4K60 (percent of total machine ≈ percent of
-# one core × cores; the harness reports single-core percent, so budget on that).
-CPU_BUDGET_BY_HEIGHT = {1080: 20 * 8, 2160: 35 * 8}
+# The harness already reports CPU time as a percentage of one core.
+CPU_BUDGET_BY_HEIGHT = {1080: 20, 2160: 35}
 
 
 def check(result, budgets, failures, prefix):
@@ -50,7 +49,7 @@ def main():
     failures = []
 
     budgets = dict(ABSOLUTE_BUDGETS["throughput"])
-    budgets["cpuPercentOfOneCore"] = CPU_BUDGET_BY_HEIGHT.get(throughput.get("height"), 35 * 8)
+    budgets["cpuPercentOfOneCore"] = CPU_BUDGET_BY_HEIGHT.get(throughput.get("height"), 35)
     drift_budget = 0.040 * max(throughput.get("seconds", 0), 1) / 3600 + 0.020
     budgets["ptsDriftSeconds"] = drift_budget
     check(throughput, budgets, failures, "throughput")
