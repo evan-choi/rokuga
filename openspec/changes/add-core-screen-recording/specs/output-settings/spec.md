@@ -14,15 +14,19 @@ The app SHALL let the user choose the output container — MP4 or MOV (default: 
 - **THEN** the file is encoded with HEVC and is at a visibly smaller size than an equivalent H.264 recording at the same quality setting
 
 ### Requirement: Quality and rate control
-The app SHALL provide a quality control from 0 to 100 (default: 80) and a rate-control mode of VBR (default) or CBR. Higher quality values MUST produce higher bitrates. At quality 100, the app MUST prioritize source-pixel fidelity over file size, MUST NOT fractionally rescale native source dimensions merely to make them even, and SHALL preserve full chroma resolution when the selected codec and hardware support it. The settings UI MUST show an estimated file size per minute for the current combination of resolution, FPS, codec, and quality.
+The app SHALL provide a quality control from 0 to 100 (default: 80) and a rate-control mode of VBR (default) or CBR. Higher quality values MUST produce higher bitrates without changing the selected codec profile or bypassing rate control at quality 100. The app MUST NOT fractionally rescale native source dimensions merely to make them even. The settings UI MUST show an estimated file size per minute for the current combination of resolution, FPS, codec, and quality.
 
 #### Scenario: Quality affects bitrate
 - **WHEN** the same content is recorded at quality 40 and quality 90
 - **THEN** the quality-90 file has a substantially higher bitrate and larger size
 
-#### Scenario: Maximum quality preserves screen detail
-- **WHEN** an odd-sized native screen region containing text and one-pixel lines is recorded at quality 100
-- **THEN** the captured pixel grid is not fractionally rescaled, fine edges remain visually faithful at 100% playback size, and bitrate limits do not override the maximum-quality request
+#### Scenario: Maximum quality remains predictable
+- **WHEN** quality changes from 99 to 100
+- **THEN** the encoder keeps the same codec profile and rate-control strategy while increasing the target bitrate along the same quality curve
+
+#### Scenario: Odd-sized captures preserve the native pixel grid
+- **WHEN** an odd-sized native screen region containing text and one-pixel lines is recorded
+- **THEN** the captured pixel grid is not fractionally rescaled or cropped and fine edges remain visually faithful at 100% playback size
 
 #### Scenario: Size estimate shown
 - **WHEN** the user changes quality, FPS, or codec in settings

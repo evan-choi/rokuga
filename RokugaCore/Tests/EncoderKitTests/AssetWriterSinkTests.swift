@@ -147,12 +147,9 @@ final class AssetWriterSinkTests: XCTestCase {
         XCTAssertEqual(Int(size.height), 360)
     }
 
-    func testMaximumQualityHEVCPreservesOddNativeDimensions() async throws {
+    func testHEVCMainPreservesOddNativeDimensionsAtMaximumQuality() async throws {
         let width = 321
         let height = 181
-        guard AssetWriterSink.supportsHardwareHEVC444(width: width, height: height) else {
-            throw XCTSkip("hardware HEVC 4:4:4 is unavailable")
-        }
         let sink = AssetWriterSink(
             outputURL: outputURL,
             configuration: makeConfiguration(
