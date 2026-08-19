@@ -143,6 +143,7 @@ cleanup_workload() {
 }
 
 cleanup_profile() {
+    local pid
     if [[ -n "$PROFILE_RECORDING_PID" ]] && kill -0 "$PROFILE_RECORDING_PID" 2>/dev/null; then
         kill -CONT "$PROFILE_RECORDING_PID" 2>/dev/null || true
         kill "$PROFILE_RECORDING_PID" 2>/dev/null || true
@@ -157,12 +158,44 @@ cleanup_profile() {
         kill "$PROFILE_FINISH_NOTIFY_PID" 2>/dev/null || true
     fi
     sleep 0.1
-    kill -KILL "$PROFILE_RECORDING_PID" "$PROFILE_TRACE_PID" "$PROFILE_NOTIFY_PID" \
-        "$PROFILE_FINISH_NOTIFY_PID" 2>/dev/null || true
+    for pid in "$PROFILE_RECORDING_PID" "$PROFILE_TRACE_PID" "$PROFILE_NOTIFY_PID" \
+        "$PROFILE_FINISH_NOTIFY_PID"; do
+        [[ -n "$pid" ]] || continue
+        kill -KILL "$pid" 2>/dev/null || true
+    done
     PROFILE_RECORDING_PID=""
     PROFILE_TRACE_PID=""
     PROFILE_NOTIFY_PID=""
     PROFILE_FINISH_NOTIFY_PID=""
+}
+
+stop_profile_trace() {
+    local trace_path="$1" trace_pid="$PROFILE_TRACE_PID" watchdog_pid status
+    [[ -n "$trace_pid" ]] || return
+
+    kill -INT "$trace_pid" 2>/dev/null || true
+    (
+        sleep 30
+        kill -TERM "$trace_pid" 2>/dev/null || exit 0
+        sleep 2
+        kill -KILL "$trace_pid" 2>/dev/null || true
+    ) &
+    watchdog_pid=$!
+    if wait "$trace_pid"; then
+        status=0
+    else
+        status=$?
+    fi
+    if kill -0 "$watchdog_pid" 2>/dev/null; then
+        kill "$watchdog_pid" 2>/dev/null || true
+    fi
+    wait "$watchdog_pid" 2>/dev/null || true
+    PROFILE_TRACE_PID=""
+
+    if [[ "$status" -eq 137 || "$status" -eq 143 ]]; then
+        fail "xctrace did not finalize within 30 seconds; incomplete trace retained at $trace_path"
+    fi
+    PROFILE_TRACE_STATUS="$status"
 }
 
 start_workload() {
@@ -333,7 +366,8 @@ profile_recording() {
     directory="$(artifact_directory "$SCENARIO-$profile")"
     environment="$directory/environment.json"
     collect_environment "$environment"
-    trap 'cleanup_profile; cleanup_workload' EXIT INT TERM
+    trap 'cleanup_profile; cleanup_workload' EXIT
+    trap 'cleanup_profile; cleanup_workload; trap - EXIT; exit 130' INT TERM
     start_workload "$directory"
     record_arguments "$RECORD_SECONDS"
     template="$(profile_template "$profile")"
@@ -383,14 +417,10 @@ profile_recording() {
     if ! kill -0 "$PROFILE_FINISH_NOTIFY_PID" 2>/dev/null; then
         wait "$PROFILE_FINISH_NOTIFY_PID"
         PROFILE_FINISH_NOTIFY_PID=""
-        kill -INT "$PROFILE_TRACE_PID" 2>/dev/null || true
-        if wait "$PROFILE_TRACE_PID"; then
-            trace_status=0
-        else
-            trace_status=$?
-        fi
-        PROFILE_TRACE_PID=""
-        kill -CONT "$PROFILE_RECORDING_PID"
+        PROFILE_TRACE_STATUS=0
+        stop_profile_trace "$directory/$profile.trace"
+        trace_status="$PROFILE_TRACE_STATUS"
+        kill -CONT "$PROFILE_RECORDING_PID" 2>/dev/null || true
     fi
 
     if wait "$PROFILE_RECORDING_PID"; then
@@ -405,12 +435,9 @@ profile_recording() {
         PROFILE_FINISH_NOTIFY_PID=""
     fi
     if [[ -n "$PROFILE_TRACE_PID" ]]; then
-        if wait "$PROFILE_TRACE_PID"; then
-            trace_status=0
-        else
-            trace_status=$?
-        fi
-        PROFILE_TRACE_PID=""
+        PROFILE_TRACE_STATUS=0
+        stop_profile_trace "$directory/$profile.trace"
+        trace_status="$PROFILE_TRACE_STATUS"
     fi
 
     if [[ "$record_status" -eq 77 ]]; then
