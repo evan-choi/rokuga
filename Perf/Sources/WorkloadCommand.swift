@@ -15,7 +15,7 @@ enum WorkloadCommand {
             throw PerfError.workloadUnavailable("no display is available")
         }
 
-        let contentSize = CGSize(width: 1_920, height: 1_080)
+        let contentSize = CGSize(width: 1920, height: 1080)
         let origin = CGPoint(
             x: screen.frame.midX - contentSize.width / 2,
             y: screen.frame.midY - contentSize.height / 2
@@ -109,7 +109,7 @@ private final class WorkloadView: NSView {
         gradient.colors = [
             NSColor(calibratedRed: 0.05, green: 0.08, blue: 0.18, alpha: 1).cgColor,
             NSColor(calibratedRed: 0.24, green: 0.06, blue: 0.32, alpha: 1).cgColor,
-            NSColor(calibratedRed: 0.02, green: 0.28, blue: 0.30, alpha: 1).cgColor,
+            NSColor(calibratedRed: 0.02, green: 0.28, blue: 0.30, alpha: 1).cgColor
         ]
         gradient.frame = bounds
         gradient.startPoint = CGPoint(x: 0, y: 0)
@@ -119,7 +119,7 @@ private final class WorkloadView: NSView {
         let stripes = CALayer()
         let stripeWidth: CGFloat = 64
         stripes.frame = bounds.insetBy(dx: -stripeWidth, dy: 0)
-        for index in 0..<32 {
+        for index in 0 ..< 32 {
             let stripe = CALayer()
             stripe.backgroundColor = NSColor.white.withAlphaComponent(index.isMultiple(of: 2) ? 0.16 : 0.03).cgColor
             stripe.frame = CGRect(
@@ -134,13 +134,13 @@ private final class WorkloadView: NSView {
 
         let grid = CAShapeLayer()
         let path = CGMutablePath()
-        stride(from: CGFloat(0), through: bounds.width, by: 120).forEach {
-            path.move(to: CGPoint(x: $0, y: 0))
-            path.addLine(to: CGPoint(x: $0, y: bounds.height))
+        for item in stride(from: CGFloat(0), through: bounds.width, by: 120) {
+            path.move(to: CGPoint(x: item, y: 0))
+            path.addLine(to: CGPoint(x: item, y: bounds.height))
         }
-        stride(from: CGFloat(0), through: bounds.height, by: 120).forEach {
-            path.move(to: CGPoint(x: 0, y: $0))
-            path.addLine(to: CGPoint(x: bounds.width, y: $0))
+        for item in stride(from: CGFloat(0), through: bounds.height, by: 120) {
+            path.move(to: CGPoint(x: 0, y: item))
+            path.addLine(to: CGPoint(x: bounds.width, y: item))
         }
         grid.path = path
         grid.strokeColor = NSColor.white.withAlphaComponent(0.2).cgColor
@@ -186,17 +186,19 @@ private final class ToneGenerator {
     private let source: AVAudioSourceNode
 
     init() throws {
-        guard let format = AVAudioFormat(standardFormatWithSampleRate: 48_000, channels: 2) else {
+        guard let format = AVAudioFormat(standardFormatWithSampleRate: 48000, channels: 2) else {
             throw PerfError.workloadUnavailable("cannot create the 48 kHz stereo audio format")
         }
         var phase = 0.0
         let increment = 2 * Double.pi * 440 / format.sampleRate
         source = AVAudioSourceNode(format: format) { _, _, frameCount, audioBufferList in
             let buffers = UnsafeMutableAudioBufferListPointer(audioBufferList)
-            for frame in 0..<Int(frameCount) {
+            for frame in 0 ..< Int(frameCount) {
                 let sample = Float(sin(phase) * 0.12)
                 phase += increment
-                if phase >= 2 * Double.pi { phase -= 2 * Double.pi }
+                if phase >= 2 * Double.pi {
+                    phase -= 2 * Double.pi
+                }
                 for buffer in buffers {
                     buffer.mData?.assumingMemoryBound(to: Float.self)[frame] = sample
                 }

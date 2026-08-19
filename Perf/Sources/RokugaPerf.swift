@@ -18,7 +18,7 @@ enum RokugaPerf {
                 guard CGPreflightScreenCaptureAccess() else {
                     throw PerfError.screenRecordingPermission
                 }
-                try printJSON(try await RecordCommand.run(arguments: arguments))
+                try await printJSON(RecordCommand.run(arguments: arguments))
             case "workload":
                 try await WorkloadCommand.run(arguments: arguments)
             default:
@@ -31,7 +31,7 @@ enum RokugaPerf {
         }
     }
 
-    static func printJSON<T: Encodable>(_ value: T, pretty: Bool = true) throws {
+    static func printJSON(_ value: some Encodable, pretty: Bool = true) throws {
         let encoder = JSONEncoder()
         encoder.outputFormatting = pretty
             ? [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
