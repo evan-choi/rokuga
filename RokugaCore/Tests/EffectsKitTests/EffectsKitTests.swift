@@ -316,6 +316,28 @@ final class CursorCompositorTests: XCTestCase {
         XCTAssertEqual(cursor.rect.midY, 90, accuracy: 0.001)
     }
 
+    func testCursorTileFitsRenderedEffects() throws {
+        let overlays = CursorOverlayRenderer.render(
+            snapshot: CursorSnapshot(location: CGPoint(x: 64, y: 64)),
+            options: CursorEffectOptions(
+                showCursor: true,
+                pointerStyle: .dot,
+                highlight: true,
+                animateClicks: false
+            ),
+            geometry: FrameGeometry(
+                contentRect: CGRect(x: 0, y: 0, width: 128, height: 128),
+                pixelSize: CGSize(width: 256, height: 256)
+            ),
+            level: .full,
+            now: 100
+        )
+
+        let cursor = try XCTUnwrap(overlays.first)
+        XCTAssertEqual(cursor.image.width, 96)
+        XCTAssertEqual(cursor.image.height, 96)
+    }
+
     func testBudgetExhaustionKeepsDotVisibleAndSignalsCursorOnlyOnce() throws {
         let options = CursorEffectOptions(showCursor: true, pointerStyle: .dot, highlight: true, animateClicks: true)
         let budget = FrameBudgetMonitor(budgetSeconds: 0.000000001, windowSize: 1)
