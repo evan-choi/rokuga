@@ -245,7 +245,8 @@ enum CursorOverlayRenderer {
               let center = geometry.pixelPosition(of: snapshot.location)
         else { return nil }
 
-        let tileDimension = Int(ceil(256 * max(scale, 1)))
+        let effectRadius = max(drawsHighlight ? 22 * scale : 0, drawsPointer ? 7 * scale : 0)
+        let tileDimension = Int(ceil((effectRadius + 2 * max(scale, 1)) * 2))
         let tileSide = CGFloat(tileDimension)
         let tileOrigin = CGPoint(x: center.x - tileSide / 2, y: center.y - tileSide / 2)
 
