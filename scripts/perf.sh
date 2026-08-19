@@ -218,14 +218,14 @@ run_recording() {
 
 parse_experiment_options() {
     SCENARIO=4k-motion
-    SECONDS=30
+    RECORD_SECONDS=30
     REPEATS=5
     WARMUP=on
     while [[ "$#" -gt 0 ]]; do
         [[ "$#" -ge 2 ]] || fail "missing value for $1"
         case "$1" in
             --scenario) SCENARIO="$2" ;;
-            --seconds) SECONDS="$2" ;;
+            --seconds) RECORD_SECONDS="$2" ;;
             --repeats) REPEATS="$2" ;;
             --warmup) WARMUP="$2" ;;
             *) fail "unknown option: $1" ;;
@@ -233,7 +233,7 @@ parse_experiment_options() {
         shift 2
     done
     configure_scenario "$SCENARIO"
-    python3 -c 'import sys; value=float(sys.argv[1]); assert value > 0 and value <= 86400' "$SECONDS" \
+    python3 -c 'import sys; value=float(sys.argv[1]); assert value > 0 and value <= 86400' "$RECORD_SECONDS" \
         || fail "seconds must be in (0, 86400]"
     [[ "$REPEATS" =~ ^[1-9][0-9]*$ ]] || fail "repeats must be a positive integer"
     [[ "$WARMUP" == on || "$WARMUP" == off ]] || fail "warmup must be on or off"
@@ -241,18 +241,18 @@ parse_experiment_options() {
 
 parse_profile_options() {
     SCENARIO=4k-motion
-    SECONDS=30
+    RECORD_SECONDS=30
     while [[ "$#" -gt 0 ]]; do
         [[ "$#" -ge 2 ]] || fail "missing value for $1"
         case "$1" in
             --scenario) SCENARIO="$2" ;;
-            --seconds) SECONDS="$2" ;;
+            --seconds) RECORD_SECONDS="$2" ;;
             *) fail "unknown option: $1" ;;
         esac
         shift 2
     done
     configure_scenario "$SCENARIO"
-    python3 -c 'import sys; value=float(sys.argv[1]); assert value > 0 and value <= 86400' "$SECONDS" \
+    python3 -c 'import sys; value=float(sys.argv[1]); assert value > 0 and value <= 86400' "$RECORD_SECONDS" \
         || fail "seconds must be in (0, 86400]"
 }
 
@@ -267,12 +267,12 @@ record_series() {
     start_workload "$directory"
 
     if [[ "$WARMUP" == on ]]; then
-        warmup_seconds="$(python3 -c 'import sys; print(min(5, float(sys.argv[1])))' "$SECONDS")"
+        warmup_seconds="$(python3 -c 'import sys; print(min(5, float(sys.argv[1])))' "$RECORD_SECONDS")"
         run_recording "$directory/warmup" "$SCENARIO" "$warmup_seconds" "$environment"
     fi
     index=1
     while [[ "$index" -le "$REPEATS" ]]; do
-        run_recording "$directory/run-$(printf '%02d' "$index")" "$SCENARIO" "$SECONDS" "$environment"
+        run_recording "$directory/run-$(printf '%02d' "$index")" "$SCENARIO" "$RECORD_SECONDS" "$environment"
         index=$((index + 1))
     done
     cleanup_workload
@@ -306,9 +306,9 @@ profile_recording() {
     collect_environment "$environment"
     trap cleanup_workload EXIT INT TERM
     start_workload "$directory"
-    record_arguments "$SECONDS"
+    record_arguments "$RECORD_SECONDS"
     template="$(profile_template "$profile")"
-    time_limit="$(python3 -c 'import sys; print(f"{float(sys.argv[1]) + 20:g}s")' "$SECONDS")"
+    time_limit="$(python3 -c 'import sys; print(f"{float(sys.argv[1]) + 20:g}s")' "$RECORD_SECONDS")"
 
     if xcrun xctrace record --quiet --no-prompt \
         --template "$template" \
