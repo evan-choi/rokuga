@@ -170,20 +170,29 @@ private struct OutputPane: View {
                     .labelsHidden()
                     Text(verbatim: "\(model.videoQuality)")
                         .monospacedDigit()
-                        .frame(width: 24, alignment: .trailing)
+                        .fixedSize()
+                        .frame(minWidth: 30, alignment: .trailing)
                 }
             }
-            LabeledContent("Estimated size") {
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text("1920×1080 · 1 min")
-                    Text(verbatim: "30 fps ≈ \(estimatedSize(fps: 30))")
-                    Text(verbatim: "60 fps ≈ \(estimatedSize(fps: 60))")
-                    Text("Actual size varies with screen activity.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.trailing)
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Estimated size")
+                        .font(.headline)
+                    Spacer()
+                    Text(verbatim: "≈ \(estimatedSize)")
+                        .font(.title3.weight(.semibold))
+                        .monospacedDigit()
                 }
+                estimateSummary
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text("Actual size varies with screen activity.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
+            .padding(12)
+            .background(.quaternary, in: RoundedRectangle(cornerRadius: 9))
+            .padding(.top, 8)
         }
         .padding(20)
     }
@@ -195,11 +204,11 @@ private struct OutputPane: View {
         )
     }
 
-    private func estimatedSize(fps: Int) -> String {
+    private var estimatedSize: String {
         let videoBitrate = RateControl.averageVideoBitrate(
             width: 1920,
             height: 1080,
-            fps: fps,
+            fps: model.frameRate.rawValue,
             quality: model.videoQuality,
             codec: model.videoCodec
         )
@@ -208,6 +217,15 @@ private struct OutputPane: View {
             : 0
         let bytesPerMinute = Int64(videoBitrate + audioBitrate) * 60 / 8
         return ByteCountFormatter.string(fromByteCount: bytesPerMinute, countStyle: .file)
+    }
+
+    private var estimateSummary: Text {
+        let codec = model.videoCodec == .hevc ? "HEVC" : "H.264"
+        let format = model.containerFormat.rawValue.uppercased()
+        let frameRateMode = model.frameRateMode == .constant ? "CFR" : "VFR"
+        return Text("1920×1080 · 1 min")
+            + Text(verbatim: " · \(codec) · \(format) · \(model.frameRate.rawValue) fps · "
+                + "\(frameRateMode) · Q\(model.videoQuality)")
     }
 }
 
