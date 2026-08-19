@@ -208,6 +208,18 @@ def hot_symbols(args):
     def resolved(element):
         return by_id.get(element.get("ref"), element)
 
+    def app_owned_name(element):
+        frame = resolved(element)
+        name = frame.get("name") or frame.get("symbol") or (frame.text or "").strip()
+        binaries = [frame.get("binary"), frame.get("module")]
+        for child in frame:
+            if local_name(child) != "binary":
+                continue
+            binary = resolved(child)
+            binaries.extend((binary.get("name"), binary.get("path")))
+        ownership = " ".join(value for value in (name, *binaries) if value)
+        return name if name and args.binary.lower() in ownership.lower() else None
+
     weights = {}
     total = 0.0
     rows = [element for element in root.iter() if local_name(element) == "row"]
@@ -224,19 +236,13 @@ def hot_symbols(args):
             for element in resolved(backtrace).iter():
                 if local_name(element) != "frame":
                     continue
-                frame = resolved(element)
-                name = frame.get("name") or frame.get("symbol") or (frame.text or "").strip()
-                binary = frame.get("binary") or frame.get("module") or ""
-                if name and args.binary.lower() in (binary + " " + name).lower():
+                if name := app_owned_name(element):
                     frames.append(name)
         if not backtraces:
             for element in row.iter():
                 if local_name(element) != "frame":
                     continue
-                frame = resolved(element)
-                name = frame.get("name") or frame.get("symbol") or (frame.text or "").strip()
-                binary = frame.get("binary") or frame.get("module") or ""
-                if name and args.binary.lower() in (binary + " " + name).lower():
+                if name := app_owned_name(element):
                     frames.append(name)
         for name in set(frames):
             weights[name] = weights.get(name, 0) + weight
