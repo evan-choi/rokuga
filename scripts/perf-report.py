@@ -163,6 +163,12 @@ def percentile(values, fraction):
 def summarize(args):
     runs = [read_json(path) for path in args.results]
     signature = experiment_signature(runs[0])
+    if not signature["scenario"] or any(
+        value is None
+        for section in ("recording", "workload", "host")
+        for value in signature[section].values()
+    ):
+        raise ValueError("result configuration is incomplete")
     if any(experiment_signature(run) != signature for run in runs[1:]):
         raise ValueError("result configurations differ")
     git_commit = runs[0].get("environment", {}).get("gitCommit")
@@ -173,8 +179,14 @@ def summarize(args):
     metrics = {}
     for path in METRICS:
         values = [value_at_path(run, path) for run in runs]
-        if any(value is None for value in values):
+        if (
+            all(value is None for value in values)
+            and path == "output.audioVideoDriftSeconds"
+            and not signature["recording"]["systemAudio"]
+        ):
             continue
+        if any(value is None for value in values):
+            raise ValueError(f"metric is missing from one or more results: {path}")
         metrics[path] = {
             "median": median(values),
             "p95": percentile(values, 0.95),
