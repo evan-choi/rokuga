@@ -194,6 +194,7 @@ enum RecordCommand {
         var frames = 0
         var duplicatePTS = 0
         var gapPTS = 0
+        var missingVideoFrames = 0
         var maxPTSGapSeconds = 0.0
         var lastPTS: CMTime?
         let expectedFrameSeconds = 1.0 / Double(max(expectedFPS, 1))
@@ -205,6 +206,7 @@ enum RecordCommand {
                     duplicatePTS += 1
                 } else if delta > expectedFrameSeconds * 1.5 {
                     gapPTS += 1
+                    missingVideoFrames += max(Int((delta / expectedFrameSeconds).rounded()) - 1, 1)
                     maxPTSGapSeconds = max(maxPTSGapSeconds, delta)
                 }
             }
@@ -233,6 +235,7 @@ enum RecordCommand {
             videoFrames: frames,
             duplicatePTS: duplicatePTS,
             gapPTS: gapPTS,
+            missingVideoFrames: missingVideoFrames,
             maxPTSGapSeconds: maxPTSGapSeconds,
             audioDurationSeconds: audioTimeRange?.duration.seconds,
             audioVideoEndpointSkewSeconds: audioTimeRange.map {
@@ -262,8 +265,7 @@ enum RecordCommand {
 
         for video in videoMarkers {
             while audioIndex + 1 < audioMarkers.count,
-                  abs(audioMarkers[audioIndex + 1] - video) < abs(audioMarkers[audioIndex] - video)
-            {
+                  abs(audioMarkers[audioIndex + 1] - video) < abs(audioMarkers[audioIndex] - video) {
                 audioIndex += 1
             }
             guard audioIndex < audioMarkers.count else { break }
@@ -308,7 +310,7 @@ enum RecordCommand {
         let window = CMTime(seconds: 30, preferredTimescale: timescale)
         return [
             CMTimeRange(start: .zero, duration: window),
-            CMTimeRange(start: CMTimeSubtract(duration, window), duration: window),
+            CMTimeRange(start: CMTimeSubtract(duration, window), duration: window)
         ]
     }
 
@@ -340,8 +342,7 @@ enum RecordCommand {
                 let time = CMSampleBufferGetPresentationTimeStamp(sample).seconds
                 if markerIsOn,
                    !markerWasOn,
-                   time > range.start.seconds + AVSyncMarker.periodSeconds * 0.5
-                {
+                   time > range.start.seconds + AVSyncMarker.periodSeconds * 0.5 {
                     markers.append(time)
                 }
                 markerWasOn = markerIsOn
@@ -376,7 +377,7 @@ enum RecordCommand {
                 AVFormatIDKey: kAudioFormatLinearPCM,
                 AVLinearPCMIsFloatKey: true,
                 AVLinearPCMBitDepthKey: 32,
-                AVLinearPCMIsNonInterleaved: false,
+                AVLinearPCMIsNonInterleaved: false
             ])
             output.alwaysCopiesSampleData = false
             reader.add(output)
@@ -422,8 +423,7 @@ enum RecordCommand {
                     let time = start + Double(frame) / sampleRate
                     if peak > 0.1,
                        time > range.start.seconds + AVSyncMarker.periodSeconds * 0.5,
-                       markers.last.map({ time - $0 > AVSyncMarker.periodSeconds * 0.5 }) ?? true
-                    {
+                       markers.last.map({ time - $0 > AVSyncMarker.periodSeconds * 0.5 }) ?? true {
                         markers.append(time)
                     }
                 }
@@ -678,6 +678,7 @@ struct CaptureResult: Codable {
     let audioCallbacks: Int
     let duplicatePTS: Int
     let gapPTS: Int
+    let missingVideoFrames: Int
     let maxPTSGapSeconds: Double
     let compositeCalls: Int
     let averageCompositeSeconds: Double
@@ -692,6 +693,7 @@ struct CaptureResult: Codable {
         audioCallbacks = snapshot.audioCallbacks
         duplicatePTS = snapshot.duplicatePTS
         gapPTS = snapshot.gapPTS
+        missingVideoFrames = snapshot.missingVideoFrames
         maxPTSGapSeconds = snapshot.maxPTSGapSeconds
         compositeCalls = snapshot.compositeCalls
         averageCompositeSeconds = snapshot.compositeCalls > 0
@@ -729,6 +731,7 @@ struct OutputResult: Codable {
     let videoFrames: Int
     let duplicatePTS: Int
     let gapPTS: Int
+    let missingVideoFrames: Int
     let maxPTSGapSeconds: Double
     let audioDurationSeconds: Double?
     let audioVideoEndpointSkewSeconds: Double?
