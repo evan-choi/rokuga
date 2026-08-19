@@ -6,5 +6,6 @@ DerivedData/
 xcuserdata/
 *.xcuserstate
 .swiftpm/
+__pycache__/
 artifacts/
 Configs/Signing.local.xcconfig
