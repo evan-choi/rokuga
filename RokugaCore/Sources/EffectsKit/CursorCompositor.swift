@@ -67,10 +67,14 @@ public final class CursorCompositor: @unchecked Sendable {
         self.sampler = sampler
         self.budget = budget
         self.onDegradeToCursorOnly = onDegradeToCursorOnly
+        let contextOptions: [CIContextOption: Any] = [
+            .cacheIntermediates: false,
+            .workingColorSpace: NSNull()
+        ]
         if let device = MTLCreateSystemDefaultDevice() {
-            context = CIContext(mtlDevice: device, options: [.cacheIntermediates: false])
+            context = CIContext(mtlDevice: device, options: contextOptions)
         } else {
-            context = CIContext(options: [.cacheIntermediates: false])
+            context = CIContext(options: contextOptions)
         }
     }
 

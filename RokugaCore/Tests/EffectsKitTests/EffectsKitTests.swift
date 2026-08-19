@@ -201,6 +201,39 @@ final class CursorCompositorTests: XCTestCase {
         XCTAssertGreaterThan(red, 128, "dot cursor should paint red at the cursor pixel")
     }
 
+    func testCompositingPreservesBasePixelsOutsideOverlay() throws {
+        let compositor = CursorCompositor(
+            options: CursorEffectOptions(
+                showCursor: true,
+                pointerStyle: .dot,
+                highlight: false,
+                animateClicks: false
+            ),
+            geometry: FrameGeometry(
+                contentRect: CGRect(x: 0, y: 0, width: 128, height: 128),
+                pixelSize: CGSize(width: 128, height: 128)
+            ),
+            sampler: FakeSampler(sampledSnapshot: CursorSnapshot(location: CGPoint(x: 64, y: 64)))
+        )
+        let input = try makeSampleBuffer(width: 128, height: 128)
+        let inputPixels = try XCTUnwrap(CMSampleBufferGetImageBuffer(input))
+        CVPixelBufferLockBaseAddress(inputPixels, [])
+        let inputBase = try XCTUnwrap(CVPixelBufferGetBaseAddress(inputPixels)?.assumingMemoryBound(to: UInt8.self))
+        inputBase[0] = 25
+        inputBase[1] = 128
+        inputBase[2] = 230
+        inputBase[3] = 255
+        CVPixelBufferUnlockBaseAddress(inputPixels, [])
+
+        let output = compositor.composite(input)
+        let outputPixels = try XCTUnwrap(CMSampleBufferGetImageBuffer(output))
+        CVPixelBufferLockBaseAddress(outputPixels, .readOnly)
+        defer { CVPixelBufferUnlockBaseAddress(outputPixels, .readOnly) }
+        let outputBase = try XCTUnwrap(CVPixelBufferGetBaseAddress(outputPixels)?.assumingMemoryBound(to: UInt8.self))
+
+        XCTAssertEqual(Array(UnsafeBufferPointer(start: outputBase, count: 4)), [25, 128, 230, 255])
+    }
+
     func testClickRingUsesAntialiasedBlackAndWhiteStrokes() throws {
         let options = CursorEffectOptions(showCursor: false, pointerStyle: .system, highlight: false, animateClicks: true)
         let geometry = FrameGeometry(
