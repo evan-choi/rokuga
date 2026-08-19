@@ -2,6 +2,7 @@ import AVFoundation
 import CaptureKit
 import CoreGraphics
 import CoreMedia
+import Darwin
 import EffectsKit
 import EncoderKit
 import Foundation
@@ -98,6 +99,16 @@ enum RecordCommand {
 
         let capture = captureMetrics.currentSnapshot()
         let writer = sink.statisticsSnapshot()
+        if let notification = ProcessInfo.processInfo.environment["ROKUGA_PERF_RECORDING_FINISHED_NOTIFICATION"] {
+            CFNotificationCenterPostNotification(
+                CFNotificationCenterGetDarwinNotifyCenter(),
+                CFNotificationName(notification as CFString),
+                nil,
+                nil,
+                true
+            )
+            raise(SIGSTOP)
+        }
         os_signpost(.begin, log: signpostLog, name: "Inspect Output")
         let output: OutputResult
         do {
