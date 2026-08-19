@@ -12,6 +12,9 @@ REQUIREMENT_FILE="$ARTIFACT_ROOT/signature.requirement"
 REPORT_TOOL="$REPO_ROOT/scripts/perf-report.py"
 
 WORKLOAD_PID=""
+PROFILE_RECORDING_PID=""
+PROFILE_TRACE_PID=""
+PROFILE_NOTIFY_PID=""
 WORKLOAD_MOTION=off
 WORKLOAD_AUDIO=off
 RECORD_CODEC=hevc
@@ -135,6 +138,25 @@ cleanup_workload() {
         wait "$WORKLOAD_PID" 2>/dev/null || true
     fi
     WORKLOAD_PID=""
+}
+
+cleanup_profile() {
+    if [[ -n "$PROFILE_NOTIFY_PID" ]] && kill -0 "$PROFILE_NOTIFY_PID" 2>/dev/null; then
+        kill "$PROFILE_NOTIFY_PID" 2>/dev/null || true
+        wait "$PROFILE_NOTIFY_PID" 2>/dev/null || true
+    fi
+    PROFILE_NOTIFY_PID=""
+    if [[ -n "$PROFILE_RECORDING_PID" ]] && kill -0 "$PROFILE_RECORDING_PID" 2>/dev/null; then
+        kill -CONT "$PROFILE_RECORDING_PID" 2>/dev/null || true
+        kill "$PROFILE_RECORDING_PID" 2>/dev/null || true
+        wait "$PROFILE_RECORDING_PID" 2>/dev/null || true
+    fi
+    PROFILE_RECORDING_PID=""
+    if [[ -n "$PROFILE_TRACE_PID" ]] && kill -0 "$PROFILE_TRACE_PID" 2>/dev/null; then
+        kill "$PROFILE_TRACE_PID" 2>/dev/null || true
+        wait "$PROFILE_TRACE_PID" 2>/dev/null || true
+    fi
+    PROFILE_TRACE_PID=""
 }
 
 start_workload() {
@@ -295,7 +317,8 @@ profile_template() {
 }
 
 profile_recording() {
-    local profile="$1" directory environment template time_limit status
+    local profile="$1" directory environment template time_limit notification
+    local attempts=0 record_status trace_status
     shift
     parse_profile_options "$@"
     DevToolsSecurity -status 2>&1 | grep -Fq 'Developer mode is currently enabled.' \
@@ -304,31 +327,70 @@ profile_recording() {
     directory="$(artifact_directory "$SCENARIO-$profile")"
     environment="$directory/environment.json"
     collect_environment "$environment"
-    trap cleanup_workload EXIT INT TERM
+    trap 'cleanup_profile; cleanup_workload' EXIT INT TERM
     start_workload "$directory"
     record_arguments "$RECORD_SECONDS"
     template="$(profile_template "$profile")"
     time_limit="$(python3 -c 'import sys; print(f"{float(sys.argv[1]) + 20:g}s")' "$RECORD_SECONDS")"
 
-    if xcrun xctrace record --quiet --no-prompt \
+    "$EXECUTABLE" "${RECORD_ARGUMENTS[@]}" \
+        > "$directory/result.json" \
+        2> "$directory/record.stderr" &
+    PROFILE_RECORDING_PID=$!
+    kill -STOP "$PROFILE_RECORDING_PID" \
+        || fail "recording exited before xctrace could attach; see $directory/record.stderr"
+
+    notification="$IDENTIFIER.xctrace-started.$$"
+    notifyutil -q -1 "$notification" &
+    PROFILE_NOTIFY_PID=$!
+    sleep 0.1
+    xcrun xctrace record --quiet --no-prompt \
         --template "$template" \
         --time-limit "$time_limit" \
         --output "$directory/$profile.trace" \
-        --launch -- /bin/zsh -c \
-        'result_path=$1; shift; exec "$@" > "$result_path"' \
-        rokuga-perf "$directory/result.json" "$EXECUTABLE" "${RECORD_ARGUMENTS[@]}" \
-        2> "$directory/record.stderr"; then
-        status=0
+        --notify-tracing-started "$notification" \
+        --attach "$PROFILE_RECORDING_PID" \
+        > "$directory/xctrace.stdout" \
+        2> "$directory/xctrace.stderr" &
+    PROFILE_TRACE_PID=$!
+
+    while kill -0 "$PROFILE_NOTIFY_PID" 2>/dev/null; do
+        kill -0 "$PROFILE_TRACE_PID" 2>/dev/null \
+            || fail "xctrace exited before tracing started; see $directory/xctrace.stderr"
+        attempts=$((attempts + 1))
+        [[ "$attempts" -lt 100 ]] \
+            || fail "xctrace did not start within 10 seconds; see $directory/xctrace.stderr"
+        sleep 0.1
+    done
+    wait "$PROFILE_NOTIFY_PID"
+    PROFILE_NOTIFY_PID=""
+    kill -CONT "$PROFILE_RECORDING_PID"
+
+    if wait "$PROFILE_RECORDING_PID"; then
+        record_status=0
     else
-        status=$?
+        record_status=$?
     fi
-    if [[ "$status" -ne 0 ]]; then
+    PROFILE_RECORDING_PID=""
+    if wait "$PROFILE_TRACE_PID"; then
+        trace_status=0
+    else
+        trace_status=$?
+    fi
+    PROFILE_TRACE_PID=""
+
+    if [[ "$record_status" -eq 77 ]]; then
+        fail "Screen Recording permission is missing; run ./scripts/perf.sh permission after explicit approval"
+    elif [[ "$record_status" -ne 0 ]]; then
+        fail "recording failed with exit $record_status; see $directory/record.stderr"
+    fi
+    if [[ "$trace_status" -ne 0 ]]; then
         grep -Fq 'Fatal logging system error: The log archive is corrupt or incomplete' \
-            "$directory/record.stderr" \
-            || fail "xctrace failed with exit $status; see $directory/record.stderr"
+            "$directory/xctrace.stderr" \
+            || fail "xctrace failed with exit $trace_status; see $directory/xctrace.stderr"
         python3 -c 'import json, sys; json.load(open(sys.argv[1]))' "$directory/result.json" \
-            || fail "xctrace failed with exit $status before recording completed; see $directory/record.stderr"
-        echo "warning: xctrace exited with $status after producing a result; validating the trace export" >&2
+            || fail "xctrace failed with exit $trace_status before recording completed; see $directory/xctrace.stderr"
+        echo "warning: xctrace exited with $trace_status after producing a result; validating the trace export" >&2
     fi
     finalize_result "$directory" "$SCENARIO" "$environment"
     xcrun xctrace export --quiet \
