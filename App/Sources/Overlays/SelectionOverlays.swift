@@ -301,7 +301,11 @@ final class PunchOverlayController {
     private let panel: CapturePanel
 
     init(display: DisplayTarget, region: CGRect) {
-        panel = CapturePanel(contentRect: display.frame, level: .screenSaver)
+        panel = CapturePanel(
+            contentRect: display.frame,
+            level: .screenSaver,
+            showsWindowShadow: false
+        )
         panel.ignoresMouseEvents = true
         panel.isMovableByWindowBackground = false
         let view = PunchView(frame: NSRect(origin: .zero, size: display.frame.size))
