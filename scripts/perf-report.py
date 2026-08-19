@@ -303,19 +303,27 @@ def hot_symbols(args):
     def resolved(element):
         return by_id.get(element.get("ref"), element)
 
-    def app_owned_name(element):
+    def frame_info(element):
         frame = resolved(element)
         name = frame.get("name") or frame.get("symbol") or (frame.text or "").strip()
         binaries = [frame.get("binary"), frame.get("module")]
+        binary_name = None
         for child in frame:
             if local_name(child) != "binary":
                 continue
             binary = resolved(child)
+            binary_name = binary_name or binary.get("name")
             binaries.extend((binary.get("name"), binary.get("path")))
         ownership = " ".join(value for value in (name, *binaries) if value)
+        return name, binary_name, ownership
+
+    def app_owned_name(element):
+        name, _, ownership = frame_info(element)
         return name if name and args.binary.lower() in ownership.lower() else None
 
     weights = {}
+    self_weights = {}
+    leaf_weights = {}
     total = 0.0
     rows = [element for element in root.iter() if local_name(element) == "row"]
     for row in rows:
@@ -339,20 +347,53 @@ def hot_symbols(args):
                     continue
                 if name := app_owned_name(element):
                     frames.append(name)
+        if backtraces:
+            leaf = next(
+                (element for element in resolved(backtraces[0]) if local_name(element) == "frame"), None
+            )
+        else:
+            leaf = next((element for element in row.iter() if local_name(element) == "frame"), None)
+        if leaf is not None:
+            name, binary, ownership = frame_info(leaf)
+            if name:
+                leaf_weights[(name, binary)] = leaf_weights.get((name, binary), 0) + weight
+                if args.binary.lower() in ownership.lower():
+                    self_weights[name] = self_weights.get(name, 0) + weight
         for name in set(frames):
             weights[name] = weights.get(name, 0) + weight
 
     symbols = [
-        {"symbol": name, "inclusiveWeight": weight, "percent": weight / total * 100 if total else 0}
+        {
+            "symbol": name,
+            "inclusiveWeight": weight,
+            "percent": weight / total * 100 if total else 0,
+            "selfWeight": self_weights.get(name, 0),
+            "selfPercent": self_weights.get(name, 0) / total * 100 if total else 0,
+        }
         for name, weight in weights.items()
     ]
     symbols.sort(key=lambda value: value["inclusiveWeight"], reverse=True)
     selected = [value for index, value in enumerate(symbols) if index < 20 or value["percent"] >= 1]
+    leaf_symbols = [
+        {
+            "symbol": name,
+            "binary": binary,
+            "selfWeight": weight,
+            "selfPercent": weight / total * 100 if total else 0,
+        }
+        for (name, binary), weight in leaf_weights.items()
+    ]
+    leaf_symbols.sort(key=lambda value: value["selfWeight"], reverse=True)
+    selected_leaves = [
+        value for index, value in enumerate(leaf_symbols)
+        if index < 20 or value["selfPercent"] >= 1
+    ]
     write_json(args.output, {
         "binaryFilter": args.binary,
         "rowCount": len(rows),
         "totalWeight": total,
         "symbols": selected,
+        "leafSymbols": selected_leaves,
     })
 
 
