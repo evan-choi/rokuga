@@ -183,9 +183,6 @@ private struct OutputPane: View {
                         .font(.title3.weight(.semibold))
                         .monospacedDigit()
                 }
-                estimateSummary
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
                 Text("Actual size varies with screen activity.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -219,14 +216,6 @@ private struct OutputPane: View {
         return ByteCountFormatter.string(fromByteCount: bytesPerMinute, countStyle: .file)
     }
 
-    private var estimateSummary: Text {
-        let codec = model.videoCodec == .hevc ? "HEVC" : "H.264"
-        let format = model.containerFormat.rawValue.uppercased()
-        let frameRateMode = model.frameRateMode == .constant ? "CFR" : "VFR"
-        return Text("1920×1080 · 1 min")
-            + Text(verbatim: " · \(codec) · \(format) · \(model.frameRate.rawValue) fps · "
-                + "\(frameRateMode) · Q\(model.videoQuality)")
-    }
 }
 
 /// Legacy Settings opener for macOS 13 only.
