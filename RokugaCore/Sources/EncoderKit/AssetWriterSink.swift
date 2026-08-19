@@ -304,37 +304,41 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
             quality: configuration.quality,
             codec: configuration.codec
         )
-        let maximumQuality = configuration.quality == 100
-
         // AVAssetWriter passes VideoToolbox compression keys through to the encoder.
         var compression: [String: Any] = [
             AVVideoMaxKeyFrameIntervalKey: fps * 2,
             AVVideoAllowFrameReorderingKey: false,
             AVVideoExpectedSourceFrameRateKey: fps,
             kVTCompressionPropertyKey_Quality as String: Float(configuration.quality) / 100.0,
-            kVTCompressionPropertyKey_PrioritizeEncodingSpeedOverQuality as String: false
-        ]
-        if maximumQuality {
-            if configuration.codec == .hevc,
-               Self.supportsHardwareHEVC444(width: configuration.width, height: configuration.height) {
-                compression[AVVideoProfileLevelKey] = Self.hevcMain444Profile
-            }
-        } else {
-            compression[AVVideoAverageBitRateKey] = averageBitrate
-            compression[kVTCompressionPropertyKey_DataRateLimits as String] =
+            kVTCompressionPropertyKey_PrioritizeEncodingSpeedOverQuality as String: false,
+            AVVideoAverageBitRateKey: averageBitrate,
+            kVTCompressionPropertyKey_DataRateLimits as String:
                 RateControl.dataRateLimits(averageBitrate: averageBitrate)
-        }
+        ]
         if configuration.codec == .h264 {
             compression[AVVideoProfileLevelKey] = AVVideoProfileLevelH264HighAutoLevel
+        } else {
+            compression[AVVideoProfileLevelKey] = kVTProfileLevel_HEVC_Main_AutoLevel as String
         }
 
-        return [
+        let encodedWidth = (configuration.width + 1) & ~1
+        let encodedHeight = (configuration.height + 1) & ~1
+        var settings: [String: Any] = [
             AVVideoCodecKey: configuration.codec == .hevc ? AVVideoCodecType.hevc : AVVideoCodecType.h264,
-            AVVideoWidthKey: configuration.width,
-            AVVideoHeightKey: configuration.height,
+            AVVideoWidthKey: encodedWidth,
+            AVVideoHeightKey: encodedHeight,
             AVVideoColorPropertiesKey: Self.sRGBColorProperties,
             AVVideoCompressionPropertiesKey: compression
         ]
+        if encodedWidth != configuration.width || encodedHeight != configuration.height {
+            settings[AVVideoCleanApertureKey] = [
+                AVVideoCleanApertureWidthKey: configuration.width,
+                AVVideoCleanApertureHeightKey: configuration.height,
+                AVVideoCleanApertureHorizontalOffsetKey: 0,
+                AVVideoCleanApertureVerticalOffsetKey: 0
+            ]
+        }
+        return settings
     }
 
     /// Matches the sRGB capture buffers SCStream delivers (`colorSpaceName = sRGB`
@@ -347,37 +351,6 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
         AVVideoTransferFunctionKey: kCVImageBufferTransferFunction_sRGB as String,
         AVVideoYCbCrMatrixKey: AVVideoYCbCrMatrix_ITU_R_709_2
     ]
-
-    /// VideoToolbox advertises this profile at runtime, but the SDK does not expose
-    /// its otherwise-public enumeration value as a Swift constant.
-    private static let hevcMain444Profile = "HEVC_Main444_AutoLevel"
-
-    static func supportsHardwareHEVC444(width: Int, height: Int) -> Bool {
-        let encoderSpecification = [
-            kVTVideoEncoderSpecification_EnableHardwareAcceleratedVideoEncoder as String: true,
-            kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder as String: true
-        ] as CFDictionary
-        var session: VTCompressionSession?
-        let status = VTCompressionSessionCreate(
-            allocator: kCFAllocatorDefault,
-            width: Int32(width),
-            height: Int32(height),
-            codecType: kCMVideoCodecType_HEVC,
-            encoderSpecification: encoderSpecification,
-            imageBufferAttributes: nil,
-            compressedDataAllocator: nil,
-            outputCallback: nil,
-            refcon: nil,
-            compressionSessionOut: &session
-        )
-        guard status == noErr, let session else { return false }
-        defer { VTCompressionSessionInvalidate(session) }
-        return VTSessionSetProperty(
-            session,
-            key: kVTCompressionPropertyKey_ProfileLevel,
-            value: hevcMain444Profile as CFString
-        ) == noErr
-    }
 
     private func audioOutputSettings() -> [String: Any] {
         [
