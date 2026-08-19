@@ -355,7 +355,7 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
             AVVideoAllowFrameReorderingKey: false,
             AVVideoExpectedSourceFrameRateKey: fps,
             kVTCompressionPropertyKey_Quality as String: Float(configuration.quality) / 100.0,
-            kVTCompressionPropertyKey_PrioritizeEncodingSpeedOverQuality as String: false,
+            kVTCompressionPropertyKey_PrioritizeEncodingSpeedOverQuality as String: true,
             AVVideoAverageBitRateKey: averageBitrate,
             kVTCompressionPropertyKey_DataRateLimits as String:
                 RateControl.dataRateLimits(averageBitrate: averageBitrate)
