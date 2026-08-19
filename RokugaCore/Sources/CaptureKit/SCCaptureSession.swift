@@ -153,30 +153,34 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
     // MARK: CaptureSession
 
     public func start() async throws {
-        let content = try await ShareableContentService.currentContent()
-        guard let filter = ContentFilterBuilder.filter(
-            for: target,
-            content: content,
-            exclusion: configuration.exclusion
-        ) else {
-            throw RecordingError.captureSourceLost
-        }
-
-        let streamConfiguration = makeStreamConfiguration()
-        let stream = SCStream(filter: filter, configuration: streamConfiguration, delegate: self)
-        try stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: sampleQueue)
-        if configuration.captureSystemAudio {
-            try stream.addStreamOutput(self, type: .audio, sampleHandlerQueue: sampleQueue)
-        }
-
-        await prepareCursorEffects(configuration: streamConfiguration)
-
+        var stream: SCStream?
         do {
-            try await sink.start()
-            try await stream.startCapture()
-            stateLock.withLock { self.stream = stream }
+            async let sinkStart: Void = sink.start()
+            let content = try await ShareableContentService.currentContent()
+            guard let filter = ContentFilterBuilder.filter(
+                for: target,
+                content: content,
+                exclusion: configuration.exclusion
+            ) else {
+                throw RecordingError.captureSourceLost
+            }
+
+            let streamConfiguration = makeStreamConfiguration()
+            let preparedStream = SCStream(filter: filter, configuration: streamConfiguration, delegate: self)
+            stream = preparedStream
+            try preparedStream.addStreamOutput(self, type: .screen, sampleHandlerQueue: sampleQueue)
+            if configuration.captureSystemAudio {
+                try preparedStream.addStreamOutput(self, type: .audio, sampleHandlerQueue: sampleQueue)
+            }
+
+            await prepareCursorEffects(configuration: streamConfiguration)
+            try await sinkStart
+            try await preparedStream.startCapture()
+            stateLock.withLock { self.stream = preparedStream }
         } catch {
-            try? await stream.stopCapture()
+            if let stream {
+                try? await stream.stopCapture()
+            }
             await stopCursorSampling()
             await sink.cancel()
             throw error
