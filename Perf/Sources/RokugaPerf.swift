@@ -1,8 +1,74 @@
+import CoreGraphics
 import Foundation
 
 @main
 enum RokugaPerf {
-    static func main() {
-        print("RokugaPerf requires a command")
+    static func main() async {
+        do {
+            guard let command = CommandLine.arguments.dropFirst().first else {
+                throw PerfError.usage
+            }
+            let arguments = Array(CommandLine.arguments.dropFirst(2))
+            switch command {
+            case "check-permission":
+                try printJSON(PermissionResult(granted: CGPreflightScreenCaptureAccess()))
+            case "permission":
+                try printJSON(PermissionResult(granted: CGRequestScreenCaptureAccess()))
+            case "record":
+                guard CGPreflightScreenCaptureAccess() else {
+                    throw PerfError.screenRecordingPermission
+                }
+                try printJSON(try await RecordCommand.run(arguments: arguments))
+            default:
+                throw PerfError.invalidArgument("unknown command: \(command)")
+            }
+        } catch {
+            let message = "error: \(error)\n"
+            FileHandle.standardError.write(Data(message.utf8))
+            exit((error as? PerfError)?.exitCode ?? 1)
+        }
+    }
+
+    private static func printJSON<T: Encodable>(_ value: T) throws {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+        let data = try encoder.encode(value)
+        FileHandle.standardOutput.write(data)
+        FileHandle.standardOutput.write(Data("\n".utf8))
+    }
+}
+
+struct PermissionResult: Codable {
+    let granted: Bool
+}
+
+enum PerfError: Error, CustomStringConvertible {
+    case usage
+    case invalidArgument(String)
+    case screenRecordingPermission
+    case captureTargetNotFound
+    case firstFrameTimeout
+
+    var exitCode: Int32 {
+        switch self {
+        case .usage, .invalidArgument: 2
+        case .screenRecordingPermission: 77
+        default: 1
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .usage:
+            "usage: RokugaPerf <check-permission|permission|record> [options]"
+        case let .invalidArgument(message):
+            message
+        case .screenRecordingPermission:
+            "Screen Recording permission is not granted; run the explicit permission command"
+        case .captureTargetNotFound:
+            "capture target not found"
+        case .firstFrameTimeout:
+            "no complete video frame arrived within 5 seconds"
+        }
     }
 }

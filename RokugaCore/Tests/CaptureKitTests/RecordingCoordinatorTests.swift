@@ -66,6 +66,18 @@ final class RecordingCoordinatorTests: XCTestCase {
         } catch { /* expected */ }
     }
 
+    func testCancelActiveRecordingAbortsSession() async throws {
+        let session = FakeSession()
+        let coordinator = makeCoordinator(session: session)
+        try await coordinator.start(mode: .window, countdown: .off)
+
+        await coordinator.cancel()
+
+        XCTAssertTrue(session.cancelled)
+        let state = await coordinator.state
+        XCTAssertEqual(state, .idle)
+    }
+
     func testSessionFailurePropagatesAndResets() async {
         struct Boom: Error {}
         let coordinator = RecordingCoordinator { _ in throw Boom() }

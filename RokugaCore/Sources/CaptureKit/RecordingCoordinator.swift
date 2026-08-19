@@ -124,12 +124,13 @@ public actor RecordingCoordinator {
         }
     }
 
-    /// Cancel during preparing/countdown (Esc). No file is produced.
+    /// Abort the in-flight session without producing a file. The app only calls this
+    /// for Esc during preparation/countdown; non-UI clients may also abort recording.
     public func cancel() async {
         countdownTask?.cancel()
         countdownTask = nil
         switch state {
-        case .preparing, .countdown:
+        case .preparing, .countdown, .recording, .paused:
             await session?.cancel()
             session = nil
             state = .idle

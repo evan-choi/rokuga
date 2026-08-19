@@ -20,6 +20,35 @@ private struct NullSink: MediaSink {
 }
 
 final class SCCaptureSessionTests: XCTestCase {
+    func testCaptureMetricsCountsGapsDuplicatesAndCompositeTime() {
+        let metrics = CaptureMetrics(frameRate: 60)
+
+        metrics.recordVideoCallback()
+        metrics.recordCompleteVideoFrame(pts: .zero, compositeSeconds: 0.001)
+        metrics.recordVideoCallback()
+        metrics.recordCompleteVideoFrame(pts: .zero, compositeSeconds: 0.002)
+        metrics.recordVideoCallback()
+        metrics.recordCompleteVideoFrame(pts: CMTime(seconds: 0.1, preferredTimescale: 600), compositeSeconds: nil)
+        metrics.recordIncompleteVideoFrame()
+        metrics.recordInvalidSample()
+        metrics.recordAudioCallback()
+        metrics.recordEffectDegradation()
+
+        let snapshot = metrics.currentSnapshot()
+        XCTAssertEqual(snapshot.videoCallbacks, 3)
+        XCTAssertEqual(snapshot.completeVideoFrames, 3)
+        XCTAssertEqual(snapshot.incompleteVideoFrames, 1)
+        XCTAssertEqual(snapshot.invalidSamples, 1)
+        XCTAssertEqual(snapshot.audioCallbacks, 1)
+        XCTAssertEqual(snapshot.duplicatePTS, 1)
+        XCTAssertEqual(snapshot.gapPTS, 1)
+        XCTAssertEqual(snapshot.maxPTSGapSeconds, 0.1, accuracy: 0.001)
+        XCTAssertEqual(snapshot.compositeCalls, 2)
+        XCTAssertEqual(snapshot.compositeSeconds, 0.003, accuracy: 0.000_001)
+        XCTAssertEqual(snapshot.effectDegradations, 1)
+        XCTAssertNotNil(snapshot.firstCompleteFrameUptimeNanoseconds)
+    }
+
     func testStreamConfigurationCapturesSRGBWithBGRAFormat() {
         withSettings { settings in
             let session = SCCaptureSession(

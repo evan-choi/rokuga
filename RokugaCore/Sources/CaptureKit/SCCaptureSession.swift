@@ -43,11 +43,87 @@ public struct CaptureConfiguration: Equatable, Sendable {
     }
 }
 
+public final class CaptureMetrics: @unchecked Sendable {
+    public struct Snapshot: Equatable, Sendable {
+        public var videoCallbacks = 0
+        public var completeVideoFrames = 0
+        public var incompleteVideoFrames = 0
+        public var invalidSamples = 0
+        public var audioCallbacks = 0
+        public var duplicatePTS = 0
+        public var gapPTS = 0
+        public var maxPTSGapSeconds = 0.0
+        public var compositeCalls = 0
+        public var compositeSeconds = 0.0
+        public var maxCompositeSeconds = 0.0
+        public var effectDegradations = 0
+        public var firstCompleteFrameUptimeNanoseconds: UInt64?
+    }
+
+    private let expectedFrameSeconds: Double
+    private let lock = NSLock()
+    private var snapshot = Snapshot()
+    private var lastVideoPTS: CMTime?
+
+    public init(frameRate: Int) {
+        expectedFrameSeconds = 1.0 / Double(max(frameRate, 1))
+    }
+
+    public func currentSnapshot() -> Snapshot {
+        lock.withLock { snapshot }
+    }
+
+    func recordInvalidSample() {
+        lock.withLock { snapshot.invalidSamples += 1 }
+    }
+
+    func recordVideoCallback() {
+        lock.withLock { snapshot.videoCallbacks += 1 }
+    }
+
+    func recordIncompleteVideoFrame() {
+        lock.withLock { snapshot.incompleteVideoFrames += 1 }
+    }
+
+    func recordCompleteVideoFrame(pts: CMTime, compositeSeconds: Double?) {
+        lock.withLock {
+            snapshot.completeVideoFrames += 1
+            if snapshot.firstCompleteFrameUptimeNanoseconds == nil {
+                snapshot.firstCompleteFrameUptimeNanoseconds = DispatchTime.now().uptimeNanoseconds
+            }
+            if let lastVideoPTS {
+                let delta = CMTimeSubtract(pts, lastVideoPTS).seconds
+                if delta <= 0 {
+                    snapshot.duplicatePTS += 1
+                } else if delta > expectedFrameSeconds * 1.5 {
+                    snapshot.gapPTS += 1
+                    snapshot.maxPTSGapSeconds = max(snapshot.maxPTSGapSeconds, delta)
+                }
+            }
+            lastVideoPTS = pts
+            if let compositeSeconds {
+                snapshot.compositeCalls += 1
+                snapshot.compositeSeconds += compositeSeconds
+                snapshot.maxCompositeSeconds = max(snapshot.maxCompositeSeconds, compositeSeconds)
+            }
+        }
+    }
+
+    func recordAudioCallback() {
+        lock.withLock { snapshot.audioCallbacks += 1 }
+    }
+
+    func recordEffectDegradation() {
+        lock.withLock { snapshot.effectDegradations += 1 }
+    }
+}
+
 /// SCStream-backed implementation of `CaptureSession` (tasks 2.2/2.3/2.5).
 public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendable {
     private let target: CaptureTarget
     private let configuration: CaptureConfiguration
     private let sink: MediaSink
+    private let metrics: CaptureMetrics?
     private let onInterruption: @Sendable (Error?) -> Void
 
     private let sampleQueue = DispatchQueue(label: "io.rokuga.capture.samples", qos: .userInteractive)
@@ -62,11 +138,13 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         target: CaptureTarget,
         configuration: CaptureConfiguration,
         sink: MediaSink,
+        metrics: CaptureMetrics? = nil,
         onInterruption: @escaping @Sendable (Error?) -> Void
     ) {
         self.target = target
         self.configuration = configuration
         self.sink = sink
+        self.metrics = metrics
         self.onInterruption = onInterruption
     }
 
@@ -141,6 +219,7 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
     }
 
     private func finishCursorEffectDegradation() {
+        metrics?.recordEffectDegradation()
         // A custom dot still needs the compositor at the cursor-only level. Native
         // system pointers are already present in every SCStream frame, so all custom
         // effects can be detached without a cursor-ownership handoff.
@@ -262,17 +341,32 @@ extension SCCaptureSession: SCStreamOutput {
         didOutputSampleBuffer sampleBuffer: CMSampleBuffer,
         of type: SCStreamOutputType
     ) {
-        guard sampleBuffer.isValid else { return }
+        guard sampleBuffer.isValid else {
+            metrics?.recordInvalidSample()
+            return
+        }
         let paused = stateLock.withLock { isPaused || isStopping }
         guard !paused else { return }
 
         switch type {
         case .screen:
-            guard isCompleteVideoFrame(sampleBuffer) else { return }
+            metrics?.recordVideoCallback()
+            guard isCompleteVideoFrame(sampleBuffer) else {
+                metrics?.recordIncompleteVideoFrame()
+                return
+            }
             let compositor = stateLock.withLock { self.compositor }
             let geometry = Self.frameGeometry(from: sampleBuffer)
-            sink.append(compositor?.composite(sampleBuffer, geometry: geometry) ?? sampleBuffer, of: .video)
+            let started = metrics != nil && compositor != nil ? CFAbsoluteTimeGetCurrent() : nil
+            let output = compositor?.composite(sampleBuffer, geometry: geometry) ?? sampleBuffer
+            let compositeSeconds = started.map { CFAbsoluteTimeGetCurrent() - $0 }
+            metrics?.recordCompleteVideoFrame(
+                pts: CMSampleBufferGetPresentationTimeStamp(sampleBuffer),
+                compositeSeconds: compositeSeconds
+            )
+            sink.append(output, of: .video)
         case .audio:
+            metrics?.recordAudioCallback()
             sink.append(sampleBuffer, of: .systemAudio)
         default:
             break
