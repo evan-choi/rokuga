@@ -5,7 +5,7 @@
 - [x] 1.1 Create Xcode project: `Rokuga` app target (SwiftUI, macOS 13.3+, sandboxed, `LSUIElement` agent) + local SPM package `RokugaCore` (CaptureKit, EncoderKit, EffectsKit, TrimKit, SettingsKit)
 - [x] 1.2 Entitlements & Info.plist: microphone usage description, security-scoped bookmarks, `LSUIElement`; launch at login via `SMAppService.mainApp`
 - [x] 1.3 Add `KeyboardShortcuts` (MIT) as the sole third-party dependency
-- [x] 1.4 CI pipeline: build + unit tests on macOS 14/15 hosted runners, localization and zero-copy static audits, benchmark job scaffold; macOS 13.3 remains manual QA
+- [x] 1.4 CI pipeline: build + unit tests on macOS 14/15 hosted runners, localization and baseline frame-transport static audits, benchmark job scaffold; macOS 13.3 remains manual QA
 
 ## 2. Capture core (CaptureKit)
 
@@ -105,7 +105,7 @@
 
 ## 10. Performance & release gates
 
-- [x] 10.1 Static zero-copy audit: no full-frame CPU pixel-buffer readback in the recording path
+- [x] 10.1 Baseline frame-transport audit: the current recording path has no full-frame CPU pixel-buffer readback; any future copy requires the measured exception defined by the performance spec
 - [ ] 10.2 End-to-end capture benchmarks: 4K60 10-min drop-rate < 0.1%, A/V drift < 40 ms/h, CPU ≤ 20%@1080p60 / ≤ 35%@4K60, memory ≤ 400 MB steady, 8 h soak
 - [ ] 10.3 Latency tests: summon ≤ 150 ms, record→first frame ≤ 500 ms, stop→playable ≤ 2 s, passthrough trim ≤ 3 s
 - [ ] 10.4 Correct CPU thresholds and wire actual capture/audio/effects benchmarks into CI as >10% regression gates

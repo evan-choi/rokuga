@@ -2,16 +2,22 @@
 
 ## ADDED Requirements
 
-### Requirement: Zero-copy capture pipeline
-The capture-to-encoder path SHALL be zero-copy on the GPU: frames travel as IOSurface-backed pixel buffers from ScreenCaptureKit through the (optional) Metal cursor compositor into VideoToolbox hardware encoding, with no CPU pixel readback at any stage. Software (CPU) video encoding MUST NOT exist in the recording path.
+### Requirement: Resource-efficient frame transport
+The default capture-to-encoder path SHALL reuse IOSurface-backed pixel buffers from ScreenCaptureKit through the optional compositor and VideoToolbox hardware encoding. Software video encoding MUST NOT exist in the recording path.
+
+A candidate MAY add a buffer copy or CPU readback only when it preserves the same resolution, cadence, codec, effect fidelity, and file integrity, and warm-up plus at least five untraced runs show a median CPU or memory improvement of 3% or more. Drop rate, A/V drift, latency, memory growth, and the other resource MUST NOT regress. The accepted benchmark comparison SHALL remain in the performance artifacts.
 
 #### Scenario: Hardware encode only
 - **WHEN** any recording runs on any supported Mac
 - **THEN** video encoding uses the hardware encoder (VideoToolbox), never a software fallback
 
-#### Scenario: Effects stay on GPU
-- **WHEN** mouse effects are enabled
-- **THEN** cursor composition happens in a Metal pass on the captured surface without copying frames to CPU memory
+#### Scenario: Default path avoids copies
+- **WHEN** no measured exception has been accepted
+- **THEN** captured surfaces reach the compositor and encoder without full-frame CPU readback
+
+#### Scenario: Copy candidate lowers total resource use
+- **WHEN** a candidate introduces a buffer copy or CPU readback
+- **THEN** it is accepted only with a preserved output contract, at least 3% median CPU or memory improvement over five untraced runs, and no regression in the other required metrics
 
 ### Requirement: Frame integrity
 Recordings SHALL be lag-free: at the configured FPS, dropped or duplicated frames MUST stay below 0.1% over any 10-minute window on Apple Silicon baseline hardware (M1, 8 GB) at up to 4K60, and A/V drift MUST stay below 40 ms over one hour. If the encoder cannot keep up, the app SHALL degrade mouse-effect quality first (per design D4) and only then lower capture rate — never freeze, stutter, or silently corrupt the file.
