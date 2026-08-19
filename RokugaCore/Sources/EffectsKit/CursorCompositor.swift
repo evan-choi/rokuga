@@ -134,6 +134,11 @@ public final class CursorCompositor: @unchecked Sendable {
         guard let pool else { return nil }
         var buffer: CVPixelBuffer?
         CVPixelBufferPoolCreatePixelBuffer(nil, pool, &buffer)
+        if let buffer {
+            // Carries the capture stream's color tags (sRGB) onto composited frames so
+            // they encode identically to passthrough frames.
+            CVBufferPropagateAttachments(source, buffer)
+        }
         return buffer
     }
 

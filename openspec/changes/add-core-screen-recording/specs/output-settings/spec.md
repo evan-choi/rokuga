@@ -32,6 +32,17 @@ The app SHALL provide a quality control from 0 to 100 (default: 80) and a rate-c
 - **WHEN** CBR mode is selected and highly dynamic content is recorded
 - **THEN** the file's bitrate stays within the configured target band rather than spiking
 
+### Requirement: Color fidelity
+The capture stream SHALL be color-matched to sRGB at the source, and every output file MUST carry color metadata that matches the encoded pixel values — BT.709 primaries, sRGB (IEC 61966-2-1) transfer function, and BT.709 YCbCr matrix — for all codecs and quality settings. Cursor-composited frames MUST carry the same color tags as passthrough frames. The writer MUST NOT tag color properties that differ from the capture buffers' actual color space.
+
+#### Scenario: Color metadata present
+- **WHEN** any recording finishes
+- **THEN** the file reports bt709 color primaries, iec61966-2-1 transfer function, and bt709 matrix instead of unknown color metadata
+
+#### Scenario: On-screen colors reproduced
+- **WHEN** a static sRGB test pattern is recorded and the file is decoded
+- **THEN** the decoded pixel values match the authored sRGB values within encoder rounding, independent of the monitor's ICC profile
+
 ### Requirement: Resolution and frame rate
 The app SHALL record at the source's native pixel resolution by default, with a user-selectable maximum resolution cap of 1080p, 1440p, 4K, or 5K (5120×2880; default: native up to 5K). Downscaling MUST preserve aspect ratio. Frame rate SHALL be selectable from 15, 24, 30, and 60 FPS (default: 60), and the encoder MUST tolerate source frame delivery below the target without audio desync.
 

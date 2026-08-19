@@ -1,11 +1,51 @@
 import CoreGraphics
+import CoreMedia
+import EncoderKit
 import Foundation
 import ScreenCaptureKit
 import SettingsKit
 import XCTest
 @testable import CaptureKit
 
+private struct NullSink: MediaSink {
+    func start() async throws {}
+    func append(_ sampleBuffer: CMSampleBuffer, of kind: MediaKind) {}
+    func markPaused() {}
+    func markResumed() {}
+    func finish() async throws -> URL {
+        URL(fileURLWithPath: "/dev/null")
+    }
+
+    func cancel() async {}
+}
+
 final class SCCaptureSessionTests: XCTestCase {
+    func testStreamConfigurationCapturesSRGBWithBGRAFormat() {
+        withSettings { settings in
+            let session = SCCaptureSession(
+                target: .display(
+                    DisplayTarget(
+                        displayID: 1,
+                        frame: CGRect(x: 0, y: 0, width: 800, height: 600),
+                        pixelWidth: 1600,
+                        pixelHeight: 1200
+                    ),
+                    crop: nil
+                ),
+                configuration: CaptureConfiguration.fromSettings(settings),
+                sink: NullSink(),
+                onInterruption: { _ in }
+            )
+
+            let config = session.makeStreamConfiguration()
+
+            XCTAssertEqual(config.pixelFormat, kCVPixelFormatType_32BGRA)
+            XCTAssertEqual(config.colorSpaceName as String, CGColorSpace.sRGB as String)
+            XCTAssertEqual(config.width, 1600)
+            XCTAssertEqual(config.height, 1200)
+        }
+    }
+
     func testSystemPointerRemainsNativeWhenEffectsAreEnabled() {
         withSettings { settings in
             settings.showCursor = true

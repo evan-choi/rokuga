@@ -339,6 +339,42 @@ final class CursorCompositorTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testCompositedFramePropagatesColorAttachments() throws {
+        let options = CursorEffectOptions(showCursor: true, pointerStyle: .dot, highlight: false, animateClicks: false)
+        let compositor = CursorCompositor(
+            options: options,
+            geometry: FrameGeometry(contentRect: CGRect(x: 0, y: 0, width: 128, height: 128), pixelSize: CGSize(width: 128, height: 128)),
+            sampler: FakeSampler(sampledSnapshot: CursorSnapshot(location: CGPoint(x: 64, y: 64)))
+        )
+        let input = try makeSampleBuffer(width: 128, height: 128)
+        let inputPixels = try XCTUnwrap(CMSampleBufferGetImageBuffer(input))
+        CVBufferSetAttachment(
+            inputPixels,
+            kCVImageBufferColorPrimariesKey,
+            kCVImageBufferColorPrimaries_ITU_R_709_2,
+            .shouldPropagate
+        )
+        CVBufferSetAttachment(
+            inputPixels,
+            kCVImageBufferTransferFunctionKey,
+            kCVImageBufferTransferFunction_sRGB,
+            .shouldPropagate
+        )
+
+        let output = compositor.composite(input)
+        XCTAssertFalse(output === input)
+        let outputPixels = try XCTUnwrap(CMSampleBufferGetImageBuffer(output))
+
+        XCTAssertEqual(
+            CVBufferCopyAttachment(outputPixels, kCVImageBufferColorPrimariesKey, nil) as? String,
+            kCVImageBufferColorPrimaries_ITU_R_709_2 as String
+        )
+        XCTAssertEqual(
+            CVBufferCopyAttachment(outputPixels, kCVImageBufferTransferFunctionKey, nil) as? String,
+            kCVImageBufferTransferFunction_sRGB as String
+        )
+    }
+
     private func makeSampleBuffer(width: Int, height: Int) throws -> CMSampleBuffer {
         var pixelBuffer: CVPixelBuffer?
         CVPixelBufferCreate(nil, width, height, kCVPixelFormatType_32BGRA, [
