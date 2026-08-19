@@ -28,6 +28,7 @@
 		9684FC108EE37250BF66ED5A /* TrimEditorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F897B54D7B59D7BD94DC58B /* TrimEditorController.swift */; };
 		9ED5D1FD641CC280475FB358 /* L10nScreenshotRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507D5C4912E93D0B81B378FB /* L10nScreenshotRunner.swift */; };
 		9F89EDC7F8BC4491FD5CAB94 /* RecordCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC241666723DED279D5F06F /* RecordCommand.swift */; };
+		A6B8E23D9F4C4B6382C52DE1 /* WorkloadCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58D6D28F65774D19A6814ECB /* WorkloadCommand.swift */; };
 		A0A4B5DE7B727756BFC46C5F /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = F57946511F3AD0E1DD96C78D /* KeyboardShortcuts */; };
 		AB89462EBDAD15F328A015C5 /* PreviewPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC9F65E55E649C93CCD296A /* PreviewPanelController.swift */; };
 		B3A15BE4EE95F0BAA7B140C0 /* TrimKit in Frameworks */ = {isa = PBXBuildFile; productRef = 370EC52E590B15D13ED8CCF1 /* TrimKit */; };
@@ -59,6 +60,7 @@
 		3EBA99597B5C4A79AA0F0957 /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		4333162F241D181B98466D2E /* RokugaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RokugaApp.swift; sourceTree = "<group>"; };
 		507D5C4912E93D0B81B378FB /* L10nScreenshotRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10nScreenshotRunner.swift; sourceTree = "<group>"; };
+		58D6D28F65774D19A6814ECB /* WorkloadCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkloadCommand.swift; sourceTree = "<group>"; };
 		579D47990E188AF6216A548C /* ToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarView.swift; sourceTree = "<group>"; };
 		5B4E0974B9E2D75C0ED0FF8C /* OnboardingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingController.swift; sourceTree = "<group>"; };
 		5DC9F65E55E649C93CCD296A /* PreviewPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPanelController.swift; sourceTree = "<group>"; };
@@ -152,6 +154,7 @@
 			children = (
 				1FC241666723DED279D5F06F /* RecordCommand.swift */,
 				DEDEFD18BCDF334659B944B3 /* RokugaPerf.swift */,
+				58D6D28F65774D19A6814ECB /* WorkloadCommand.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -384,6 +387,7 @@
 			files = (
 				9F89EDC7F8BC4491FD5CAB94 /* RecordCommand.swift in Sources */,
 				DC6DA5525A681CF919456A49 /* RokugaPerf.swift in Sources */,
+				A6B8E23D9F4C4B6382C52DE1 /* WorkloadCommand.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
