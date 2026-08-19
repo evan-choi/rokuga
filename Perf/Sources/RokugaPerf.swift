@@ -1,10 +1,14 @@
 import AppKit
 import CoreGraphics
+import Darwin
 import Foundation
 
 @main
 enum RokugaPerf {
     static func main() async {
+        if ProcessInfo.processInfo.environment["ROKUGA_PERF_SUSPEND_FOR_PROFILING"] == "1" {
+            raise(SIGSTOP)
+        }
         do {
             guard let command = CommandLine.arguments.dropFirst().first else {
                 throw PerfError.usage
