@@ -44,7 +44,7 @@ To run Rokuga:
 
 To build Rokuga:
 
-- Xcode 16
+- Xcode 26
 - XcodeGen
 
 ## Build from source
