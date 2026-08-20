@@ -18,5 +18,5 @@
 
 ## 4. Documentation and gates
 
-- [ ] 4.1 Update README audio capabilities to describe Mixed as the default and Separate as a MOV editing option.
+- [x] 4.1 Update README audio capabilities to describe Mixed as the default and Separate as a MOV editing option.
 - [ ] 4.2 Run `swift test`, unsigned `xcodebuild`, SwiftLint, SwiftFormat, localization checks, `git diff --check`, and `openspec validate add-separate-audio-tracks --strict`.
