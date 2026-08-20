@@ -120,7 +120,7 @@ final class AppState: ObservableObject {
             // Pause is not surfaced in the UI; the state remains only as a core capability.
             break
         }
-        Hotkeys.update(for: state)
+        Hotkeys.update(for: state, toolbarVisible: toolbarController?.isVisible == true)
     }
 
     // MARK: Toolbar
@@ -138,11 +138,13 @@ final class AppState: ObservableObject {
         }
         toolbarController?.showAtMouseDisplay()
         refreshSelectionLayer()
+        Hotkeys.update(for: recordingState, toolbarVisible: toolbarController?.isVisible == true)
     }
 
     func dismissToolbar() {
         toolbarController?.hide()
         teardownSelectionLayer()
+        Hotkeys.update(for: recordingState, toolbarVisible: false)
     }
 
     func selectionModeChanged() {
@@ -334,6 +336,14 @@ final class AppState: ObservableObject {
 
     func cancelCountdown() {
         Task { await coordinator.cancel() }
+    }
+
+    func cancelPendingCapture() {
+        if toolbarController?.isVisible == true {
+            dismissToolbar()
+        } else {
+            cancelCountdown()
+        }
     }
 
     // MARK: Post-recording flow

@@ -16,7 +16,7 @@ enum Hotkeys {
             appState?.summonToolbar()
         }
         KeyboardShortcuts.onKeyDown(for: .cancelPendingCapture) { [weak appState] in
-            appState?.cancelCountdown()
+            appState?.cancelPendingCapture()
         }
         KeyboardShortcuts.onKeyDown(for: .stopRecording) { [weak appState] in
             appState?.stopRecording()
@@ -24,8 +24,9 @@ enum Hotkeys {
         KeyboardShortcuts.disable(.cancelPendingCapture, .stopRecording)
     }
 
-    static func update(for state: RecordingState) {
+    static func update(for state: RecordingState, toolbarVisible: Bool) {
         let nextShortcut: KeyboardShortcuts.Name? = switch state {
+        case .idle where toolbarVisible: .cancelPendingCapture
         case .preparing, .countdown: .cancelPendingCapture
         case .recording, .paused: .stopRecording
         case .idle, .finishing: nil
