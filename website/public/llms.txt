@@ -1,12 +1,12 @@
 # Rokuga
 
-> A free, native, open-source screen recorder for macOS.
+> A free, native, open-source screen recorder for Mac.
 
 Rokuga is a menu bar app with a floating recording toolbar. It records directly to a Finder folder using ScreenCaptureKit and AVFoundation.
 
 ## Current status
 
-Rokuga is under active development. There is no signed public build yet. The app can be built from source and requires macOS 15 Sequoia or later.
+Rokuga is under active development. Distribution through the Mac App Store and Homebrew is planned, and both releases are currently in preparation. The app can be built from source and requires macOS 15 Sequoia or later.
 
 ## Recording
 
@@ -15,6 +15,7 @@ Rokuga is under active development. There is no signed public build yet. The app
 - Frame rates: 30 fps, 60 fps, or matched to the display
 - Audio: driver-free system audio capture
 - Limits: no time limit and no watermark
+- Planned distribution: Mac App Store and Homebrew
 
 ## Languages
 
