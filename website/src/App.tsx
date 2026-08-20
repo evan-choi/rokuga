@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import logoUrl from '../../docs/logo.png'
+import appleLogoUrl from './assets/apple.svg'
 import { isLanguage, languageLabels, languages, selectLanguage, translations } from './i18n'
 import { initialSelection, mobileInitialSelection, moveSelection, resizeSelection, type SelectionHandle, type SelectionRegion } from './selection'
 
@@ -19,14 +20,24 @@ export default function App() {
     navigator.languages,
   ))
   const [captureMode, setCaptureMode] = useState<CaptureMode>('selectedArea')
+  const [now, setNow] = useState(() => new Date())
   const [selectionBaseline] = useState(() => (
     window.matchMedia('(max-width: 660px)').matches ? mobileInitialSelection : initialSelection
   ))
   const [selection, setSelection] = useState(selectionBaseline)
   const [selectionDrag, setSelectionDrag] = useState<SelectionHandle | 'move' | null>(null)
+  const [brewCopyStatus, setBrewCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle')
   const productStageRef = useRef<HTMLDivElement>(null)
   const selectionDragRef = useRef<SelectionDrag | null>(null)
   const copy = translations[language]
+  const brewCopyLabel = brewCopyStatus === 'copied'
+    ? copy.download.brewCopied
+    : brewCopyStatus === 'error' ? copy.download.brewCopyFailed : copy.download.brewCopy
+  const currentDate = [
+    new Intl.DateTimeFormat(language, { month: 'short', day: 'numeric' }).format(now),
+    `(${new Intl.DateTimeFormat(language, { weekday: 'short' }).format(now)})`,
+    new Intl.DateTimeFormat(language, { hour: 'numeric', minute: '2-digit' }).format(now),
+  ].join(' ')
 
   useEffect(() => {
     const localizedCopy = translations[language]
@@ -37,6 +48,17 @@ export default function App() {
     description?.setAttribute('content', localizedCopy.metaDescription)
     localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
   }, [language])
+
+  useEffect(() => {
+    let timer: number
+    const tick = () => {
+      setNow(new Date())
+      timer = window.setTimeout(tick, 60_000 - Date.now() % 60_000)
+    }
+
+    timer = window.setTimeout(tick, 60_000 - Date.now() % 60_000)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   const startSelectionDrag = (event: PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return
@@ -63,7 +85,14 @@ export default function App() {
     const dx = (event.clientX - drag.startX) / stage.width
     const dy = (event.clientY - drag.startY) / stage.height
     setSelection(drag.handle
-      ? resizeSelection(drag.region, drag.handle, dx, dy, 50 / stage.width, 50 / stage.height)
+      ? resizeSelection(
+          drag.region,
+          drag.handle,
+          dx,
+          dy,
+          50 * selectionBaseline.width / 960,
+          50 * selectionBaseline.height / 540,
+        )
       : moveSelection(drag.region, dx, dy))
   }
 
@@ -89,6 +118,17 @@ export default function App() {
 
     setSelection((region) => moveSelection(region, dx, dy))
     event.preventDefault()
+  }
+
+  const copyBrewCommand = async () => {
+    try {
+      await navigator.clipboard.writeText(copy.download.brewCommand)
+      setBrewCopyStatus('copied')
+      window.setTimeout(() => setBrewCopyStatus('idle'), 1600)
+    } catch (error) {
+      console.error('Failed to copy the Homebrew command.', error)
+      setBrewCopyStatus('error')
+    }
   }
 
   return (
@@ -156,12 +196,16 @@ export default function App() {
                 onPointerCancel={endSelectionDrag}
               >
                 <div className="mac-menu" aria-hidden="true">
-                  <span className="apple-logo"></span>
+                  <img className="apple-logo" src={appleLogoUrl} alt="" />
                   <strong>Finder</strong><span>{copy.product.file}</span><span>{copy.product.edit}</span><span>{copy.product.view}</span>
-                  <span className="grow"></span><span>{copy.product.date}</span>
+                  <span className="grow"></span><span>{currentDate}</span>
                 </div>
                 <div className="full-screen-target" aria-hidden="true" />
-                <div className="window-target" aria-hidden="true">
+                <div className="window-target window-target-primary" aria-hidden="true">
+                  <div className="window-target-bar"><i /><i /><i /></div>
+                  <div className="window-target-body"><span /><span /><span /></div>
+                </div>
+                <div className="window-target window-target-secondary" aria-hidden="true">
                   <div className="window-target-bar"><i /><i /><i /></div>
                   <div className="window-target-body"><span /><span /><span /></div>
                 </div>
@@ -230,9 +274,14 @@ export default function App() {
                     </button>
                   </div>
                   <span className="toolbar-drag" />
-                  <span className="toolbar-options">
+                  <button
+                    className="toolbar-options"
+                    type="button"
+                    aria-label={copy.product.options}
+                    data-tooltip={copy.product.options}
+                  >
                     <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6h12M4 10h12M4 14h12" /><circle cx="8" cy="6" r="1.35" /><circle cx="13" cy="10" r="1.35" /><circle cx="7" cy="14" r="1.35" /></svg>
-                  </span>
+                  </button>
                   <span className="toolbar-record">{copy.product.record}</span>
                 </div>
                 <span className="mode-status" aria-live="polite">{copy.product[captureMode]}</span>
@@ -346,14 +395,24 @@ export default function App() {
                   <h2>{copy.download.brewName}</h2>
                   <p>{copy.download.brewDescription}</p>
                 </div>
-                <code className="brew-command">{copy.download.brewCommand}</code>
-                <button className="button button-disabled download-button" type="button" disabled>
-                  {copy.download.brewButton}
-                </button>
-                <div className="source-note">
-                  {copy.download.sourceBefore}
-                  <a href="https://github.com/evan-choi/rokuga#build-from-source">{copy.download.sourceLink}</a>
-                  {copy.download.sourceAfter}
+                <div className="brew-command">
+                  <code>{copy.download.brewCommand}</code>
+                  <button
+                    className="brew-copy-button"
+                    type="button"
+                    data-state={brewCopyStatus}
+                    aria-label={brewCopyLabel}
+                    aria-live="polite"
+                    title={brewCopyLabel}
+                    onClick={copyBrewCommand}
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      {brewCopyStatus === 'copied'
+                        ? <path d="m5 12 4 4L19 6" />
+                        : <><rect width="13" height="13" x="9" y="9" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></>}
+                    </svg>
+                    <span>{brewCopyLabel}</span>
+                  </button>
                 </div>
               </article>
             </div>
