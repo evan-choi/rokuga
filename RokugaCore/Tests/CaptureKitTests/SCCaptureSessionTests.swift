@@ -77,6 +77,39 @@ final class SCCaptureSessionTests: XCTestCase {
         }
     }
 
+    func testStreamConfigurationUsesNativeClickEffectsWithoutCompositor() throws {
+        guard #available(macOS 15.0, *) else {
+            throw XCTSkip("ScreenCaptureKit native click effects require macOS 15")
+        }
+
+        withSettings { settings in
+            settings.showCursor = false
+            settings.highlightCursor = false
+            settings.animateClicks = true
+            let configuration = CaptureConfiguration.fromSettings(settings)
+            let session = SCCaptureSession(
+                target: .display(
+                    DisplayTarget(
+                        displayID: 1,
+                        frame: CGRect(x: 0, y: 0, width: 800, height: 600),
+                        pixelWidth: 1600,
+                        pixelHeight: 1200
+                    ),
+                    crop: nil
+                ),
+                configuration: configuration,
+                sink: NullSink(),
+                onInterruption: { _ in }
+            )
+
+            let config = session.makeStreamConfiguration()
+
+            XCTAssertFalse(config.showsCursor)
+            XCTAssertTrue(config.showMouseClicks)
+            XCTAssertFalse(configuration.cursorEffects.needsCompositor)
+        }
+    }
+
     func testSystemPointerRemainsNativeWhenEffectsAreEnabled() {
         withSettings { settings in
             settings.showCursor = true

@@ -6,9 +6,8 @@ import Foundation
 public final class FrameBudgetMonitor: @unchecked Sendable {
     public enum Level: Int, Comparable, Sendable {
         case full = 0
-        case noClickAnimations = 1
-        case noHighlight = 2
-        case cursorOnly = 3
+        case noHighlight = 1
+        case cursorOnly = 2
 
         public static func < (lhs: Level, rhs: Level) -> Bool {
             lhs.rawValue < rhs.rawValue

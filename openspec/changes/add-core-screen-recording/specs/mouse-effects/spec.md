@@ -25,22 +25,22 @@ The app SHALL offer a highlight effect that renders a colored translucent circle
 - **THEN** the next recording reflects the new appearance, and a settings preview shows the effect immediately
 
 ### Requirement: Click effects
-The app SHALL offer click effects that render a brief animation (expanding ripple) at the cursor position when a mouse button is pressed during recording. Left-click and right-click effects MUST be independently toggleable with independently configurable colors, and the animation MUST appear only in the recording.
+The app SHALL offer a click-effect toggle backed by ScreenCaptureKit's native mouse-click indicator. When enabled, ScreenCaptureKit MUST draw the system circular indicator directly into the BGRA capture stream when the user clicks. The effect SHALL remain independent of cursor visibility, appear only in the recording, and retain its system-owned appearance without app-specific color or animation customization.
 
-#### Scenario: Left click ripple
-- **WHEN** left-click effect is enabled (red) and the user left-clicks during a recording
-- **THEN** the recorded video shows a red ripple expanding from the click position at the moment of the click
+#### Scenario: Native click indicator
+- **WHEN** click effects are enabled and the user clicks during a recording
+- **THEN** the recorded video shows the macOS circular click indicator at the click position
 
-#### Scenario: Distinct right click
-- **WHEN** both effects are enabled with different colors and the user right-clicks
-- **THEN** the recording shows the right-click color, not the left-click color
+#### Scenario: Indicator with hidden cursor
+- **WHEN** click effects are enabled while cursor visibility is off
+- **THEN** the native click indicator remains visible in the recording without rendering the cursor
 
 #### Scenario: Click effects off
 - **WHEN** click effects are disabled and the user clicks during a recording
-- **THEN** no ripple appears in the recorded video
+- **THEN** no click indicator appears in the recorded video
 
 ### Requirement: Effect fidelity and performance
-Mouse effect rendering MUST track the true cursor position with no more than one frame of positional lag at the configured frame rate, and enabling all mouse effects MUST NOT reduce the achieved recording frame rate by more than 10% relative to effects-off on supported hardware. If the system cannot sustain the frame budget, effects SHALL degrade gracefully (simplified rendering) rather than dropping video frames.
+Custom pointer and highlight rendering MUST track the true cursor position with no more than one frame of positional lag at the configured frame rate, and enabling all mouse effects MUST NOT reduce the achieved recording frame rate by more than 10% relative to effects-off on supported hardware. If the system cannot sustain the compositor frame budget, custom highlight rendering SHALL degrade gracefully rather than dropping video frames; the ScreenCaptureKit-owned click indicator SHALL remain outside that degradation ladder.
 
 #### Scenario: Position accuracy
 - **WHEN** the cursor moves rapidly across the captured region during a 60 FPS recording

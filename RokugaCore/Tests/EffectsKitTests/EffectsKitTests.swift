@@ -17,10 +17,6 @@ final class FrameBudgetMonitorTests: XCTestCase {
         for _ in 0 ..< 10 {
             monitor.record(frameSeconds: 0.01)
         }
-        XCTAssertEqual(monitor.currentLevel, .noClickAnimations)
-        for _ in 0 ..< 10 {
-            monitor.record(frameSeconds: 0.01)
-        }
         XCTAssertEqual(monitor.currentLevel, .noHighlight)
         for _ in 0 ..< 10 {
             monitor.record(frameSeconds: 0.01)
@@ -33,22 +29,30 @@ final class FrameBudgetMonitorTests: XCTestCase {
         for _ in 0 ..< 5 {
             monitor.record(frameSeconds: 0.01)
         }
-        XCTAssertEqual(monitor.currentLevel, .noClickAnimations)
+        XCTAssertEqual(monitor.currentLevel, .noHighlight)
         for _ in 0 ..< 100 {
             monitor.record(frameSeconds: 0.0001)
         }
-        XCTAssertEqual(monitor.currentLevel, .noClickAnimations)
+        XCTAssertEqual(monitor.currentLevel, .noHighlight)
     }
 }
 
 final class CursorEffectOptionsTests: XCTestCase {
-    func testSystemPointerRemainsNativeWhenEffectsNeedCompositing() {
-        let options = CursorEffectOptions(showCursor: true, pointerStyle: .system, highlight: true, animateClicks: true)
+    func testSystemPointerRemainsNativeWhenHighlightNeedsCompositing() {
+        let options = CursorEffectOptions(showCursor: true, pointerStyle: .system, highlight: true, animateClicks: false)
 
         XCTAssertTrue(options.usesNativeSystemCursor)
         XCTAssertFalse(options.compositesPointer)
         XCTAssertTrue(options.needsCompositor)
         XCTAssertFalse(options.isPassthrough)
+    }
+
+    func testNativeClickEffectsBypassCompositor() {
+        let options = CursorEffectOptions(showCursor: false, pointerStyle: .system, highlight: false, animateClicks: true)
+
+        XCTAssertFalse(options.usesNativeSystemCursor)
+        XCTAssertFalse(options.needsCompositor)
+        XCTAssertTrue(options.isPassthrough)
     }
 
     func testDotPointerHasSingleEffectsKitOwner() {
@@ -64,37 +68,6 @@ final class CursorEffectOptionsTests: XCTestCase {
 
         XCTAssertFalse(options.usesNativeSystemCursor)
         XCTAssertTrue(options.isPassthrough)
-    }
-}
-
-final class ClickRippleTests: XCTestCase {
-    func testActiveClicksProduceProgress() {
-        let now: TimeInterval = 100
-        let clicks: [(time: TimeInterval, location: CGPoint)] = [
-            (time: 99.9, location: CGPoint(x: 5, y: 5)),
-            (time: 99.75, location: CGPoint(x: 8, y: 8))
-        ]
-        let progresses = ClickRipple.progresses(clicks: clicks, now: now)
-        XCTAssertEqual(progresses.count, 2)
-        XCTAssertEqual(progresses[0].progress, 0.2, accuracy: 0.001)
-        XCTAssertEqual(progresses[1].progress, 0.5, accuracy: 0.001)
-    }
-
-    func testExpiredAndFutureClicksAreDropped() {
-        let now: TimeInterval = 100
-        let clicks: [(time: TimeInterval, location: CGPoint)] = [
-            (time: 99.0, location: .zero),
-            (time: 101.0, location: .zero)
-        ]
-        XCTAssertTrue(ClickRipple.progresses(clicks: clicks, now: now).isEmpty)
-    }
-
-    func testRingUsesCompactSizeAndHoldsBeforeFading() {
-        XCTAssertEqual(ClickRipple.radius * 2, 80, accuracy: 0.001)
-        XCTAssertEqual(ClickRipple.opacity(at: 0), 1, accuracy: 0.001)
-        XCTAssertEqual(ClickRipple.opacity(at: 0.4), 1, accuracy: 0.001)
-        XCTAssertEqual(ClickRipple.opacity(at: 0.7), 0.5, accuracy: 0.001)
-        XCTAssertEqual(ClickRipple.opacity(at: 1), 0, accuracy: 0.001)
     }
 }
 
@@ -234,99 +207,6 @@ final class CursorCompositorTests: XCTestCase {
         XCTAssertEqual(Array(UnsafeBufferPointer(start: outputBase, count: 4)), [25, 128, 230, 255])
     }
 
-    func testClickRingUsesAntialiasedBlackAndWhiteStrokes() throws {
-        let options = CursorEffectOptions(showCursor: false, pointerStyle: .system, highlight: false, animateClicks: true)
-        let geometry = FrameGeometry(
-            contentRect: CGRect(x: 0, y: 0, width: 256, height: 256),
-            pixelSize: CGSize(width: 256, height: 256)
-        )
-        let snapshot = CursorSnapshot(
-            location: CGPoint(x: 128, y: 128),
-            clicks: [(time: 99.9, location: CGPoint(x: 128, y: 128))]
-        )
-
-        let overlays = CursorOverlayRenderer.render(
-            snapshot: snapshot,
-            options: options,
-            geometry: geometry,
-            level: .full,
-            now: 100
-        )
-        let overlay = try XCTUnwrap(overlays.first)
-        let data = try XCTUnwrap(overlay.image.dataProvider?.data as Data?)
-        let centerOffset = (overlay.image.height / 2) * overlay.image.bytesPerRow + (overlay.image.width / 2) * 4
-
-        var hasBlack = false
-        var hasWhite = false
-        var hasAntialiasedEdge = false
-        var radialBands: [Int] = []
-        data.withUnsafeBytes { bytes in
-            let pixels = bytes.bindMemory(to: UInt8.self)
-            for offset in stride(from: 0, to: pixels.count, by: 4) {
-                let blue = pixels[offset]
-                let green = pixels[offset + 1]
-                let red = pixels[offset + 2]
-                let alpha = pixels[offset + 3]
-                hasBlack = hasBlack || (alpha > 240 && red < 16 && green < 16 && blue < 16)
-                hasWhite = hasWhite || (alpha > 240 && red > 240 && green > 240 && blue > 240)
-                hasAntialiasedEdge = hasAntialiasedEdge || (alpha > 0 && alpha < 240)
-            }
-
-            let centerRow = (overlay.image.height / 2) * overlay.image.bytesPerRow
-            for x in 0 ..< (overlay.image.width / 2) {
-                let offset = centerRow + x * 4
-                let blue = pixels[offset]
-                let green = pixels[offset + 1]
-                let red = pixels[offset + 2]
-                let alpha = pixels[offset + 3]
-                let band: Int = if alpha > 200, red > 200, green > 200, blue > 200 {
-                    1
-                } else if alpha > 200, red < 32, green < 32, blue < 32 {
-                    -1
-                } else {
-                    0
-                }
-                if band != 0, radialBands.last != band {
-                    radialBands.append(band)
-                }
-            }
-        }
-
-        XCTAssertTrue(hasBlack, "click ring should include an opaque black outer stroke")
-        XCTAssertTrue(hasWhite, "click ring should include an opaque white outline")
-        XCTAssertTrue(hasAntialiasedEdge, "click ring edge should contain partially covered pixels")
-        XCTAssertEqual(Array(radialBands.prefix(3)), [1, -1, 1], "click ring should be white-black-white from edge to center")
-        XCTAssertEqual(data[centerOffset + 3], 0, "click ring should not fill its center")
-    }
-
-    func testOnlyLatestClickRingRemainsAfterCursorLeavesFrame() throws {
-        let options = CursorEffectOptions(showCursor: false, pointerStyle: .system, highlight: false, animateClicks: true)
-        let geometry = FrameGeometry(
-            contentRect: CGRect(x: 0, y: 0, width: 256, height: 256),
-            pixelSize: CGSize(width: 256, height: 256)
-        )
-        let snapshot = CursorSnapshot(
-            location: CGPoint(x: 1000, y: 1000),
-            clicks: [
-                (time: 99.8, location: CGPoint(x: 64, y: 64)),
-                (time: 99.9, location: CGPoint(x: 128, y: 128))
-            ]
-        )
-
-        let overlays = CursorOverlayRenderer.render(
-            snapshot: snapshot,
-            options: options,
-            geometry: geometry,
-            level: .full,
-            now: 100
-        )
-
-        let clickOverlay = try XCTUnwrap(overlays.first)
-        XCTAssertEqual(overlays.count, 1)
-        XCTAssertEqual(clickOverlay.rect.midX, 128, accuracy: 0.001)
-        XCTAssertEqual(clickOverlay.rect.midY, 128, accuracy: 0.001)
-    }
-
     func testPerFrameWindowGeometryPlacesDotInsideSurfaceContentRect() throws {
         let options = CursorEffectOptions(showCursor: true, pointerStyle: .dot, highlight: false, animateClicks: false)
         let snapshot = CursorSnapshot(
@@ -340,8 +220,7 @@ final class CursorCompositorTests: XCTestCase {
                 pixelSize: CGSize(width: 140, height: 180),
                 pixelContentRect: CGRect(x: 20, y: 40, width: 100, height: 100)
             ),
-            level: .full,
-            now: 100
+            level: .full
         )
 
         let cursor = try XCTUnwrap(overlays.first)
@@ -362,8 +241,7 @@ final class CursorCompositorTests: XCTestCase {
                 contentRect: CGRect(x: 0, y: 0, width: 128, height: 128),
                 pixelSize: CGSize(width: 256, height: 256)
             ),
-            level: .full,
-            now: 100
+            level: .full
         )
 
         let cursor = try XCTUnwrap(overlays.first)

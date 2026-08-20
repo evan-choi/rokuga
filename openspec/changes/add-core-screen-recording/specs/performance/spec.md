@@ -39,7 +39,7 @@ When an identified `xctrace` release cannot finalize the File Activity template 
 - **THEN** the file profile records and exports System Trace syscalls without administrator privileges, and the trace metadata identifies System Trace as the template
 
 ### Requirement: Frame integrity
-Recordings SHALL be lag-free: at the configured FPS, dropped or duplicated frames MUST stay below 0.1% over any 10-minute window on Apple Silicon baseline hardware (M1, 8 GB) at up to 4K60, and A/V drift MUST stay below 40 ms over one hour. If the encoder cannot keep up, the app SHALL degrade mouse-effect quality first (per design D4) and only then lower capture rate — never freeze, stutter, or silently corrupt the file.
+Recordings SHALL be lag-free: at the configured FPS, dropped or duplicated frames MUST stay below 0.1% over any 10-minute window on Apple Silicon baseline hardware (M1, 8 GB) at up to 4K60, and A/V drift MUST stay below 40 ms over one hour. If the encoder cannot keep up, the app SHALL degrade custom compositor quality first (per design D4) and only then lower capture rate — never freeze, stutter, or silently corrupt the file. ScreenCaptureKit's native click indicator SHALL remain system-owned during degradation.
 
 A/V drift is the change in relative offset between synchronized audio and visual content markers over the measured interval. Track start/end or duration differences SHALL be reported separately as endpoint skew and MUST NOT be labeled as clock drift.
 
@@ -49,7 +49,7 @@ A/V drift is the change in relative offset between synchronized audio and visual
 
 #### Scenario: Overload degradation order
 - **WHEN** sustained encoder back-pressure is detected
-- **THEN** effect quality degrades first, capture FPS second, and the recording continues without a gap; the applied degradation is reported after the recording ends
+- **THEN** custom highlight quality degrades first, capture FPS second, and the recording continues without a gap; the applied degradation is reported after the recording ends
 
 ### Requirement: System responsiveness during recording
 Recording MUST NOT lag the machine: the app SHALL never block the ScreenCaptureKit delivery thread or the main thread with synchronous work, and total CPU overhead of the app during a 1080p60 screen recording SHALL stay ≤ 20% of one core on baseline hardware (≤ 35% at 4K60). Memory SHALL stay bounded (steady-state ≤ 400 MB during recording, independent of duration), and disk writes SHALL stream incrementally — no growing in-memory buffer.

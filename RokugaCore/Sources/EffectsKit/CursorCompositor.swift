@@ -40,7 +40,7 @@ public struct FrameGeometry: Equatable, Sendable {
     }
 }
 
-/// Metal-backed cursor compositor (task 6.1). Renders cursor/halo/click layers into
+/// Metal-backed cursor compositor (task 6.1). Renders dot-pointer and highlight layers into
 /// recorded frames only — the live screen is never touched. The full-resolution frame
 /// stays on the GPU (CoreImage over IOSurface); only small cursor/effect overlay tiles
 /// are rasterized on the CPU each frame.
@@ -99,8 +99,7 @@ public final class CursorCompositor: @unchecked Sendable {
             snapshot: snapshot,
             options: options,
             geometry: frameGeometry ?? geometry,
-            level: level,
-            now: ProcessInfo.processInfo.systemUptime
+            level: level
         )
         guard !overlays.isEmpty else { return sampleBuffer }
 
@@ -175,7 +174,7 @@ public final class CursorCompositor: @unchecked Sendable {
     }
 }
 
-/// CPU rasterizer for small cursor and click-effect overlay tiles.
+/// CPU rasterizer for small cursor and highlight overlay tiles.
 enum CursorOverlayRenderer {
     struct Overlay {
         let image: CGImage
@@ -187,53 +186,15 @@ enum CursorOverlayRenderer {
         snapshot: CursorSnapshot,
         options: CursorEffectOptions,
         geometry: FrameGeometry,
-        level: FrameBudgetMonitor.Level,
-        now: TimeInterval
+        level: FrameBudgetMonitor.Level
     ) -> [Overlay] {
         let scale = geometry.scale
         var overlays: [Overlay] = []
-
-        if options.animateClicks, level < .noClickAnimations {
-            if let ripple = ClickRipple.progresses(clicks: snapshot.clicks, now: now).last,
-               let center = geometry.pixelPosition(of: ripple.location),
-               let click = renderClick(center: center, progress: ripple.progress, scale: scale) {
-                overlays.append(click)
-            }
-        }
 
         if let cursor = renderCursor(snapshot: snapshot, options: options, geometry: geometry, level: level, scale: scale) {
             overlays.append(cursor)
         }
         return overlays
-    }
-
-    private static func renderClick(center: CGPoint, progress: Double, scale: CGFloat) -> Overlay? {
-        let radius = ClickRipple.radius * scale
-        let outerLineWidth = 4 * scale
-        let tileDimension = Int(ceil(radius * 2 + outerLineWidth + 2))
-        let tileSide = CGFloat(tileDimension)
-        let tileOrigin = CGPoint(x: center.x - tileSide / 2, y: center.y - tileSide / 2)
-
-        guard let ctx = makeContext(tileDimension: tileDimension) else { return nil }
-
-        let local = CGPoint(x: tileSide / 2, y: tileSide / 2)
-        let ringRect = CGRect(
-            x: local.x - radius,
-            y: local.y - radius,
-            width: radius * 2,
-            height: radius * 2
-        )
-        let opacity = ClickRipple.opacity(at: progress)
-
-        // Match macOS screen recording's black ring with a thin white outline.
-        ctx.setStrokeColor(CGColor(gray: 1, alpha: opacity))
-        ctx.setLineWidth(outerLineWidth)
-        ctx.strokeEllipse(in: ringRect)
-        ctx.setStrokeColor(CGColor(gray: 0, alpha: opacity))
-        ctx.setLineWidth(2 * scale)
-        ctx.strokeEllipse(in: ringRect)
-
-        return makeOverlay(context: ctx, origin: tileOrigin, dimension: tileDimension)
     }
 
     private static func renderCursor(

@@ -2,7 +2,8 @@ import Foundation
 import SettingsKit
 
 /// Cursor compositing options snapshotted at recording start.
-/// The Metal compositor (task 6.1) renders these into recorded frames only — nothing is drawn on the live screen.
+/// EffectsKit composites dot pointers and highlights into recorded frames. ScreenCaptureKit
+/// owns the system pointer and native click indicator.
 public struct CursorEffectOptions: Equatable, Sendable {
     public var showCursor: Bool
     public var pointerStyle: PointerStyle
@@ -36,7 +37,7 @@ public struct CursorEffectOptions: Equatable, Sendable {
     }
 
     public var needsCompositor: Bool {
-        compositesPointer || highlight || animateClicks
+        compositesPointer || highlight
     }
 
     /// True when frames can bypass the effects compositor entirely.
