@@ -3,7 +3,7 @@
 ## ADDED Requirements
 
 ### Requirement: Cursor visibility
-The app SHALL offer a toggle to include or exclude the mouse cursor in screen recordings (default: include). Mouse effects settings SHALL apply to all three modes (Selected Area, Full Screen, Window).
+The app SHALL offer a toggle to include or exclude the system mouse cursor in screen recordings (default: include). ScreenCaptureKit MUST render the cursor directly into the capture stream, and the setting SHALL apply to all three modes (Selected Area, Full Screen, Window).
 
 #### Scenario: Cursor included
 - **WHEN** cursor visibility is on and the user moves the mouse during a recording
@@ -13,19 +13,8 @@ The app SHALL offer a toggle to include or exclude the mouse cursor in screen re
 - **WHEN** cursor visibility is off
 - **THEN** the recorded video contains no cursor even while the mouse moves over the captured region
 
-### Requirement: Pointer highlight
-The app SHALL offer a highlight effect that renders a colored translucent circle around the cursor in the recording. The user MUST be able to configure the highlight's color, size, and opacity, and the effect MUST appear only in the recording — never on the live screen.
-
-#### Scenario: Highlight rendered in recording only
-- **WHEN** highlight is enabled with a yellow color and a recording is made
-- **THEN** the recorded video shows a yellow circle following the cursor, while the live screen during recording shows no such circle
-
-#### Scenario: Highlight customization
-- **WHEN** the user changes highlight color, size, or opacity in settings
-- **THEN** the next recording reflects the new appearance, and a settings preview shows the effect immediately
-
 ### Requirement: Click effects
-The app SHALL offer a click-effect toggle backed by ScreenCaptureKit's native mouse-click indicator. When enabled, ScreenCaptureKit MUST draw the system circular indicator directly into the BGRA capture stream when the user clicks. The effect SHALL remain independent of cursor visibility, appear only in the recording, and retain its system-owned appearance without app-specific color or animation customization.
+The app SHALL offer a click-effect toggle backed by ScreenCaptureKit's native mouse-click indicator. When enabled, ScreenCaptureKit MUST draw the system circular indicator directly into the BGRA capture stream when the user clicks. The effect SHALL remain independent of cursor visibility, appear only in the recording, and retain its system-owned appearance without app-specific cursor sampling, composition, color, or animation customization.
 
 #### Scenario: Native click indicator
 - **WHEN** click effects are enabled and the user clicks during a recording
@@ -38,14 +27,3 @@ The app SHALL offer a click-effect toggle backed by ScreenCaptureKit's native mo
 #### Scenario: Click effects off
 - **WHEN** click effects are disabled and the user clicks during a recording
 - **THEN** no click indicator appears in the recorded video
-
-### Requirement: Effect fidelity and performance
-Custom pointer and highlight rendering MUST track the true cursor position with no more than one frame of positional lag at the configured frame rate, and enabling all mouse effects MUST NOT reduce the achieved recording frame rate by more than 10% relative to effects-off on supported hardware. If the system cannot sustain the compositor frame budget, custom highlight rendering SHALL degrade gracefully rather than dropping video frames; the ScreenCaptureKit-owned click indicator SHALL remain outside that degradation ladder.
-
-#### Scenario: Position accuracy
-- **WHEN** the cursor moves rapidly across the captured region during a 60 FPS recording
-- **THEN** the rendered cursor/highlight in each frame corresponds to the cursor's actual position at that frame within one frame's movement
-
-#### Scenario: Performance under load
-- **WHEN** all mouse effects are enabled during a full-screen 60 FPS recording on supported hardware
-- **THEN** the achieved average frame rate is at least 90% of the same recording with effects disabled

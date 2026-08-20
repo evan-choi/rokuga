@@ -3,9 +3,9 @@
 ## ADDED Requirements
 
 ### Requirement: Resource-efficient frame transport
-The default capture-to-encoder path SHALL reuse IOSurface-backed pixel buffers from ScreenCaptureKit through the optional compositor and VideoToolbox hardware encoding. Software video encoding MUST NOT exist in the recording path.
+The default capture-to-encoder path SHALL pass IOSurface-backed pixel buffers directly from ScreenCaptureKit to VideoToolbox hardware encoding. Software video encoding MUST NOT exist in the recording path.
 
-A candidate MAY add a buffer copy or CPU readback only when it preserves the same resolution, cadence, codec, effect fidelity, and file integrity, and warm-up plus at least five untraced runs show a median CPU or memory improvement of 3% or more. Drop rate, A/V drift, latency, memory growth, and the other resource MUST NOT regress. The accepted benchmark comparison SHALL remain in the performance artifacts.
+A candidate MAY add a buffer copy or CPU readback only when it preserves the same resolution, cadence, codec, native cursor/click behavior, and file integrity, and warm-up plus at least five untraced runs show a median CPU or memory improvement of 3% or more. Drop rate, A/V drift, latency, memory growth, and the other resource MUST NOT regress. The accepted benchmark comparison SHALL remain in the performance artifacts.
 
 #### Scenario: Hardware encode only
 - **WHEN** any recording runs on any supported Mac
@@ -13,14 +13,14 @@ A candidate MAY add a buffer copy or CPU readback only when it preserves the sam
 
 #### Scenario: Default path avoids copies
 - **WHEN** no measured exception has been accepted
-- **THEN** captured surfaces reach the compositor and encoder without full-frame CPU readback
+- **THEN** captured surfaces reach the encoder without full-frame CPU readback or app-owned cursor composition
 
 #### Scenario: Copy candidate lowers total resource use
 - **WHEN** a candidate introduces a buffer copy or CPU readback
 - **THEN** it is accepted only with a preserved output contract, at least 3% median CPU or memory improvement over five untraced runs, and no regression in the other required metrics
 
 ### Requirement: Repeatable local performance experiments
-Performance experiments SHALL run without UI automation through a separately signed `io.rokuga.Rokuga.Perf` app. The harness MUST use a separate DerivedData directory and sandbox identity, preserve one designated code-signing requirement across rebuilds, and leave the production app, its container, and its settings untouched. It SHALL drive the production `RecordingCoordinator → SCCaptureSession → CursorCompositor → AssetWriterSink` path against a fixed Retina 4K window workload.
+Performance experiments SHALL run without UI automation through a separately signed `io.rokuga.Rokuga.Perf` app. The harness MUST use a separate DerivedData directory and sandbox identity, preserve one designated code-signing requirement across rebuilds, and leave the production app, its container, and its settings untouched. It SHALL drive the production `RecordingCoordinator → SCCaptureSession → AssetWriterSink` path against a fixed Retina 4K window workload.
 
 Each run SHALL retain its recording, build and host metadata, capture/writer counters, output inspection, resource samples, and relevant native trace under a timestamped artifact directory. Untraced warm-up plus at least five runs SHALL determine whether a candidate is accepted. Time Profiler, Metal System Trace, Allocations, and file-I/O traces SHALL be used for diagnosis and MUST NOT supply the acceptance metrics.
 
@@ -39,17 +39,13 @@ When an identified `xctrace` release cannot finalize the File Activity template 
 - **THEN** the file profile records and exports System Trace syscalls without administrator privileges, and the trace metadata identifies System Trace as the template
 
 ### Requirement: Frame integrity
-Recordings SHALL be lag-free: at the configured FPS, dropped or duplicated frames MUST stay below 0.1% over any 10-minute window on Apple Silicon baseline hardware (M1, 8 GB) at up to 4K60, and A/V drift MUST stay below 40 ms over one hour. If the encoder cannot keep up, the app SHALL degrade custom compositor quality first (per design D4) and only then lower capture rate — never freeze, stutter, or silently corrupt the file. ScreenCaptureKit's native click indicator SHALL remain system-owned during degradation.
+Recordings SHALL be lag-free: at the configured FPS, dropped or duplicated frames MUST stay below 0.1% over any 10-minute window on Apple Silicon baseline hardware (M1, 8 GB) at up to 4K60, and A/V drift MUST stay below 40 ms over one hour. Encoder back-pressure MUST NOT freeze the capture delivery path or silently corrupt the file.
 
 A/V drift is the change in relative offset between synchronized audio and visual content markers over the measured interval. Track start/end or duration differences SHALL be reported separately as endpoint skew and MUST NOT be labeled as clock drift.
 
 #### Scenario: Sustained 4K60
 - **WHEN** a 10-minute 4K60 recording runs on baseline hardware
 - **THEN** dropped/duplicated frames are below 0.1% and audio stays in sync (< 40 ms drift)
-
-#### Scenario: Overload degradation order
-- **WHEN** sustained encoder back-pressure is detected
-- **THEN** custom highlight quality degrades first, capture FPS second, and the recording continues without a gap; the applied degradation is reported after the recording ends
 
 ### Requirement: System responsiveness during recording
 Recording MUST NOT lag the machine: the app SHALL never block the ScreenCaptureKit delivery thread or the main thread with synchronous work, and total CPU overhead of the app during a 1080p60 screen recording SHALL stay ≤ 20% of one core on baseline hardware (≤ 35% at 4K60). Memory SHALL stay bounded (steady-state ≤ 400 MB during recording, independent of duration), and disk writes SHALL stream incrementally — no growing in-memory buffer.
@@ -74,7 +70,7 @@ UI interactions SHALL feel instant: toolbar summon → visible in ≤ 150 ms; re
 - **THEN** the finalized playable file is ready within 2 seconds
 
 ### Requirement: Performance regression gates
-The performance budgets above SHALL be enforced by automated benchmarks in CI (capture smoke + encode throughput + memory watermark), failing the build when a budget regresses by more than 10%.
+The performance budgets above SHALL be enforced by automated benchmarks in CI (capture/audio smoke + encode throughput + memory watermark), failing the build when a budget regresses by more than 10%.
 
 #### Scenario: Regression blocks merge
 - **WHEN** a change pushes 4K60 dropped frames above budget on the benchmark runner

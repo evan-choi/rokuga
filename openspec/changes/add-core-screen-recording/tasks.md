@@ -2,7 +2,7 @@
 
 ## 1. Project scaffolding
 
-- [x] 1.1 Create Xcode project: `Rokuga` app target (SwiftUI, macOS 15+, sandboxed, `LSUIElement` agent) + local SPM package `RokugaCore` (CaptureKit, EncoderKit, EffectsKit, TrimKit, SettingsKit)
+- [x] 1.1 Create Xcode project: `Rokuga` app target (SwiftUI, macOS 15+, sandboxed, `LSUIElement` agent) + local SPM package `RokugaCore` (CaptureKit, EncoderKit, TrimKit, SettingsKit)
 - [x] 1.2 Entitlements & Info.plist: microphone usage description, security-scoped bookmarks, `LSUIElement`; launch at login via `SMAppService.mainApp`
 - [x] 1.3 Add `KeyboardShortcuts` (MIT) as the sole third-party dependency
 - [x] 1.4 CI pipeline: build + unit tests on macOS 14/15 hosted runners, localization and baseline frame-transport static audits, benchmark job scaffold
@@ -23,7 +23,7 @@
 - [x] 3.3a System audio via SCStream (`capturesAudio`, `excludesCurrentProcessAudio`) → 48 kHz AAC track, covered by an asset-writer integration test
 - [ ] 3.3b Connected mic capture via AVCaptureSession → 48 kHz mixer → the same AAC track
 - [x] 3.4a Quality 0–100 and AAC 128–320 kbps mapping; quality remains on one bounded bitrate curve and codec profile through 100 while clean aperture preserves odd native dimensions
-- [x] 3.4c sRGB-matched color pipeline: capture in sRGB (`colorSpaceName`), tag output BT.709 primaries + sRGB transfer + BT.709 matrix, propagate color attachments through the cursor compositor
+- [x] 3.4c sRGB-matched color pipeline: capture in sRGB (`colorSpaceName`) and tag output BT.709 primaries + sRGB transfer + BT.709 matrix
 - [ ] 3.4b Selectable VBR/capped-VBR UI
 - [x] 3.5 Resolution cap (≤ 5K), 30/60 FPS, and capture-display refresh matching with automatic downscale of oversized sources
 - [x] 3.6 Disk-full preflight + 30 s watermark + auto-stop below 500 MB free
@@ -53,12 +53,9 @@
 - [x] 5.2 Wire toolbar start and menu bar stop to the coordinator; concurrent-start prevention; quit-while-recording confirm + safe finalize
 - [x] 5.3 Register lifecycle-scoped global shortcuts: Esc cancels preparing/countdown and ⌃⌘Esc stops recording/paused; disable both while idle/finishing
 
-## 6. Mouse effects (EffectsKit)
+## 6. Mouse effects (ScreenCaptureKit)
 
-- [x] 6.1 Cursor effects: ScreenCaptureKit-owned system pointer and native click indicator; compositor-owned dot pointer and fixed highlight halo — recorded-only, invisible live
-- [x] 6.2 Per-frame GPU budget monitor with automatic effect degradation ladder
-- [ ] 6.3 Mouse-effect customization: highlight color/size/opacity and settings preview
-- [x] 6.4 Sample cursor state at the configured capture rate so 60 FPS recordings meet the one-frame positional-lag contract
+- [x] 6.1 ScreenCaptureKit-owned system pointer and native click indicator, independently toggleable and rendered directly into the capture stream
 
 ## 7. Post-recording delivery
 
@@ -108,6 +105,5 @@
 - [x] 10.1 Baseline frame-transport audit: the current recording path has no full-frame CPU pixel-buffer readback; any future copy requires the measured exception defined by the performance spec
 - [x] 10.2 End-to-end capture benchmarks: 4K60 10-min drop-rate < 0.1%, A/V drift < 40 ms/h, CPU ≤ 20%@1080p60 / ≤ 35%@4K60, memory ≤ 400 MB steady, 8 h soak
 - [x] 10.3 Latency tests: summon ≤ 150 ms, record→first frame ≤ 500 ms, stop→playable ≤ 2 s, passthrough trim ≤ 3 s
-- [ ] 10.4 Correct CPU thresholds and wire actual capture/audio/effects benchmarks into CI as >10% regression gates
+- [ ] 10.4 Correct CPU thresholds and wire actual capture/audio benchmarks into CI as >10% regression gates
 - [ ] 10.5 QA matrix: macOS 15+ × Intel/Apple Silicon × 1–3 displays incl. mixed scale factors; accessibility review
-- [ ] 10.6 Runtime degradation after effects fallback: lower capture FPS and report the applied degradation after recording
