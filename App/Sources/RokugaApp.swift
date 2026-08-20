@@ -98,24 +98,7 @@ struct MenuBarContentView: View {
     }
 }
 
-/// Menu item that opens the Settings scene.
-/// macOS 14+ removed the `showSettingsWindow:` selector path, so the official
-/// `openSettings` environment action must be used there.
 struct SettingsMenuItem: View {
-    var body: some View {
-        if #available(macOS 14.0, *) {
-            ModernSettingsMenuItem()
-        } else {
-            Button("Settings…") {
-                SettingsOpener.open()
-            }
-            .keyboardShortcut(",", modifiers: .command)
-        }
-    }
-}
-
-@available(macOS 14.0, *)
-private struct ModernSettingsMenuItem: View {
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {

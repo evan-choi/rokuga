@@ -10,7 +10,7 @@ No watermarks. No time limits. No accounts. No paywalls.
 
 [![CI](https://github.com/evan-choi/rokuga/actions/workflows/ci.yml/badge.svg)](https://github.com/evan-choi/rokuga/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-macOS%2013.3%2B-black?logo=apple)](https://www.apple.com/macos/)
+[![Platform](https://img.shields.io/badge/Platform-macOS%2015%2B-black?logo=apple)](https://www.apple.com/macos/)
 
 </div>
 
@@ -39,7 +39,7 @@ Rokuga runs as a menu bar app with a floating recording toolbar instead of a lib
 
 To run Rokuga:
 
-- macOS 13.3 (Ventura) or later
+- macOS 15 (Sequoia) or later
 - Screen Recording permission
 
 To build Rokuga:

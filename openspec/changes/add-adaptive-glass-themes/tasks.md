@@ -6,7 +6,7 @@
 
 ## 2. Glass surfaces
 
-- [x] 2.1 Use one Dark palette for macOS 26 glass and the macOS 13.3–15 visual-effect fallback
+- [x] 2.1 Use one Dark palette for macOS 26 glass and the macOS 15–25 visual-effect fallback
 - [x] 2.2 Apply the shared Dark glass contract to the toolbar, tooltip, preview, and trim editor
 - [x] 2.3 Preserve rounded clipping, fixed-contrast overlays, and semantic Dark chrome
 - [x] 2.4 Retain Increase Contrast and Reduce Transparency behavior
