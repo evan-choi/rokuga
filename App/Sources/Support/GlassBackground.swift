@@ -32,6 +32,7 @@ struct GlassBackground: View {
             if reduceTransparency {
                 shape.fill(resolvedPalette.tint)
             } else {
+#if compiler(>=6.2)
                 if #available(macOS 26.0, *) {
                     shape.fill(.clear)
                         .glassEffect(.regular, in: shape)
@@ -39,6 +40,10 @@ struct GlassBackground: View {
                     VisualEffectView()
                         .clipShape(shape)
                 }
+#else
+                VisualEffectView()
+                    .clipShape(shape)
+#endif
                 shape.fill(resolvedPalette.tint.opacity(resolvedPalette.scrimOpacity))
             }
         }
