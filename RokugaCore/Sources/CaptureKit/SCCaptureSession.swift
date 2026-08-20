@@ -1,5 +1,4 @@
 import CoreMedia
-import EffectsKit
 import EncoderKit
 import Foundation
 import ScreenCaptureKit
@@ -9,26 +8,21 @@ public struct CaptureConfiguration: Equatable, Sendable {
     public var frameRate: Int
     public var captureSystemAudio: Bool
     public var exclusion: ExclusionOptions
-    public var cursorEffects: CursorEffectOptions
-
-    /// ScreenCaptureKit owns the system pointer for the entire stream. Custom dot
-    /// pointers remain owned by EffectsKit for the entire stream.
-    public var showsCursor: Bool {
-        cursorEffects.usesNativeSystemCursor
-    }
+    public var showsCursor: Bool
+    public var showMouseClicks: Bool
 
     public init(
         frameRate: Int,
         captureSystemAudio: Bool,
         exclusion: ExclusionOptions,
-        cursorEffects: CursorEffectOptions = CursorEffectOptions(
-            showCursor: true, pointerStyle: .system, highlight: false, animateClicks: false
-        )
+        showsCursor: Bool = true,
+        showMouseClicks: Bool = false
     ) {
         self.frameRate = max(frameRate, 1)
         self.captureSystemAudio = captureSystemAudio
         self.exclusion = exclusion
-        self.cursorEffects = cursorEffects
+        self.showsCursor = showsCursor
+        self.showMouseClicks = showMouseClicks
     }
 
     public static func fromSettings(_ settings: SettingsStore, frameRate: Int? = nil) -> Self {
@@ -38,7 +32,8 @@ public struct CaptureConfiguration: Equatable, Sendable {
             exclusion: ExclusionOptions(
                 excludeDesktopIcons: settings.excludeDesktopIcons
             ),
-            cursorEffects: CursorEffectOptions.fromSettings(settings)
+            showsCursor: settings.showCursor,
+            showMouseClicks: settings.animateClicks
         )
     }
 }
@@ -54,10 +49,6 @@ public final class CaptureMetrics: @unchecked Sendable {
         public var gapPTS = 0
         public var missingVideoFrames = 0
         public var maxPTSGapSeconds = 0.0
-        public var compositeCalls = 0
-        public var compositeSeconds = 0.0
-        public var maxCompositeSeconds = 0.0
-        public var effectDegradations = 0
         public var firstCompleteFrameUptimeNanoseconds: UInt64?
     }
 
@@ -86,7 +77,7 @@ public final class CaptureMetrics: @unchecked Sendable {
         lock.withLock { snapshot.incompleteVideoFrames += 1 }
     }
 
-    func recordCompleteVideoFrame(pts: CMTime, compositeSeconds: Double?) {
+    func recordCompleteVideoFrame(pts: CMTime) {
         lock.withLock {
             snapshot.completeVideoFrames += 1
             if snapshot.firstCompleteFrameUptimeNanoseconds == nil {
@@ -103,20 +94,11 @@ public final class CaptureMetrics: @unchecked Sendable {
                 }
             }
             lastVideoPTS = pts
-            if let compositeSeconds {
-                snapshot.compositeCalls += 1
-                snapshot.compositeSeconds += compositeSeconds
-                snapshot.maxCompositeSeconds = max(snapshot.maxCompositeSeconds, compositeSeconds)
-            }
         }
     }
 
     func recordAudioCallback() {
         lock.withLock { snapshot.audioCallbacks += 1 }
-    }
-
-    func recordEffectDegradation() {
-        lock.withLock { snapshot.effectDegradations += 1 }
     }
 }
 
@@ -133,8 +115,6 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
     private var stream: SCStream?
     private var isPaused = false
     private var isStopping = false
-    private var compositor: CursorCompositor?
-    private var cursorSampler: CursorStateSampler?
 
     public init(
         target: CaptureTarget,
@@ -165,15 +145,13 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
                 throw RecordingError.captureSourceLost
             }
 
-            let streamConfiguration = makeStreamConfiguration()
-            let preparedStream = SCStream(filter: filter, configuration: streamConfiguration, delegate: self)
+            let preparedStream = SCStream(filter: filter, configuration: makeStreamConfiguration(), delegate: self)
             stream = preparedStream
             try preparedStream.addStreamOutput(self, type: .screen, sampleHandlerQueue: sampleQueue)
             if configuration.captureSystemAudio {
                 try preparedStream.addStreamOutput(self, type: .audio, sampleHandlerQueue: sampleQueue)
             }
 
-            await prepareCursorEffects(configuration: streamConfiguration)
             try await sinkStart
             try await preparedStream.startCapture()
             stateLock.withLock { self.stream = preparedStream }
@@ -181,63 +159,8 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
             if let stream {
                 try? await stream.stopCapture()
             }
-            await stopCursorSampling()
             await sink.cancel()
             throw error
-        }
-    }
-
-    private func prepareCursorEffects(configuration streamConfiguration: SCStreamConfiguration) async {
-        guard configuration.cursorEffects.needsCompositor else { return }
-
-        let sampler = CursorStateSampler(
-            framesPerSecond: configuration.frameRate
-        )
-        await sampler.start()
-        let compositor = CursorCompositor(
-            options: configuration.cursorEffects,
-            geometry: frameGeometry(configuration: streamConfiguration),
-            sampler: sampler
-        ) { [weak self] in
-            self?.finishCursorEffectDegradation()
-        }
-        stateLock.withLock {
-            cursorSampler = sampler
-            self.compositor = compositor
-        }
-    }
-
-    /// Global-CG-coordinate rect of the captured content, used to map cursor positions into frame pixels.
-    private func frameGeometry(configuration: SCStreamConfiguration) -> FrameGeometry {
-        var contentRect = target.globalFrame
-        if case let .display(display, crop) = target, let crop {
-            contentRect = CGRect(
-                x: display.frame.minX + crop.minX,
-                y: display.frame.minY + crop.minY,
-                width: crop.width,
-                height: crop.height
-            )
-        }
-        return FrameGeometry(
-            contentRect: contentRect,
-            pixelSize: CGSize(width: Int(configuration.width), height: Int(configuration.height))
-        )
-    }
-
-    private func finishCursorEffectDegradation() {
-        metrics?.recordEffectDegradation()
-        // A custom dot still needs the compositor at the cursor-only level. Native
-        // system pointers are already present in every SCStream frame, so all custom
-        // effects can be detached without a cursor-ownership handoff.
-        guard !configuration.cursorEffects.compositesPointer else { return }
-
-        let sampler = stateLock.withLock { () -> CursorStateSampler? in
-            compositor = nil
-            defer { cursorSampler = nil }
-            return cursorSampler
-        }
-        if let sampler {
-            Task { await sampler.stop() }
         }
     }
 
@@ -261,7 +184,6 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
             // stopCapture throws if the stream already died (e.g. display unplug) — the sink still holds valid data, so finalize regardless.
             try? await stream.stopCapture()
         }
-        await stopCursorSampling()
         return try await sink.finish()
     }
 
@@ -274,19 +196,7 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         if let stream {
             try? await stream.stopCapture()
         }
-        await stopCursorSampling()
         await sink.cancel()
-    }
-
-    private func stopCursorSampling() async {
-        let sampler = stateLock.withLock { () -> CursorStateSampler? in
-            compositor = nil
-            defer { cursorSampler = nil }
-            return cursorSampler
-        }
-        if let sampler {
-            await sampler.stop()
-        }
     }
 
     /// Re-resolves the content filter so newly created windows (e.g. the floating thumbnail) honor the exclusion rules mid-recording (task 2.4).
@@ -320,7 +230,7 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         config.colorSpaceName = CGColorSpace.sRGB
         config.showsCursor = configuration.showsCursor
         if #available(macOS 15.0, *) {
-            config.showMouseClicks = configuration.cursorEffects.animateClicks
+            config.showMouseClicks = configuration.showMouseClicks
         }
         config.queueDepth = 8
 
@@ -364,16 +274,10 @@ extension SCCaptureSession: SCStreamOutput {
                 metrics?.recordIncompleteVideoFrame()
                 return
             }
-            let compositor = stateLock.withLock { self.compositor }
-            let geometry = Self.frameGeometry(from: sampleBuffer)
-            let started = metrics != nil && compositor != nil ? CFAbsoluteTimeGetCurrent() : nil
-            let output = compositor?.composite(sampleBuffer, geometry: geometry) ?? sampleBuffer
-            let compositeSeconds = started.map { CFAbsoluteTimeGetCurrent() - $0 }
             metrics?.recordCompleteVideoFrame(
-                pts: CMSampleBufferGetPresentationTimeStamp(sampleBuffer),
-                compositeSeconds: compositeSeconds
+                pts: CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
             )
-            sink.append(output, of: .video)
+            sink.append(sampleBuffer, of: .video)
         case .audio:
             metrics?.recordAudioCallback()
             sink.append(sampleBuffer, of: .systemAudio)
@@ -389,49 +293,6 @@ extension SCCaptureSession: SCStreamOutput {
             let status = SCFrameStatus(rawValue: statusRaw)
         else { return false }
         return status == .complete
-    }
-
-    private static func frameGeometry(from sampleBuffer: CMSampleBuffer) -> FrameGeometry? {
-        guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer),
-              let attachments = CMSampleBufferGetSampleAttachmentsArray(sampleBuffer, createIfNecessary: false)
-              as? [[SCStreamFrameInfo: Any]],
-              let frameInfo = attachments.first
-        else { return nil }
-
-        return frameGeometry(
-            frameInfo: frameInfo,
-            pixelSize: CGSize(
-                width: CVPixelBufferGetWidth(imageBuffer),
-                height: CVPixelBufferGetHeight(imageBuffer)
-            )
-        )
-    }
-
-    static func frameGeometry(
-        frameInfo: [SCStreamFrameInfo: Any],
-        pixelSize: CGSize
-    ) -> FrameGeometry? {
-        guard let screenRect = frameInfo[.screenRect] as? CGRect,
-              let surfaceRect = frameInfo[.contentRect] as? CGRect,
-              let scaleFactor = frameInfo[.scaleFactor] as? CGFloat,
-              screenRect.width > 0,
-              screenRect.height > 0,
-              scaleFactor > 0
-        else { return nil }
-
-        let pixelContentRect = CGRect(
-            x: surfaceRect.minX * scaleFactor,
-            y: surfaceRect.minY * scaleFactor,
-            width: surfaceRect.width * scaleFactor,
-            height: surfaceRect.height * scaleFactor
-        ).intersection(CGRect(origin: .zero, size: pixelSize))
-        guard !pixelContentRect.isNull, !pixelContentRect.isEmpty else { return nil }
-
-        return FrameGeometry(
-            contentRect: screenRect,
-            pixelSize: pixelSize,
-            pixelContentRect: pixelContentRect
-        )
     }
 }
 

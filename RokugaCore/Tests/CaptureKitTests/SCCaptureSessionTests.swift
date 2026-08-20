@@ -20,19 +20,18 @@ private struct NullSink: MediaSink {
 }
 
 final class SCCaptureSessionTests: XCTestCase {
-    func testCaptureMetricsCountsGapsDuplicatesAndCompositeTime() {
+    func testCaptureMetricsCountsGapsAndDuplicates() {
         let metrics = CaptureMetrics(frameRate: 60)
 
         metrics.recordVideoCallback()
-        metrics.recordCompleteVideoFrame(pts: .zero, compositeSeconds: 0.001)
+        metrics.recordCompleteVideoFrame(pts: .zero)
         metrics.recordVideoCallback()
-        metrics.recordCompleteVideoFrame(pts: .zero, compositeSeconds: 0.002)
+        metrics.recordCompleteVideoFrame(pts: .zero)
         metrics.recordVideoCallback()
-        metrics.recordCompleteVideoFrame(pts: CMTime(seconds: 0.1, preferredTimescale: 600), compositeSeconds: nil)
+        metrics.recordCompleteVideoFrame(pts: CMTime(seconds: 0.1, preferredTimescale: 600))
         metrics.recordIncompleteVideoFrame()
         metrics.recordInvalidSample()
         metrics.recordAudioCallback()
-        metrics.recordEffectDegradation()
 
         let snapshot = metrics.currentSnapshot()
         XCTAssertEqual(snapshot.videoCallbacks, 3)
@@ -44,9 +43,6 @@ final class SCCaptureSessionTests: XCTestCase {
         XCTAssertEqual(snapshot.gapPTS, 1)
         XCTAssertEqual(snapshot.missingVideoFrames, 5)
         XCTAssertEqual(snapshot.maxPTSGapSeconds, 0.1, accuracy: 0.001)
-        XCTAssertEqual(snapshot.compositeCalls, 2)
-        XCTAssertEqual(snapshot.compositeSeconds, 0.003, accuracy: 0.000_001)
-        XCTAssertEqual(snapshot.effectDegradations, 1)
         XCTAssertNotNil(snapshot.firstCompleteFrameUptimeNanoseconds)
     }
 
@@ -77,14 +73,13 @@ final class SCCaptureSessionTests: XCTestCase {
         }
     }
 
-    func testStreamConfigurationUsesNativeClickEffectsWithoutCompositor() throws {
+    func testStreamConfigurationUsesNativeClickEffects() throws {
         guard #available(macOS 15.0, *) else {
             throw XCTSkip("ScreenCaptureKit native click effects require macOS 15")
         }
 
         withSettings { settings in
             settings.showCursor = false
-            settings.highlightCursor = false
             settings.animateClicks = true
             let configuration = CaptureConfiguration.fromSettings(settings)
             let session = SCCaptureSession(
@@ -106,71 +101,31 @@ final class SCCaptureSessionTests: XCTestCase {
 
             XCTAssertFalse(config.showsCursor)
             XCTAssertTrue(config.showMouseClicks)
-            XCTAssertFalse(configuration.cursorEffects.needsCompositor)
         }
     }
 
-    func testSystemPointerRemainsNativeWhenEffectsAreEnabled() {
+    func testSystemPointerAndClickIndicatorUseNativeConfiguration() {
         withSettings { settings in
             settings.showCursor = true
-            settings.pointerStyle = .system
-            settings.highlightCursor = true
             settings.animateClicks = true
 
             let configuration = CaptureConfiguration.fromSettings(settings)
 
             XCTAssertTrue(configuration.showsCursor)
-            XCTAssertTrue(configuration.cursorEffects.needsCompositor)
+            XCTAssertTrue(configuration.showMouseClicks)
         }
     }
 
-    func testDotPointerDisablesNativeCursorAndKeepsCompositor() {
-        withSettings { settings in
-            settings.showCursor = true
-            settings.pointerStyle = .dot
-            settings.highlightCursor = false
-            settings.animateClicks = false
-
-            let configuration = CaptureConfiguration.fromSettings(settings)
-
-            XCTAssertFalse(configuration.showsCursor)
-            XCTAssertTrue(configuration.cursorEffects.compositesPointer)
-            XCTAssertTrue(configuration.cursorEffects.needsCompositor)
-        }
-    }
-
-    func testHiddenPointerDisablesBothCursorOwners() {
+    func testCursorAndClickIndicatorCanBeDisabledIndependently() {
         withSettings { settings in
             settings.showCursor = false
-            settings.pointerStyle = .system
-            settings.highlightCursor = false
             settings.animateClicks = false
 
             let configuration = CaptureConfiguration.fromSettings(settings)
 
             XCTAssertFalse(configuration.showsCursor)
-            XCTAssertFalse(configuration.cursorEffects.needsCompositor)
+            XCTAssertFalse(configuration.showMouseClicks)
         }
-    }
-
-    func testFrameMetadataTracksMovingWindowAndSurfacePlacement() throws {
-        let frameInfo: [SCStreamFrameInfo: Any] = [
-            .screenRect: CGRect(x: 120, y: 80, width: 640, height: 480),
-            .contentRect: CGRect(x: 10, y: 20, width: 320, height: 240),
-            .scaleFactor: CGFloat(2)
-        ]
-
-        let geometry = try XCTUnwrap(SCCaptureSession.frameGeometry(
-            frameInfo: frameInfo,
-            pixelSize: CGSize(width: 800, height: 600)
-        ))
-
-        XCTAssertEqual(geometry.contentRect, CGRect(x: 120, y: 80, width: 640, height: 480))
-        XCTAssertEqual(geometry.pixelContentRect, CGRect(x: 20, y: 40, width: 640, height: 480))
-        XCTAssertEqual(
-            geometry.pixelPosition(of: CGPoint(x: 440, y: 320)),
-            CGPoint(x: 340, y: 280)
-        )
     }
 
     private func withSettings(_ body: (SettingsStore) -> Void) {

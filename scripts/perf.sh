@@ -24,7 +24,6 @@ WORKLOAD_AUDIO=off
 RECORD_CODEC=hevc
 RECORD_FRAME_RATE_MODE=variable
 RECORD_SYSTEM_AUDIO=off
-RECORD_EFFECTS=off
 
 fail() {
     echo "error: $*" >&2
@@ -103,7 +102,6 @@ configure_scenario() {
             RECORD_CODEC=hevc
             RECORD_FRAME_RATE_MODE=variable
             RECORD_SYSTEM_AUDIO=off
-            RECORD_EFFECTS=off
             ;;
         4k-motion)
             WORKLOAD_MOTION=on
@@ -111,7 +109,6 @@ configure_scenario() {
             RECORD_CODEC=hevc
             RECORD_FRAME_RATE_MODE=variable
             RECORD_SYSTEM_AUDIO=off
-            RECORD_EFFECTS=off
             ;;
         4k-audio)
             WORKLOAD_MOTION=on
@@ -119,15 +116,6 @@ configure_scenario() {
             RECORD_CODEC=hevc
             RECORD_FRAME_RATE_MODE=variable
             RECORD_SYSTEM_AUDIO=on
-            RECORD_EFFECTS=off
-            ;;
-        4k-effects)
-            WORKLOAD_MOTION=on
-            WORKLOAD_AUDIO=off
-            RECORD_CODEC=hevc
-            RECORD_FRAME_RATE_MODE=variable
-            RECORD_SYSTEM_AUDIO=off
-            RECORD_EFFECTS=on
             ;;
         4k-cfr-h264)
             WORKLOAD_MOTION=off
@@ -135,10 +123,9 @@ configure_scenario() {
             RECORD_CODEC=h264
             RECORD_FRAME_RATE_MODE=constant
             RECORD_SYSTEM_AUDIO=off
-            RECORD_EFFECTS=off
             ;;
         *)
-            fail "unknown scenario: $1 (expected 4k-static, 4k-motion, 4k-audio, 4k-effects, or 4k-cfr-h264)"
+            fail "unknown scenario: $1 (expected 4k-static, 4k-motion, 4k-audio, or 4k-cfr-h264)"
             ;;
     esac
 }
@@ -266,7 +253,6 @@ record_arguments() {
         --codec "$RECORD_CODEC"
         --frame-rate-mode "$RECORD_FRAME_RATE_MODE"
         --system-audio "$RECORD_SYSTEM_AUDIO"
-        --effects "$RECORD_EFFECTS"
         --window-pid "$WORKLOAD_PID"
     )
 }
@@ -635,7 +621,7 @@ case "${1:-}" in
         capture_gate "$@"
         ;;
     scenarios)
-        printf '%s\n' 4k-static 4k-motion 4k-audio 4k-effects 4k-cfr-h264
+        printf '%s\n' 4k-static 4k-motion 4k-audio 4k-cfr-h264
         ;;
     *)
         usage

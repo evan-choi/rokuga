@@ -57,16 +57,6 @@ final class SettingsModel: ObservableObject {
         set { update { $0.showCursor = newValue } }
     }
 
-    var pointerStyle: PointerStyle {
-        get { store.pointerStyle }
-        set { update { $0.pointerStyle = newValue } }
-    }
-
-    var highlightCursor: Bool {
-        get { store.highlightCursor }
-        set { update { $0.highlightCursor = newValue } }
-    }
-
     var animateClicks: Bool {
         get { store.animateClicks }
         set { update { $0.animateClicks = newValue } }

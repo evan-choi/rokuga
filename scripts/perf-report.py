@@ -29,8 +29,6 @@ METRICS = (
     "capture.gapPTS",
     "capture.missingVideoFrames",
     "capture.duplicatePTS",
-    "capture.averageCompositeSeconds",
-    "capture.maxCompositeSeconds",
     "writer.averageQueueWaitSeconds",
     "writer.maxQueueWaitSeconds",
     "output.gapPTS",
@@ -45,7 +43,7 @@ HIGHER_IS_BETTER = {"derived.outputFPS"}
 COMPARABLE_METRICS = set(METRICS) - {"output.fileSizeBytes"}
 RECORDING_CONFIGURATION = (
     "target", "width", "height", "fps", "seconds", "codec",
-    "frameRateMode", "systemAudio", "effects",
+    "frameRateMode", "systemAudio",
 )
 WORKLOAD_CONFIGURATION = (
     "widthPoints", "heightPoints", "backingScale", "widthPixels",

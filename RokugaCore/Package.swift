@@ -11,7 +11,6 @@ let package = Package(
         .executable(name: "rokuga-bench", targets: ["rokuga-bench"]),
         .library(name: "CaptureKit", targets: ["CaptureKit"]),
         .library(name: "EncoderKit", targets: ["EncoderKit"]),
-        .library(name: "EffectsKit", targets: ["EffectsKit"]),
         .library(name: "TrimKit", targets: ["TrimKit"]),
         .library(name: "SettingsKit", targets: ["SettingsKit"]),
     ],
@@ -19,16 +18,11 @@ let package = Package(
         // MARK: Capture — ScreenCaptureKit session management, recording state machine
         .target(
             name: "CaptureKit",
-            dependencies: ["EncoderKit", "EffectsKit", "SettingsKit"]
+            dependencies: ["EncoderKit", "SettingsKit"]
         ),
         // MARK: Encode — AVAssetWriter/VideoToolbox pipeline, audio mixing
         .target(
             name: "EncoderKit",
-            dependencies: ["SettingsKit"]
-        ),
-        // MARK: Effects — Metal dot-pointer and cursor-highlight compositor
-        .target(
-            name: "EffectsKit",
             dependencies: ["SettingsKit"]
         ),
         // MARK: Trim — passthrough export, timeline model
@@ -55,10 +49,6 @@ let package = Package(
         .testTarget(
             name: "TrimKitTests",
             dependencies: ["TrimKit"]
-        ),
-        .testTarget(
-            name: "EffectsKitTests",
-            dependencies: ["EffectsKit"]
         ),
         .executableTarget(
             name: "rokuga-bench",

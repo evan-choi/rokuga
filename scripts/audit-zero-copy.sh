@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
-# Zero-copy audit (task 10.1): the record path (capture → composite → encode)
+# Zero-copy audit (task 10.1): the record path (capture → encode)
 # must never read frame pixels back to the CPU. This static gate fails when CPU
-# pixel-access APIs appear in record-path sources. The cursor compositor's tiny
-# overlay tile (≤256 px, not the frame) is rasterized on CPU by design and its
-# file is allowlisted; frame compositing there goes through CoreImage on Metal.
+# pixel-access APIs appear in record-path sources.
 #
 # For the dynamic proof, run:
 #   xctrace record --template 'Metal System Trace' --launch rokuga-bench throughput
