@@ -36,9 +36,12 @@ type Copy = {
     edit: string
     view: string
     date: string
+    demoLabel: string
+    hint: string
   }
   trust: {
     label: string
+    title: string
     codec: string
     frameRate: string
     resolution: string
@@ -120,9 +123,12 @@ export const translations: Record<Language, Copy> = {
       edit: '편집',
       view: '보기',
       date: '8월 19일 수요일  20:24',
+      demoLabel: '직접 사용해 보기',
+      hint: '영역을 드래그하거나 가장자리를 잡아 크기를 바꿔보세요.',
     },
     trust: {
       label: 'Rokuga 핵심 가치',
+      title: '핵심만, 한눈에.',
       codec: '고효율 영상 코덱',
       frameRate: '모니터 주사율에 맞춰',
       resolution: '최대 해상도',
@@ -199,9 +205,12 @@ export const translations: Record<Language, Copy> = {
       edit: 'Edit',
       view: 'View',
       date: 'Wed Aug 19  8:24 PM',
+      demoLabel: 'Try it yourself',
+      hint: 'Drag the area or grab an edge to resize it.',
     },
     trust: {
       label: 'Rokuga highlights',
+      title: 'The essentials, at a glance.',
       codec: 'High-efficiency video codec',
       frameRate: 'Matched to your display',
       resolution: 'Maximum resolution',
@@ -278,9 +287,12 @@ export const translations: Record<Language, Copy> = {
       edit: '編集',
       view: '表示',
       date: '8月19日 水曜日  20:24',
+      demoLabel: '操作してみる',
+      hint: '範囲をドラッグするか、端をつかんでサイズを変更できます。',
     },
     trust: {
       label: 'Rokugaの特長',
+      title: '特長を、ひと目で。',
       codec: '高効率ビデオコーデック',
       frameRate: 'ディスプレイに合わせて',
       resolution: '最大解像度',
@@ -357,9 +369,12 @@ export const translations: Record<Language, Copy> = {
       edit: '编辑',
       view: '显示',
       date: '8月19日 周三  20:24',
+      demoLabel: '亲自试试',
+      hint: '拖动选区，或抓住边缘调整大小。',
     },
     trust: {
       label: 'Rokuga 核心亮点',
+      title: '亮点，一目了然。',
       codec: '高效视频编码',
       frameRate: '匹配显示器刷新率',
       resolution: '最高分辨率',
