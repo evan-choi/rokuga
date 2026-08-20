@@ -26,7 +26,7 @@ settings:
     SWIFT_VERSION: "5.0"
     MACOSX_DEPLOYMENT_TARGET: "15.0"
     DEAD_CODE_STRIPPING: YES
-    MARKETING_VERSION: "0.1.0"
+    MARKETING_VERSION: "1.0"
     CURRENT_PROJECT_VERSION: "1"
   configs:
     # Hardened runtime blocks debugger attach; Release-only (Debug keeps get-task-allow).
