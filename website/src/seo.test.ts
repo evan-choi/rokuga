@@ -19,6 +19,8 @@ describe('crawler metadata', () => {
     })
     expect(index).toContain('Rokuga is a free, native, open-source screen recorder for Mac that records at display-matched frame rates, with H.265 and resolutions up to 5K.')
     expect(index).toContain('Get Rokuga from the Mac App Store or install it with Homebrew.')
+    expect(index).toContain('<div id="root"></div>')
+    expect(index).toMatch(/<noscript>[\s\S]*Rokuga for Mac[\s\S]*<\/noscript>/)
     expect(robots).toContain(`Sitemap: ${websiteUrl}sitemap.xml`)
     expect(sitemap).toContain(`<loc>${websiteUrl}</loc>`)
     expect(llms).toContain(`Website: ${websiteUrl}`)
