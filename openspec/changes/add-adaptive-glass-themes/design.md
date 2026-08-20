@@ -1,6 +1,6 @@
 ## Context
 
-The app previously persisted an Auto, Light, or Dark selection and applied it through `ThemeApplier`. Native glass still reacts to desktop content, so a stored Light appearance could leave dark-backdrop toolbar controls without enough contrast. Rokuga supports macOS 13.3 and later, with `glassEffect` on macOS 26 and `NSVisualEffectView` on earlier supported releases.
+The app previously persisted an Auto, Light, or Dark selection and applied it through `ThemeApplier`. Native glass still reacts to desktop content, so a stored Light appearance could leave dark-backdrop toolbar controls without enough contrast. Rokuga supports macOS 15 and later, with `glassEffect` on macOS 26 and `NSVisualEffectView` on earlier supported releases.
 
 ## Goals / Non-Goals
 
@@ -27,7 +27,7 @@ Set `NSApp.appearance` to `.darkAqua` in `applicationWillFinishLaunching`, befor
 
 `GlassBackground` uses a `#1E1E23` scrim at 0.70 opacity and a white border at 0.14 opacity. Increase Contrast raises these to 0.84 and 0.26. Reduce Transparency replaces native material and scrim compositing with the opaque Dark tint. The shared `captureWindowChrome` modifier applies this contract to the toolbar, tooltip, preview, and trim editor; shared constants keep the panel and tooltip radii consistent.
 
-Native material remains below the scrim: `.glassEffect(.regular)` on macOS 26 and clipped `NSVisualEffectView` on macOS 13.3–15. The explicit scrim, not material tint behavior, provides the contrast floor over arbitrary content. Rounded hosting layers remain clipped to their visible bounds with native window shadows disabled, including the smaller tooltip panel. The trim editor uses the same material and scrim with square window corners.
+Native material remains below the scrim: `.glassEffect(.regular)` on macOS 26 and clipped `NSVisualEffectView` on macOS 15–25. The explicit scrim, not material tint behavior, provides the contrast floor over arbitrary content. Rounded hosting layers remain clipped to their visible bounds with native window shadows disabled, including the smaller tooltip panel. The trim editor uses the same material and scrim with square window corners.
 
 ### Resolve app chrome under Dark Aqua
 

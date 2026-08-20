@@ -186,17 +186,6 @@ private struct OutputPane: View {
     }
 }
 
-/// Legacy Settings opener for macOS 13 only.
-/// On macOS 14+ this selector no longer exists; use the `openSettings`
-/// environment action instead (see `SettingsMenuItem`).
-@MainActor
-enum SettingsOpener {
-    static func open() {
-        NSApp.activate(ignoringOtherApps: true)
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-    }
-}
-
 /// SwiftUI's Settings `TabView` snaps the window to each pane's size, unlike AppKit's
 /// `NSTabViewController` which animates it. Pinning every pane to one shared height and
 /// animating that value makes the window frame follow smoothly instead.

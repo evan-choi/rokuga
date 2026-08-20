@@ -16,7 +16,7 @@ The app SHALL set Dark Aqua before creating app-owned surfaces and SHALL NOT exp
 - **THEN** no appearance or theme control is shown
 
 ### Requirement: Fixed-Dark glass surfaces
-App-owned glass chrome SHALL render native material beneath an identically clipped Dark contrast scrim. The toolbar, toolbar tooltip, preview panel, and trim editor MUST share this visual contract; only their corner radii MAY differ. The palette SHALL NOT depend on the desktop or system appearance. The macOS 26 glass implementation and macOS 13.3–15 visual-effect fallback MUST provide equivalent Dark behavior and MUST NOT rely on `.glassEffect.tint` as the contrast guarantee.
+App-owned glass chrome SHALL render native material beneath an identically clipped Dark contrast scrim. The toolbar, toolbar tooltip, preview panel, and trim editor MUST share this visual contract; only their corner radii MAY differ. The palette SHALL NOT depend on the desktop or system appearance. The macOS 26 glass implementation and macOS 15–25 visual-effect fallback MUST provide equivalent Dark behavior and MUST NOT rely on `.glassEffect.tint` as the contrast guarantee.
 
 #### Scenario: Glass over bright content
 - **WHEN** a glass surface appears over white or near-white content
@@ -27,7 +27,7 @@ App-owned glass chrome SHALL render native material beneath an identically clipp
 - **THEN** its Dark palette remains stable and normal text reaches at least 4.5:1 while graphical controls reach at least 3:1
 
 #### Scenario: Older macOS fallback
-- **WHEN** an app-owned glass surface renders on macOS 13.3 through 15
+- **WHEN** an app-owned glass surface renders on macOS 15 through 25
 - **THEN** it uses the visual-effect fallback with the same Dark palette and contrast requirements as macOS 26
 
 #### Scenario: Rounded glass boundary

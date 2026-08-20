@@ -389,8 +389,8 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     /// Matches the sRGB capture buffers SCStream delivers (`colorSpaceName = sRGB`
     /// tags them 709 primaries / sRGB transfer / 709 matrix), so AVAssetWriter tags
     /// the output truthfully without a value-altering color conversion. The transfer
-    /// string equals `AVVideoTransferFunction_IEC_sRGB`, whose AVFoundation constant
-    /// requires macOS 15; the CoreVideo constant carries the same value on 13.3.
+    /// string equals `AVVideoTransferFunction_IEC_sRGB`; the CoreVideo constant keeps
+    /// the value shared with the capture buffer attachment.
     static let sRGBColorProperties: [String: String] = [
         AVVideoColorPrimariesKey: AVVideoColorPrimaries_ITU_R_709_2,
         AVVideoTransferFunctionKey: kCVImageBufferTransferFunction_sRGB as String,

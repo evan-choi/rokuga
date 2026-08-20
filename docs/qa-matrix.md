@@ -26,17 +26,17 @@ material.
 
 ## Manual hardware passes (release checklist)
 
-GitHub retired hosted macOS 13 and Intel runners, so these run on physical
-hardware before each tagged release. Record results in the release PR.
+Hosted runners do not cover Intel or multi-display configurations, so these run
+on physical hardware before each tagged release. Record results in the release PR.
 
 | # | Configuration | What to verify | Result |
 | --- | --- | --- | --- |
-| 1 | macOS 13.3, Apple Silicon, 1 display | Selected Area, Full Screen, and Window recording with system audio; trim and export | ☐ |
-| 2 | macOS 13.3, Intel, 1 display | Same + HEVC/H.264 hardware encode | ☐ |
-| 3 | macOS 14, Intel, 2 displays (mixed scale) | Region selection per display, loupe accuracy, toolbar summon on mouse display | ☐ |
+| 1 | macOS 15, Apple Silicon, 1 display | Selected Area, Full Screen, and Window recording with system audio; trim and export | ☐ |
+| 2 | macOS 15, Intel, 1 display | Same + HEVC/H.264 hardware encode | ☐ |
+| 3 | macOS 15, Intel, 2 displays (mixed scale) | Region selection per display, loupe accuracy, toolbar summon on mouse display | ☐ |
 | 4 | macOS 15, Apple Silicon, 3 displays (1× + 2×) | Display unplug mid-recording, cursor compositor across scale factors | ☐ |
 | 5 | Any, VoiceOver enabled | Toolbar → record → stop → preview → trim editor fully by keyboard/VO | ☐ |
 | 6 | Any, Reduce Transparency + Reduce Motion | Solid panel fallbacks, no animated transitions | ☐ |
 | 7 | Any, 8 h soak (`rokuga-bench throughput --seconds 28800`) | Memory ≤ 400 MB steady, zero drops | ☐ |
-| 8 | macOS 13.3–15, system Light and Dark | Rokuga remains Dark; `NSVisualEffectView` stays active beneath the explicit scrim over white, black, and high-chroma content; rounded boundaries remain visible; Reduce Transparency uses the solid Dark palette | Pending |
+| 8 | macOS 15–25, system Light and Dark | Rokuga remains Dark; `NSVisualEffectView` stays active beneath the explicit scrim over white, black, and high-chroma content; rounded boundaries remain visible; Reduce Transparency uses the solid Dark palette | Pending |
 | 9 | macOS 26+, system Light and Dark | Rokuga remains Dark; untinted native Liquid Glass stays visibly active beneath the explicit scrim; controls remain legible over white and black content | Pending |

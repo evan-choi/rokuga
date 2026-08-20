@@ -3,7 +3,7 @@ import EncoderKit
 import Foundation
 
 /// AVCaptureSession-based microphone source feeding `MediaSink` (task 3.3).
-/// SCStream's `.microphone` output type needs macOS 15; this path works on the 13.3 baseline.
+/// This path remains separate from SCStream so microphone samples can be mixed explicitly.
 public final class MicrophoneCapture: NSObject, @unchecked Sendable {
     private let session = AVCaptureSession()
     private let output = AVCaptureAudioDataOutput()

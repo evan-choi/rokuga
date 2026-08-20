@@ -4,7 +4,7 @@ options:
   developmentLanguage: en
   knownRegions: [en, ko, ja, zh-Hans]
   deploymentTarget:
-    macOS: "13.3"
+    macOS: "15.0"
   createIntermediateGroups: true
   xcodeVersion: "16.0"
 
@@ -24,7 +24,7 @@ configFiles:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MACOSX_DEPLOYMENT_TARGET: "13.3"
+    MACOSX_DEPLOYMENT_TARGET: "15.0"
     DEAD_CODE_STRIPPING: YES
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
@@ -58,7 +58,7 @@ targets:
         CFBundleDisplayName: Rokuga
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
-        LSMinimumSystemVersion: "13.3"
+        LSMinimumSystemVersion: "15.0"
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.video
         NSMicrophoneUsageDescription: Rokuga records your voice only when you enable microphone capture for a recording.
@@ -95,7 +95,7 @@ targets:
         CFBundleDisplayName: RokugaPerf
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
-        LSMinimumSystemVersion: "13.3"
+        LSMinimumSystemVersion: "15.0"
         LSUIElement: true
     dependencies:
       - package: RokugaCore

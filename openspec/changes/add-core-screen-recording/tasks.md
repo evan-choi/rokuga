@@ -2,10 +2,10 @@
 
 ## 1. Project scaffolding
 
-- [x] 1.1 Create Xcode project: `Rokuga` app target (SwiftUI, macOS 13.3+, sandboxed, `LSUIElement` agent) + local SPM package `RokugaCore` (CaptureKit, EncoderKit, EffectsKit, TrimKit, SettingsKit)
+- [x] 1.1 Create Xcode project: `Rokuga` app target (SwiftUI, macOS 15+, sandboxed, `LSUIElement` agent) + local SPM package `RokugaCore` (CaptureKit, EncoderKit, EffectsKit, TrimKit, SettingsKit)
 - [x] 1.2 Entitlements & Info.plist: microphone usage description, security-scoped bookmarks, `LSUIElement`; launch at login via `SMAppService.mainApp`
 - [x] 1.3 Add `KeyboardShortcuts` (MIT) as the sole third-party dependency
-- [x] 1.4 CI pipeline: build + unit tests on macOS 14/15 hosted runners, localization and baseline frame-transport static audits, benchmark job scaffold; macOS 13.3 remains manual QA
+- [x] 1.4 CI pipeline: build + unit tests on macOS 14/15 hosted runners, localization and baseline frame-transport static audits, benchmark job scaffold
 
 ## 2. Capture core (CaptureKit)
 
@@ -36,7 +36,7 @@
 - [x] 4.1 Menu bar controls: idle `MenuBarExtra` menu (toolbar, last recording, output folder, settings, quit) and recording status item with `M:SS` plus one-click stop
 - [x] 4.2 Recording toolbar: non-activating `NSPanel` HUD at bottom-center of the mouse-pointer display, movable only from its divider handle; summon via menu bar or ⇧⌘6; Esc and record dismiss
 - [x] 4.3 Mode buttons ×3 (area/full screen/window) + options popover (save location, countdown, FPS, audio, mouse, thumbnail toggles) + record button
-- [x] 4.4 Liquid Glass materials on HUD and transient preview panels with `NSVisualEffectView` fallback (13.3–15) + Reduce Transparency path
+- [x] 4.4 Liquid Glass materials on HUD and transient preview panels with `NSVisualEffectView` fallback (15–25) + Reduce Transparency path
 - [ ] 4.5 Region selection overlay: drag-select, resizable edges/corners, Retina pixel dimensions, pixel-loupe magnifier, per-display persistence
 - [x] 4.6 Countdown overlay (off/3/5/10 s, Esc cancels, always capture-excluded)
 - [x] 4.7 Full Screen selection overlay: clicking any display starts recording that display immediately
@@ -109,5 +109,5 @@
 - [x] 10.2 End-to-end capture benchmarks: 4K60 10-min drop-rate < 0.1%, A/V drift < 40 ms/h, CPU ≤ 20%@1080p60 / ≤ 35%@4K60, memory ≤ 400 MB steady, 8 h soak
 - [x] 10.3 Latency tests: summon ≤ 150 ms, record→first frame ≤ 500 ms, stop→playable ≤ 2 s, passthrough trim ≤ 3 s
 - [ ] 10.4 Correct CPU thresholds and wire actual capture/audio/effects benchmarks into CI as >10% regression gates
-- [ ] 10.5 QA matrix: macOS 13.3/14/15 × Intel/Apple Silicon × 1–3 displays incl. mixed scale factors; accessibility review
+- [ ] 10.5 QA matrix: macOS 15+ × Intel/Apple Silicon × 1–3 displays incl. mixed scale factors; accessibility review
 - [ ] 10.6 Runtime degradation after effects fallback: lower capture FPS and report the applied degradation after recording

@@ -8,7 +8,7 @@ Normative specs define the target contract. `tasks.md` records implementation st
 
 Constraints:
 
-- macOS 13.3+ (Ventura). This floor gives us stable ScreenCaptureKit system-audio capture without a kernel/virtual-audio driver, and SwiftUI `MenuBarExtra`.
+- macOS 15+ (Sequoia). This floor provides ScreenCaptureKit's native mouse-click indicator alongside driver-free system audio capture and SwiftUI `MenuBarExtra`.
 - App Sandbox enabled from day one (future Mac App Store distribution must not require a re-architecture).
 - MIT license: dependencies must be permissively licensed; prefer zero third-party dependencies in the capture/encode path.
 
@@ -126,7 +126,7 @@ Use the existing Carbon `RegisterEventHotKey` wrapper for the configurable toolb
 - **Material and appearance**: app-owned chrome inherits an application-wide Dark Aqua appearance. `captureWindowChrome` is the shared visual contract for the toolbar, tooltip, preview, and trim editor. It places untinted native material below an identically clipped `#1e1e23` scrim at 0.70 opacity. Each owning window clips to the same corner radius and disables the rectangular window shadow; tooltip chrome uses its smaller shared radius. Active chrome uses full-strength semantic Dark foregrounds and system selection/control surfaces. Increase Contrast strengthens the scrim and border; Reduce Transparency replaces both layers with the opaque Dark palette. Capture overlays and controls drawn over video keep fixed-contrast colors. Menu bar items, menus, dialogs, and system recording indicators remain system-rendered under Dark Aqua.
 - **Chrome buttons**: icon actions in panel/toolbar chrome are borderless (`.buttonStyle(.borderless)`) — icon-only, neutral monochrome (no red tint on destructive icons; danger is communicated by the confirmation dialog), shape revealed on hover only, hit target kept ≥ 28pt regardless of visual size.
 - **Iconography**: in-app icons are real SF Symbols via `Image(systemName:)` (`pencil`, `trash`, etc.) — legal on Apple platforms; SF Symbols assets MUST NOT be committed to the MIT repo. AppKit renders the bundled 32×32 `screenshotwindow.svg` and `resize*.svg` assets as custom capture and resize cursors. Other repo-shipped artwork (mockups, web, README) uses Lucide (ISC) equivalents tuned to SF stroke weight (~1.8/24).
-- **Visual language**: native Liquid Glass — untinted `.glassEffect`/glass background APIs where available (macOS 26+), graceful fallback to `NSVisualEffectView`/`.ultraThinMaterial` on macOS 13.3–15. The fixed Dark contrast scrim is separate from, and does not replace, those system materials. Reduce Transparency replaces the layered background with the opaque Dark palette.
+- **Visual language**: native Liquid Glass — untinted `.glassEffect`/glass background APIs where available (macOS 26+), graceful fallback to `NSVisualEffectView`/`.ultraThinMaterial` on macOS 15–25. The fixed Dark contrast scrim is separate from, and does not replace, those system materials. Reduce Transparency replaces the layered background with the opaque Dark palette.
 - **Cursor tracking**: non-key capture panels use one `ActiveCursorView` path backed by `NSTrackingArea` mouse enter/move events with `.activeAlways`. The same path owns drag-handle, area-resize, click-to-record, and trim-handle cursor updates. It trusts AppKit's delivered event window and visible view bounds as cursor ownership; it does not re-check WindowServer stacking or write an arrow on exit, so transparent overlays and delayed exit events cannot suppress or overwrite the destination cursor.
 - **Why**: zero learning curve (users already know ⇧⌘5), no focus-stealing during capture workflows, and the smallest possible UI surface for a recorder — the screen itself is the canvas.
 
@@ -158,7 +158,7 @@ Use the existing Carbon `RegisterEventHotKey` wrapper for the configurable toolb
 
 ## Risks / Trade-offs
 
-- [SCK behavior drifts across macOS versions (13.3 → 15+)] → runtime `#available` gates, CI on available macOS 14/15 hosted runners, and manual macOS 13.3 coverage
+- [SCK behavior drifts across supported macOS versions] → CI build coverage and manual release QA on supported hardware
 - [Cursor compositor can't hold 5K@60 on low-end hardware] → GPU-only path, per-frame budget monitor with automatic effect degradation (D4), FPS/resolution suggestions in UI when sustained drops are detected
 - [Capped-VBR "CBR" isn't broadcast-true CBR] → label honestly in UI help; acceptable for the target use cases (uploads, tutorials)
 - [Passthrough trim start snaps to keyframes — up to one GOP (~2 s) coarser than frame-exact] → visible snap in the UI (no silent surprise) + re-encode fallback offered as "frame-exact trim" option

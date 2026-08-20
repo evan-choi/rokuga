@@ -17,7 +17,7 @@ struct VisualEffectView: NSViewRepresentable {
     }
 }
 
-/// Fixed-Dark panel background: Liquid Glass on macOS 26+, `NSVisualEffectView` on 13.3–15,
+/// Fixed-Dark panel background: Liquid Glass on macOS 26+, `NSVisualEffectView` on 15–25,
 /// and a solid fallback under Reduce Transparency.
 struct GlassBackground: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
@@ -86,13 +86,7 @@ extension View {
     }
 
     /// System capture chrome never shows focus rings; suppress them on our HUD surfaces.
-    /// (macOS 13 has no `focusEffectDisabled`; the ring only appears there with Full Keyboard Access on.)
-    @ViewBuilder
     func hiddenFocusRing() -> some View {
-        if #available(macOS 14.0, *) {
-            focusEffectDisabled()
-        } else {
-            self
-        }
+        focusEffectDisabled()
     }
 }

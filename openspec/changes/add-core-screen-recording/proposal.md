@@ -10,7 +10,7 @@ This change defines the core product: three recording modes, system and micropho
 
 ## What Changes
 
-- New macOS app (Swift/SwiftUI, macOS 13.3+) with a **windowless UI**: a ⇧⌘5-style floating recording toolbar (menu bar agent app, no main window, no Dock icon) offering three recording modes:
+- New macOS app (Swift/SwiftUI, macOS 15+) with a **windowless UI**: a ⇧⌘5-style floating recording toolbar (menu bar agent app, no main window, no Dock icon) offering three recording modes:
   - **Selected area**: drag-to-select region with resizable edges/corners and a pixel-loupe magnifier
   - **Full screen**: entire display capture with multi-display selection
   - **Window**: single application window capture, isolated from overlapping windows
@@ -54,5 +54,5 @@ _None — this is the first change; no existing specs._
 - **New codebase**: Xcode project, Swift 5.9+/SwiftUI app target, sandboxed for future Mac App Store distribution
 - **System frameworks**: ScreenCaptureKit (screen/window/audio capture), AVFoundation (mic, asset writing/export), VideoToolbox (hardware H.264/HEVC encoding), CoreGraphics/AppKit (region selection overlays, menu bar)
 - **Entitlements/Info.plist**: microphone usage description, security-scoped bookmarks for the user-chosen output folder, `LSUIElement`; launch at login uses `SMAppService.mainApp`
-- **Minimum OS**: macOS 13.3 (Ventura) — required for driver-free system audio capture via ScreenCaptureKit
+- **Minimum OS**: macOS 15 (Sequoia) — required for ScreenCaptureKit's native mouse-click indicator
 - **No network dependencies**: all recording, encoding, and editing is fully local

@@ -145,7 +145,7 @@ export const translations: Record<Language, Copy> = {
       appDescription: 'macOS 네이티브 화면 녹화 앱',
       releaseDescription: 'Apple Silicon과 Intel Mac을 지원하는 Universal 빌드입니다.',
       button: '출시 예정',
-      requirements: 'macOS 13.3 Ventura 이상 · Universal · 무료',
+      requirements: 'macOS 15 Sequoia 이상 · Universal · 무료',
       installTitle: '처음 설치하시나요?',
       installIntro: '현재 프리뷰는 Apple 공증 전 빌드이므로 최초 실행 때 한 번의 확인이 필요합니다.',
       steps: [
@@ -219,7 +219,7 @@ export const translations: Record<Language, Copy> = {
       appDescription: 'Native screen recorder for macOS',
       releaseDescription: 'A Universal build for Apple Silicon and Intel Mac.',
       button: 'Coming soon',
-      requirements: 'macOS 13.3 Ventura or later · Universal · Free',
+      requirements: 'macOS 15 Sequoia or later · Universal · Free',
       installTitle: 'Installing for the first time?',
       installIntro: 'This preview has not yet been notarized by Apple, so one confirmation is required the first time you open it.',
       steps: [
@@ -293,7 +293,7 @@ export const translations: Record<Language, Copy> = {
       appDescription: 'macOSネイティブの画面録画アプリ',
       releaseDescription: 'Apple SiliconとIntel Macに対応したUniversalビルドです。',
       button: '近日公開',
-      requirements: 'macOS 13.3 Ventura以降 · Universal · 無料',
+      requirements: 'macOS 15 Sequoia以降 · Universal · 無料',
       installTitle: '初めてインストールしますか？',
       installIntro: '現在のプレビュー版はAppleによる公証前のため、初回起動時に一度だけ確認が必要です。',
       steps: [
@@ -367,7 +367,7 @@ export const translations: Record<Language, Copy> = {
       appDescription: 'macOS 原生屏幕录制应用',
       releaseDescription: '支持 Apple Silicon 和 Intel Mac 的 Universal 版本。',
       button: '即将推出',
-      requirements: 'macOS 13.3 Ventura 或更高版本 · Universal · 免费',
+      requirements: 'macOS 15 Sequoia 或更高版本 · Universal · 免费',
       installTitle: '第一次安装？',
       installIntro: '当前预览版尚未经过 Apple 公证，首次启动时需要确认一次。',
       steps: [
