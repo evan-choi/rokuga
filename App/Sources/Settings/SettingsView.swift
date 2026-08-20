@@ -109,13 +109,23 @@ private struct AudioPane: View {
                     .disabled(model.containerFormat == .mp4)
             }
             if model.containerFormat == .mp4 {
-                Text("Separate tracks require MOV.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Label {
+                    Text("Separate tracks require MOV.")
+                } icon: {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.yellow)
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
             } else if model.audioTrackLayout == .separate {
-                Text("Separate tracks are intended for editing. Some players may play only one track.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Label {
+                    Text("Separate tracks are intended for editing. Some players may play only one track.")
+                } icon: {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.yellow)
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
         }
         .padding(20)
