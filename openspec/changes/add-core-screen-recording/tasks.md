@@ -55,9 +55,9 @@
 
 ## 6. Mouse effects (EffectsKit)
 
-- [x] 6.1 Cursor compositor: cursor show/hide, system/dot pointer styles, fixed highlight halo, fixed click animation — recorded-only, invisible live
+- [x] 6.1 Cursor effects: ScreenCaptureKit-owned system pointer and native click indicator; compositor-owned dot pointer and fixed highlight halo — recorded-only, invisible live
 - [x] 6.2 Per-frame GPU budget monitor with automatic effect degradation ladder
-- [ ] 6.3 Mouse-effect customization: highlight color/size/opacity, settings preview, independent left/right click toggles and colors
+- [ ] 6.3 Mouse-effect customization: highlight color/size/opacity and settings preview
 - [x] 6.4 Sample cursor state at the configured capture rate so 60 FPS recordings meet the one-frame positional-lag contract
 
 ## 7. Post-recording delivery

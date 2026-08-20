@@ -319,6 +319,9 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         // 709 matrix, which AssetWriterSink records verbatim (color-fidelity fix).
         config.colorSpaceName = CGColorSpace.sRGB
         config.showsCursor = configuration.showsCursor
+        if #available(macOS 15.0, *) {
+            config.showMouseClicks = configuration.cursorEffects.animateClicks
+        }
         config.queueDepth = 8
 
         if case let .display(_, crop) = target, let crop {

@@ -1,18 +1,12 @@
-import AppKit
+import CoreGraphics
 import Foundation
 
 /// A point-in-time snapshot of cursor state, in global CG (top-left origin) coordinates.
 public struct CursorSnapshot: Sendable {
     public var location: CGPoint
-    /// Click timestamps (host clock) with locations, newest last.
-    public var clicks: [(time: TimeInterval, location: CGPoint)]
 
-    public init(
-        location: CGPoint,
-        clicks: [(time: TimeInterval, location: CGPoint)] = []
-    ) {
+    public init(location: CGPoint) {
         self.location = location
-        self.clicks = clicks
     }
 }
 
@@ -29,9 +23,7 @@ public final class CursorStateSampler: CursorStateSampling, @unchecked Sendable 
     let samplingInterval: TimeInterval
 
     private var latest = CursorSnapshot(location: .zero)
-    private var clicks: [(time: TimeInterval, location: CGPoint)] = []
     private var timer: DispatchSourceTimer?
-    private var clickMonitor: Any?
 
     public init(
         framesPerSecond: Int = 60,
@@ -55,16 +47,6 @@ public final class CursorStateSampler: CursorStateSampling, @unchecked Sendable 
         }
         self.timer = timer
         timer.resume()
-
-        clickMonitor = NSEvent.addGlobalMonitorForEvents(
-            matching: [.leftMouseDown, .rightMouseDown]
-        ) { [weak self] _ in
-            guard let self else { return }
-            let location = locationProvider()
-            lock.withLock {
-                self.clicks = [(time: ProcessInfo.processInfo.systemUptime, location: location)]
-            }
-        }
     }
 
     @MainActor
@@ -72,56 +54,16 @@ public final class CursorStateSampler: CursorStateSampling, @unchecked Sendable 
         timer?.setEventHandler {}
         timer?.cancel()
         timer = nil
-        if let clickMonitor {
-            NSEvent.removeMonitor(clickMonitor)
-            self.clickMonitor = nil
-        }
     }
 
     func sampleNow() {
         let location = locationProvider()
         lock.withLock {
-            latest = CursorSnapshot(
-                location: location,
-                clicks: latest.clicks
-            )
+            latest = CursorSnapshot(location: location)
         }
     }
 
     public func snapshot() -> CursorSnapshot {
-        lock.withLock {
-            var snap = latest
-            let cutoff = ProcessInfo.processInfo.systemUptime - ClickRipple.lifetime
-            clicks.removeAll { $0.time < cutoff }
-            snap.clicks = clicks
-            return snap
-        }
-    }
-}
-
-/// Native-style click indicator timeline (pure math, unit tested).
-public enum ClickRipple {
-    public static let lifetime: TimeInterval = 0.5
-    static let radius: CGFloat = 40
-    static let fadeStartProgress = 0.4
-
-    /// Progress values in 0...1 for clicks still animating at `now`.
-    public static func progresses(
-        clicks: [(time: TimeInterval, location: CGPoint)],
-        now: TimeInterval
-    ) -> [(progress: Double, location: CGPoint)] {
-        clicks.compactMap { click in
-            let age = now - click.time
-            guard age >= 0, age < lifetime else { return nil }
-            return (progress: age / lifetime, location: click.location)
-        }
-    }
-
-    static func opacity(at progress: Double) -> CGFloat {
-        let clamped = min(max(progress, 0), 1)
-        guard clamped > fadeStartProgress else { return 1 }
-        let fadeProgress = (clamped - fadeStartProgress) / (1 - fadeStartProgress)
-        let eased = fadeProgress * fadeProgress * (3 - 2 * fadeProgress)
-        return CGFloat(1 - eased)
+        lock.withLock { latest }
     }
 }

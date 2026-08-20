@@ -26,7 +26,7 @@ let package = Package(
             name: "EncoderKit",
             dependencies: ["SettingsKit"]
         ),
-        // MARK: Effects — Metal cursor compositor, click animations
+        // MARK: Effects — Metal dot-pointer and cursor-highlight compositor
         .target(
             name: "EffectsKit",
             dependencies: ["SettingsKit"]
