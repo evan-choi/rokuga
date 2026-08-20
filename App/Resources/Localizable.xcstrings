@@ -703,28 +703,6 @@
         }
       }
     },
-    "Dot" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ドット"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "점"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "圆点"
-          }
-        }
-      }
-    },
     "Edit" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1041,29 +1019,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在录制中隐藏桌面图标"
-          }
-        }
-      }
-    },
-    "Highlight cursor" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "カーソルをハイライト"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "커서 강조"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "高亮光标"
           }
         }
       }
@@ -1542,29 +1497,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "播放"
-          }
-        }
-      }
-    },
-    "Pointer style" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ポインタのスタイル"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "포인터 스타일"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "指针样式"
           }
         }
       }
@@ -2248,28 +2180,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "要停止录制并退出吗？"
-          }
-        }
-      }
-    },
-    "System" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "システム"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "시스템"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "系统"
           }
         }
       }

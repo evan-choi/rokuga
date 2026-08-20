@@ -27,8 +27,6 @@ public final class SettingsStore: @unchecked Sendable {
         case captureSystemAudio = "audio.system"
         case captureMicrophone = "audio.microphone"
         case showCursor = "mouse.showCursor"
-        case pointerStyle = "mouse.pointerStyle"
-        case highlightCursor = "mouse.highlight"
         case animateClicks = "mouse.clicks"
         case countdown = "recording.countdown"
         case excludeDesktopIcons = "capture.excludeDesktopIcons"
@@ -96,16 +94,6 @@ public final class SettingsStore: @unchecked Sendable {
     public var showCursor: Bool {
         get { bool(.showCursor, default: true) }
         set { set(newValue, for: .showCursor) }
-    }
-
-    public var pointerStyle: PointerStyle {
-        get { rawRepresentable(.pointerStyle) ?? .system }
-        set { setRawRepresentable(newValue, for: .pointerStyle) }
-    }
-
-    public var highlightCursor: Bool {
-        get { bool(.highlightCursor, default: false) }
-        set { set(newValue, for: .highlightCursor) }
     }
 
     public var animateClicks: Bool {

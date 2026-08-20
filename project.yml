@@ -69,7 +69,6 @@ targets:
         products:
           - CaptureKit
           - EncoderKit
-          - EffectsKit
           - TrimKit
           - SettingsKit
       - package: KeyboardShortcuts
@@ -102,7 +101,6 @@ targets:
         products:
           - CaptureKit
           - EncoderKit
-          - EffectsKit
           - SettingsKit
     settings:
       base:

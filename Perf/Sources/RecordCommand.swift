@@ -3,7 +3,6 @@ import CaptureKit
 import CoreGraphics
 import CoreMedia
 import Darwin
-import EffectsKit
 import EncoderKit
 import Foundation
 import os.signpost
@@ -34,8 +33,7 @@ enum RecordCommand {
         let captureConfiguration = CaptureConfiguration(
             frameRate: options.fps,
             captureSystemAudio: options.systemAudio,
-            exclusion: ExclusionOptions(excludeDesktopIcons: false),
-            cursorEffects: options.cursorEffects
+            exclusion: ExclusionOptions(excludeDesktopIcons: false)
         )
         let sink = AssetWriterSink(
             outputURL: outputURL,
@@ -133,7 +131,6 @@ enum RecordCommand {
             codec: options.codec.rawValue,
             frameRateMode: options.frameRateMode.rawValue,
             systemAudio: options.systemAudio,
-            effects: options.effects,
             wallSeconds: wallSeconds,
             cpuPercentOfOneCore: cpuSeconds / wallSeconds * 100,
             peakMemoryMB: max(Double(peakMemoryBytes()) / 1_048_576, resources.peakMemoryMB),
@@ -462,15 +459,7 @@ private struct RecordOptions {
     var codec = VideoCodec.hevc
     var frameRateMode = FrameRateMode.variable
     var systemAudio = false
-    var effects = false
     var windowPID: pid_t?
-
-    var cursorEffects: CursorEffectOptions {
-        if effects {
-            return CursorEffectOptions(showCursor: true, pointerStyle: .dot, highlight: true, animateClicks: true)
-        }
-        return CursorEffectOptions(showCursor: true, pointerStyle: .system, highlight: false, animateClicks: false)
-    }
 
     init(_ arguments: [String]) throws {
         var index = 0
@@ -501,8 +490,6 @@ private struct RecordOptions {
                 frameRateMode = parsed
             case "--system-audio":
                 systemAudio = try Self.boolean(value, name: flag)
-            case "--effects":
-                effects = try Self.boolean(value, name: flag)
             case "--window-pid":
                 guard let parsed = pid_t(value), parsed > 0 else {
                     throw PerfError.invalidArgument("invalid window pid: \(value)")
@@ -558,7 +545,6 @@ struct RecordResult: Codable {
     let codec: String
     let frameRateMode: String
     let systemAudio: Bool
-    let effects: Bool
     let wallSeconds: Double
     let cpuPercentOfOneCore: Double
     let peakMemoryMB: Double
@@ -691,10 +677,6 @@ struct CaptureResult: Codable {
     let gapPTS: Int
     let missingVideoFrames: Int
     let maxPTSGapSeconds: Double
-    let compositeCalls: Int
-    let averageCompositeSeconds: Double
-    let maxCompositeSeconds: Double
-    let effectDegradations: Int
 
     init(_ snapshot: CaptureMetrics.Snapshot) {
         videoCallbacks = snapshot.videoCallbacks
@@ -706,12 +688,6 @@ struct CaptureResult: Codable {
         gapPTS = snapshot.gapPTS
         missingVideoFrames = snapshot.missingVideoFrames
         maxPTSGapSeconds = snapshot.maxPTSGapSeconds
-        compositeCalls = snapshot.compositeCalls
-        averageCompositeSeconds = snapshot.compositeCalls > 0
-            ? snapshot.compositeSeconds / Double(snapshot.compositeCalls)
-            : 0
-        maxCompositeSeconds = snapshot.maxCompositeSeconds
-        effectDegradations = snapshot.effectDegradations
     }
 }
 

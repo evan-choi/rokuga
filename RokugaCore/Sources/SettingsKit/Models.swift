@@ -55,13 +55,6 @@ public enum AudioBitrate: Int, CaseIterable, Codable, Sendable {
     case kbps320 = 320
 }
 
-// MARK: - Mouse effects
-
-public enum PointerStyle: String, CaseIterable, Codable, Sendable {
-    case system
-    case dot
-}
-
 // MARK: - Countdown
 
 public enum CountdownDuration: Int, CaseIterable, Codable, Sendable {

@@ -111,12 +111,6 @@ private struct MousePane: View {
     var body: some View {
         Form {
             Toggle("Show cursor", isOn: $model.showCursor)
-            Picker("Pointer style", selection: $model.pointerStyle) {
-                Text("System").tag(PointerStyle.system)
-                Text("Dot").tag(PointerStyle.dot)
-            }
-            .disabled(!model.showCursor)
-            Toggle("Highlight cursor", isOn: $model.highlightCursor)
             Toggle("Animate clicks", isOn: $model.animateClicks)
         }
         .padding(20)
