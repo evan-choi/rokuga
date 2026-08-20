@@ -343,7 +343,9 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     private var constantFrameDuration: CMTime {
         CMTime(value: 1, timescale: CMTimeScale(configuration.frameRate))
     }
+}
 
+extension AssetWriterSink {
     // MARK: Audio path
 
     private func appendSystemAudio(_ sampleBuffer: CMSampleBuffer) {
