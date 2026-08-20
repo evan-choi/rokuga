@@ -13,7 +13,7 @@ packages:
     path: RokugaCore
   KeyboardShortcuts:
     url: https://github.com/sindresorhus/KeyboardShortcuts
-    from: 2.0.0
+    from: 3.0.1
 
 # Signing lives in Configs/Signing.xcconfig (ad-hoc by default so anyone can
 # clone & build; run scripts/setup-dev-signing.sh for a persistent identity).

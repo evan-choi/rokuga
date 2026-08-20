@@ -138,6 +138,7 @@ struct ShortcutsPane: View {
     var body: some View {
         Form {
             KeyboardShortcuts.Recorder("Open Recording Toolbar", name: .summonToolbar)
+                .keyboardShortcutsConflictPolicy(.init(systemShortcut: .allow))
         }
         .padding(20)
     }

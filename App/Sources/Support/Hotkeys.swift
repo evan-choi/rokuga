@@ -2,9 +2,9 @@ import CaptureKit
 import KeyboardShortcuts
 
 extension KeyboardShortcuts.Name {
-    static let summonToolbar = Self("summonToolbar", default: .init(.six, modifiers: [.command, .shift]))
-    static let cancelPendingCapture = Self("cancelPendingCapture", default: .init(.escape))
-    static let stopRecording = Self("stopRecording", default: .init(.escape, modifiers: [.command, .control]))
+    static let summonToolbar = Self("summonToolbar", initial: .init(.six, modifiers: [.command, .shift]))
+    static let cancelPendingCapture = Self("cancelPendingCapture", initial: .init(.escape))
+    static let stopRecording = Self("stopRecording", initial: .init(.escape, modifiers: [.command, .control]))
 }
 
 @MainActor
