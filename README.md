@@ -44,14 +44,14 @@ To run Rokuga:
 To build Rokuga:
 
 - Xcode 26
-- XcodeGen
+- [mise](https://mise.jdx.dev/)
 
 ## Build from source
 
 ```bash
-brew install xcodegen
 git clone https://github.com/evan-choi/rokuga.git
 cd rokuga
+mise install
 xcodegen generate
 open Rokuga.xcodeproj
 ```
@@ -72,13 +72,14 @@ The default ad-hoc signature does not require an Apple account. For repeated loc
 Install the repository check tools and run the core test suite:
 
 ```bash
-brew install swiftlint swiftformat
+mise install
 (cd RokugaCore && swift test)
 ```
 
 Run the repository checks:
 
 ```bash
+actionlint
 swiftlint lint --strict
 swiftformat --lint .
 python3 scripts/lint-localization.py
