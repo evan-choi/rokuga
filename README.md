@@ -86,9 +86,9 @@ python3 scripts/lint-localization.py
 ./scripts/audit-zero-copy.sh
 ```
 
-## Contributing
+## Performance testing
 
-Check [`tasks.md`](openspec/changes/add-core-screen-recording/tasks.md) for implementation status and read the active change before modifying behavior. Update the relevant spec and task status with the implementation, then run the tests and repository checks above before opening a pull request.
+CI runs synthetic encoder and latency checks through `rokuga-bench`; its committed comparison values live in [`benchmarks/baseline.json`](benchmarks/baseline.json). The separate `RokugaPerf` app in [`Perf`](Perf) exercises the production capture path against a deterministic on-screen workload. It requires local code signing and Screen Recording permission, so it runs through `./scripts/perf.sh` instead of shared CI runners.
 
 ## License
 
