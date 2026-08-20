@@ -105,7 +105,7 @@ export const translations: Record<Language, Copy> = {
       eyebrow: 'Rokuga for Mac',
       title: '모든 프레임을,',
       accent: '그대로',
-      lead: 'H.265 · 최대 5K · 모니터 주사율에 맞춘 녹화',
+      lead: 'H.265 · 최대 5K · 화면 주사율 그대로',
       download: 'macOS용 다운로드',
       source: '소스 코드 보기',
     },
