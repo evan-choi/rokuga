@@ -141,19 +141,9 @@ private struct AudioPane: View {
                             Text("Mixed").tag(AudioTrackLayout.mixed)
                             Text("Separate")
                                 .tag(AudioTrackLayout.separate)
-                                .disabled(model.containerFormat == .mp4)
                         }
                         .labelsHidden()
-                        if model.containerFormat == .mp4 {
-                            Label {
-                                Text("Separate tracks require MOV.")
-                            } icon: {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundStyle(.yellow)
-                            }
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
-                        } else if model.audioTrackLayout == .separate {
+                        if model.audioTrackLayout == .separate {
                             Text("Separate tracks are intended for editing.\nSome players may play only one track.")
                                 .font(.callout)
                                 .foregroundStyle(.secondary)

@@ -6,7 +6,7 @@ The current mixed AAC track plays reliably in standard players but prevents user
 
 - Add an Audio setting for `Mixed` (default) or `Separate` track layout.
 - Keep `Mixed` behavior unchanged: enabled system audio and microphone input are combined into one AAC track.
-- In `Separate` mode, write system audio and microphone input as two independently identified AAC tracks in an MP4 or MOV file.
+- In `Separate` mode, write system audio and microphone input as two independently ordered AAC tracks in an MP4 or MOV file, with titles where the container preserves them.
 - Keep `Mixed` as the compatibility default and explain that some players may play only one separate track.
 - When only one audio source is enabled, write one audio track regardless of the selected layout.
 - Lock the track-layout control while recording and localize its labels and compatibility guidance.
@@ -26,5 +26,5 @@ None.
 - `SettingsKit`: persist the selected audio track layout and include it in per-recording snapshots.
 - `EncoderKit`: create either one mixed audio input or independent system/microphone audio inputs with shared pause/resume timing.
 - App settings UI: expose the option, playback guidance, and recording-time lock.
-- Tests and localization: verify track counts, metadata, default compatibility, persistence, and all shipping languages.
+- Tests and localization: verify track counts, order, supported metadata, default compatibility, persistence, and all shipping languages.
 - No new dependency or output format is introduced.

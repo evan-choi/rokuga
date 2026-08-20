@@ -86,10 +86,10 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertEqual(store.audioTrackLayout, .mixed)
     }
 
-    func testMP4NormalizesAudioTrackLayoutToMixed() {
+    func testContainerChangePreservesAudioTrackLayout() {
         store.audioTrackLayout = .separate
         store.containerFormat = .mp4
-        XCTAssertEqual(store.audioTrackLayout, .mixed)
+        XCTAssertEqual(store.audioTrackLayout, .separate)
     }
 
     func testCaptureLimitsClamp5K() {

@@ -66,7 +66,7 @@ The sink remains the owner of every writer input. Both separate paths use the ex
 
 ### Use stable track identity and per-track bitrate
 
-When both separate tracks exist, the writer adds system audio first and microphone second. Each input receives locale-neutral title metadata: `System Audio` or `Microphone`. Deterministic order provides a fallback for editors that do not expose titles.
+When both separate tracks exist, the writer adds system audio first and microphone second. Each input receives locale-neutral title metadata: `System Audio` or `Microphone`. MOV preserves those titles. AVAssetWriter drops per-track title metadata from MP4, so deterministic order is the MP4 identity contract and remains the fallback for editors that do not expose MOV titles.
 
 The selected AAC bitrate applies to each separate track. A two-track file can therefore use approximately twice the audio bitrate of the equivalent Mixed recording. Splitting one bitrate between tracks would reduce quality and make the existing bitrate setting misleading.
 
@@ -79,6 +79,7 @@ Track layout belongs in Settings › Audio, not the recording toolbar. The toolb
 - [Some players play only one audio track] → Keep Mixed as default and describe Separate as editing-oriented.
 - [Separate output is larger] → State that the selected bitrate applies per track; do not silently lower either source's quality.
 - [An editor ignores title metadata] → Write tracks in deterministic system-then-microphone order.
+- [MP4 drops per-track title metadata] → Use deterministic order instead of adding a post-processing muxer.
 - [One audio input backpressures independently] → Check readiness per input and test that one source does not route into or block the other source's track.
 - [Existing and new settings drift] → Make `AudioTrackLayout` and the effective-layout rule the single core contract used by the UI snapshot and writer.
 
@@ -89,7 +90,7 @@ No file migration is required. Existing installations have no layout key and res
 ## Verification
 
 - Settings tests cover the Mixed default, persistence, reset, and container-independent layout.
-- Asset-writer integration tests inspect zero, one, mixed, and separate output track counts and titles for MP4 and MOV.
+- Asset-writer integration tests inspect zero, one, mixed, and separate output track counts and order for MP4 and MOV, plus titles for MOV.
 - Source-isolation fixtures give system and microphone buffers distinct signals and verify each decoded separate track contains only its source.
 - Pause/resume integration verifies that both separate tracks use the same splice duration and remain aligned with video.
 - Start-failure and cancel tests verify that partial files are removed.

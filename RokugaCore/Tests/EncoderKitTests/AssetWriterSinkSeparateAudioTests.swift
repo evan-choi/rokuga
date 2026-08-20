@@ -94,13 +94,25 @@ extension AssetWriterSinkTests {
     }
 
     func testWritesSeparateMOVTracksWithStableIdentityAndIsolatedSignals() async throws {
-        useMOVOutputURL()
+        try await assertWritesSeparateTracksWithStableIdentityAndIsolatedSignals(container: .mov)
+    }
+
+    func testWritesSeparateMP4TracksWithStableIdentityAndIsolatedSignals() async throws {
+        try await assertWritesSeparateTracksWithStableIdentityAndIsolatedSignals(container: .mp4)
+    }
+
+    private func assertWritesSeparateTracksWithStableIdentityAndIsolatedSignals(
+        container: ContainerFormat
+    ) async throws {
+        if container == .mov {
+            useMOVOutputURL()
+        }
         let sink = AssetWriterSink(
             outputURL: outputURL,
             configuration: makeConfiguration(
                 capturesSystemAudio: true,
                 capturesMicrophone: true,
-                container: .mov,
+                container: container,
                 audioTrackLayout: .separate
             )
         )
@@ -123,7 +135,12 @@ extension AssetWriterSinkTests {
 
         let url = try await sink.finish()
         let header = try Data(contentsOf: url).prefix(12)
-        XCTAssertEqual(String(bytes: header.dropFirst(8), encoding: .utf8), "qt  ")
+        let majorBrand = String(bytes: header.dropFirst(8), encoding: .utf8)
+        if container == .mov {
+            XCTAssertEqual(majorBrand, "qt  ")
+        } else {
+            XCTAssertTrue(["isom", "mp41", "mp42"].contains(majorBrand))
+        }
 
         let asset = AVAsset(url: url)
         let tracks = try await asset.loadTracks(withMediaType: .audio)
@@ -134,10 +151,12 @@ extension AssetWriterSinkTests {
         let microphoneLanguageTag = try await audioTrackLanguageTag(tracks[1])
         let systemSampleRate = try await audioSampleRate(tracks[0])
         let microphoneSampleRate = try await audioSampleRate(tracks[1])
-        XCTAssertEqual(systemTitle, "System Audio")
-        XCTAssertEqual(microphoneTitle, "Microphone")
-        XCTAssertEqual(systemLanguageTag, "und")
-        XCTAssertEqual(microphoneLanguageTag, "und")
+        if container == .mov {
+            XCTAssertEqual(systemTitle, "System Audio")
+            XCTAssertEqual(microphoneTitle, "Microphone")
+            XCTAssertEqual(systemLanguageTag, "und")
+            XCTAssertEqual(microphoneLanguageTag, "und")
+        }
         XCTAssertEqual(systemSampleRate, 48000)
         XCTAssertEqual(microphoneSampleRate, 48000)
 

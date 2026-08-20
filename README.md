@@ -23,7 +23,7 @@ Rokuga runs as a menu bar app with a floating recording toolbar instead of a lib
 ## Current capabilities
 
 - Selected-area, full-screen, and individual-window capture
-- Driver-free system audio and microphone capture, mixed into one AAC track by default or written as separate MOV tracks for editing
+- Driver-free system audio and microphone capture, mixed into one AAC track by default or written as separate MP4/MOV tracks for editing
 - H.264 and HEVC encoding to MP4 or MOV at up to 5K, with 30/60 fps or display-matched capture
 - Cursor visibility and native macOS click indicators
 - Floating post-recording thumbnail, preview panel, and trim editor

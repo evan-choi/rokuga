@@ -73,12 +73,7 @@ public final class SettingsStore: @unchecked Sendable {
 
     public var containerFormat: ContainerFormat {
         get { rawRepresentable(.containerFormat) ?? .mov }
-        set {
-            setRawRepresentable(newValue, for: .containerFormat)
-            if newValue == .mp4 {
-                audioTrackLayout = .mixed
-            }
-        }
+        set { setRawRepresentable(newValue, for: .containerFormat) }
     }
 
     public var frameRate: FrameRate {

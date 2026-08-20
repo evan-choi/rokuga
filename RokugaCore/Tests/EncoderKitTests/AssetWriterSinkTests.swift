@@ -110,14 +110,14 @@ final class AssetWriterSinkTests: XCTestCase {
         return times
     }
 
-    func testMP4NormalizesSeparateAudioTracksToMixed() {
+    func testMP4PreservesSeparateAudioTracks() {
         let configuration = makeConfiguration(
             capturesSystemAudio: true,
             capturesMicrophone: true,
             container: .mp4,
             audioTrackLayout: .separate
         )
-        XCTAssertEqual(configuration.audioTrackLayout, .mixed)
+        XCTAssertEqual(configuration.audioTrackLayout, .separate)
     }
 
     func testMOVPreservesSeparateAudioTracksWithOneSource() {

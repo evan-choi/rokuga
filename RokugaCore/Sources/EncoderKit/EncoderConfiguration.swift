@@ -40,7 +40,7 @@ public struct EncoderConfiguration: Equatable, Sendable {
         self.audioBitrate = audioBitrate
         self.capturesSystemAudio = capturesSystemAudio
         self.capturesMicrophone = capturesMicrophone
-        self.audioTrackLayout = container == .mov ? audioTrackLayout : .mixed
+        self.audioTrackLayout = audioTrackLayout
     }
 
     /// Snapshot the user's current preferences for a source of the given size.

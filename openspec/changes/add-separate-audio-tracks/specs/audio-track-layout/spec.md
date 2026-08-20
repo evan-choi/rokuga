@@ -31,19 +31,23 @@ In `Mixed` mode, the app SHALL preserve the existing output behavior. When syste
 - **THEN** the recording contains no audio track regardless of the saved layout
 
 ### Requirement: Separate audio tracks
-In `Separate` mode with both sources enabled, the app SHALL write an MP4 or MOV file with two 48 kHz stereo AAC tracks instead of applying the audio-capture capability's default single-track mix: system audio first and microphone second. The system-audio track MUST NOT contain microphone samples, and the microphone track MUST NOT contain system-audio samples. The tracks SHALL carry locale-neutral titles `System Audio` and `Microphone`. The selected AAC bitrate SHALL apply to each track independently.
+In `Separate` mode with both sources enabled, the app SHALL write an MP4 or MOV file with two 48 kHz stereo AAC tracks instead of applying the audio-capture capability's default single-track mix: system audio first and microphone second. The system-audio track MUST NOT contain microphone samples, and the microphone track MUST NOT contain system-audio samples. MOV tracks SHALL carry locale-neutral titles `System Audio` and `Microphone`; MP4 track identity SHALL rely on deterministic order because AVAssetWriter does not preserve per-track title metadata in MP4. The selected AAC bitrate SHALL apply to each track independently.
 
 #### Scenario: Both sources are separated
 - **WHEN** `Separate` is selected for MP4 or MOV and both audio sources produce sound
 - **THEN** the file contains two AAC tracks whose first track contains only system audio and whose second track contains only microphone audio
 
-#### Scenario: Tracks are identified
-- **WHEN** an editor reads a recording created with two separate tracks
+#### Scenario: MOV tracks are identified by title
+- **WHEN** an editor reads a MOV recording created with two separate tracks
 - **THEN** it can identify the tracks by the titles `System Audio` and `Microphone`
+
+#### Scenario: MP4 tracks are identified by order
+- **WHEN** an editor reads an MP4 recording created with two separate tracks
+- **THEN** the first audio track contains system audio and the second contains microphone audio
 
 #### Scenario: One source in Separate mode
 - **WHEN** `Separate` is selected and exactly one audio source is enabled
-- **THEN** the output file contains one titled AAC track for the enabled source
+- **THEN** the output file contains one AAC track for the enabled source, titled when MOV is selected
 
 ### Requirement: Container-independent separate layout
 The `Separate` option SHALL be available for MP4 and MOV. Changing the container MUST preserve the selected layout. The Audio settings SHALL explain that separate tracks are intended for editing and some players may play only one track.

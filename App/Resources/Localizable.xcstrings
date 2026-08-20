@@ -2145,28 +2145,6 @@
         }
       }
     },
-    "Separate tracks require MOV." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "トラック分離にはMOVが必要です。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "트랙 분리는 MOV에서만 사용할 수 있습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分离音轨需要使用 MOV 格式。"
-          }
-        }
-      }
-    },
     "Settings are locked while recording" : {
       "localizations" : {
         "ja" : {
