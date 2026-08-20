@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import logoUrl from '../../docs/logo.png'
-import toolbarUrl from '../../design/mockups/assets/rokuga-recording-toolbar.png'
 import { isLanguage, languageLabels, languages, selectLanguage, translations } from './i18n'
 
 const LANGUAGE_STORAGE_KEY = 'rokuga-language'
@@ -89,7 +88,25 @@ export default function App() {
                   <i className="handle" /><i className="handle" /><i className="handle" /><i className="handle" />
                   <i className="handle" /><i className="handle" /><i className="handle" /><i className="handle" />
                 </div>
-                <img className="actual-toolbar" src={toolbarUrl} alt="" />
+                <div className="actual-toolbar" aria-hidden="true">
+                  <span className="toolbar-close">
+                    <svg viewBox="0 0 20 20"><path d="m7 7 6 6m0-6-6 6" /></svg>
+                  </span>
+                  <span className="toolbar-action toolbar-action-active">
+                    <svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="2" /></svg>
+                  </span>
+                  <span className="toolbar-action toolbar-screen">
+                    <svg viewBox="0 0 20 20"><rect x="2.5" y="3" width="15" height="13" rx="1.5" /><path d="M5 17h10" /></svg>
+                  </span>
+                  <span className="toolbar-action toolbar-window">
+                    <svg viewBox="0 0 20 20"><rect x="2.5" y="3" width="15" height="14" rx="2" /><path d="M3 7h14" /><path d="M6 5h.01M8.5 5h.01" /></svg>
+                  </span>
+                  <span className="toolbar-divider" />
+                  <span className="toolbar-action toolbar-settings">
+                    <svg viewBox="0 0 20 20"><path d="M4 5h12M4 10h12M4 15h12" /><circle cx="8" cy="5" r="1.5" /><circle cx="13" cy="10" r="1.5" /><circle cx="7" cy="15" r="1.5" /></svg>
+                  </span>
+                  <span className="toolbar-record">{copy.product.record}</span>
+                </div>
               </div>
             </div>
           </div>
