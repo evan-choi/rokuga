@@ -1,5 +1,5 @@
-import Foundation
 import CoreGraphics
+import Foundation
 
 // MARK: - Recording mode
 
@@ -21,7 +21,9 @@ public enum ContainerFormat: String, CaseIterable, Codable, Sendable {
     case mp4
     case mov
 
-    public var fileExtension: String { rawValue }
+    public var fileExtension: String {
+        rawValue
+    }
 }
 
 /// Frame-rate preference. Match-display is resolved once the capture target is known.
