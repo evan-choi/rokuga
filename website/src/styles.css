@@ -134,6 +134,7 @@ a { color: inherit; }
   position: relative;
   width: 32px;
   min-height: 32px;
+  margin-inline: -8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
