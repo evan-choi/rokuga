@@ -55,6 +55,14 @@ private struct GeneralPane: View {
 
     var body: some View {
         Form {
+            Picker("Language", selection: $model.appLanguage) {
+                Text("System Default").tag(AppLanguage.system)
+                Text("English").tag(AppLanguage.english)
+                Text("Korean").tag(AppLanguage.korean)
+                Text("Japanese").tag(AppLanguage.japanese)
+                Text("Simplified Chinese").tag(AppLanguage.simplifiedChinese)
+            }
+            .disabled(locked)
             Toggle("Launch at login", isOn: $model.launchAtLogin)
             Toggle("Show floating thumbnail after recording", isOn: $model.showFloatingThumbnail)
             Picker("Countdown", selection: $model.countdown) {

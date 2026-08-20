@@ -34,6 +34,7 @@ public final class SettingsStore: @unchecked Sendable {
         case showFloatingThumbnail = "post.showThumbnail"
         case outputFolderBookmark = "output.folderBookmark"
         case selectedRegions = "region.perDisplay"
+        case appLanguage = "app.language"
         case launchAtLogin = "app.launchAtLogin"
         case onboardingCompleted = "app.onboardingCompleted"
         case lastRecordingPath = "post.lastRecordingPath"
@@ -45,6 +46,20 @@ public final class SettingsStore: @unchecked Sendable {
     }
 
     // MARK: Typed accessors
+
+    public var appLanguage: AppLanguage {
+        get { rawRepresentable(.appLanguage) ?? .system }
+        set {
+            lock.withLock {
+                defaults.set(newValue.rawValue, forKey: Key.appLanguage.rawValue)
+                if let languageCode = newValue.languageCode {
+                    defaults.set([languageCode], forKey: "AppleLanguages")
+                } else {
+                    defaults.removeObject(forKey: "AppleLanguages")
+                }
+            }
+        }
+    }
 
     public var recordingMode: RecordingMode {
         get { rawRepresentable(.recordingMode) ?? .selectedArea }
@@ -166,6 +181,7 @@ public final class SettingsStore: @unchecked Sendable {
             for key in Key.allCases {
                 defaults.removeObject(forKey: key.rawValue)
             }
+            defaults.removeObject(forKey: "AppleLanguages")
         }
     }
 

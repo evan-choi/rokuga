@@ -13,6 +13,7 @@ final class SettingsStoreTests: XCTestCase {
     }
 
     func testDefaults() {
+        XCTAssertEqual(store.appLanguage, .system)
         XCTAssertEqual(store.recordingMode, .selectedArea)
         XCTAssertEqual(store.videoCodec, .hevc)
         XCTAssertEqual(store.containerFormat, .mov)
@@ -26,6 +27,7 @@ final class SettingsStoreTests: XCTestCase {
     }
 
     func testRoundTrip() {
+        store.appLanguage = .japanese
         store.recordingMode = .window
         store.videoCodec = .h264
         store.frameRate = .matchDisplay
@@ -34,6 +36,8 @@ final class SettingsStoreTests: XCTestCase {
         store.audioTrackLayout = .separate
 
         let reread = SettingsStore(defaults: defaults)
+        XCTAssertEqual(reread.appLanguage, .japanese)
+        XCTAssertEqual(defaults.array(forKey: "AppleLanguages") as? [String], ["ja"])
         XCTAssertEqual(reread.recordingMode, .window)
         XCTAssertEqual(reread.videoCodec, .h264)
         XCTAssertEqual(reread.frameRate, .matchDisplay)
@@ -56,15 +60,25 @@ final class SettingsStoreTests: XCTestCase {
     }
 
     func testResetAllRestoresDefaults() {
+        store.appLanguage = .korean
         store.videoCodec = .h264
         store.frameRateMode = .constant
         store.captureMicrophone = true
         store.audioTrackLayout = .separate
         store.resetAll()
+        XCTAssertEqual(store.appLanguage, .system)
+        XCTAssertNil(defaults.persistentDomain(forName: "io.rokuga.tests")?["AppleLanguages"])
         XCTAssertEqual(store.videoCodec, .hevc)
         XCTAssertEqual(store.frameRateMode, .variable)
         XCTAssertFalse(store.captureMicrophone)
         XCTAssertEqual(store.audioTrackLayout, .mixed)
+    }
+
+    func testSystemLanguageRemovesOverride() {
+        store.appLanguage = .simplifiedChinese
+        store.appLanguage = .system
+
+        XCTAssertNil(defaults.persistentDomain(forName: "io.rokuga.tests")?["AppleLanguages"])
     }
 
     func testUnknownAudioTrackLayoutFallsBackToMixed() {

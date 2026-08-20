@@ -1,6 +1,20 @@
 import CoreGraphics
 import Foundation
 
+// MARK: - App
+
+public enum AppLanguage: String, CaseIterable, Codable, Sendable {
+    case system
+    case english = "en"
+    case korean = "ko"
+    case japanese = "ja"
+    case simplifiedChinese = "zh-Hans"
+
+    public var languageCode: String? {
+        self == .system ? nil : rawValue
+    }
+}
+
 // MARK: - Recording mode
 
 /// The four capture modes exposed by the toolbar (webcam intentionally excluded).

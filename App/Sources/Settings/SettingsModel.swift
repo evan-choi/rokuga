@@ -8,6 +8,16 @@ import SettingsKit
 final class SettingsModel: ObservableObject {
     private let store = SettingsStore.shared
 
+    var appLanguage: AppLanguage {
+        get { store.appLanguage }
+        set {
+            guard newValue != store.appLanguage else { return }
+            objectWillChange.send()
+            store.appLanguage = newValue
+            offerRelaunch()
+        }
+    }
+
     var launchAtLogin: Bool {
         get { store.launchAtLogin }
         set {
@@ -115,9 +125,32 @@ final class SettingsModel: ObservableObject {
         alert.addButton(withTitle: String(localized: "Reset"))
         alert.addButton(withTitle: String(localized: "Cancel"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
+        let resetsLanguage = store.appLanguage != .system
         objectWillChange.send()
         store.resetAll()
         LaunchAtLogin.set(enabled: store.launchAtLogin)
+        if resetsLanguage {
+            offerRelaunch()
+        }
+    }
+
+    private func offerRelaunch() {
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Restart Rokuga to apply the language change?")
+        alert.informativeText = String(localized: "The new language will be used after Rokuga restarts.")
+        alert.addButton(withTitle: String(localized: "Relaunch"))
+        alert.addButton(withTitle: String(localized: "Later"))
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.createsNewApplicationInstance = true
+        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: configuration) { _, error in
+            if let error {
+                NSAlert(error: error).runModal()
+            } else {
+                NSApp.terminate(nil)
+            }
+        }
     }
 
     private func update(_ mutate: (SettingsStore) -> Void) {
