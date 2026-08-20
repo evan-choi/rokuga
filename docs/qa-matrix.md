@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | macOS 15 (arm64) | CI `test` job (`macos-15`) | ✅ every push/PR |
 | Unit + integration suites | `swift test` (49 tests: capture, encoder, audio output, splice clock, mixer, rate control, settings, trim) | ✅ CI |
-| Performance budgets | `rokuga-bench` + `scripts/bench-gate.py` (PR: 1080p60; nightly: 4K60 10 min) | ✅ CI |
+| Performance budgets | `rokuga-bench` + `scripts/bench-gate.py` (PR: 1080p60) | ✅ CI |
 | Zero-copy record path | `scripts/audit-zero-copy.sh` + xctrace recipe | ✅ CI (static) |
 | Localization (ko/ja/zh-Hans) | `scripts/lint-localization.py` + `scripts/l10n-screenshots.sh` | ✅ CI / artifacts |
 | Accessibility fallbacks | Reduce Transparency (`GlassBackground`), Reduce Motion paths, VoiceOver labels | ✅ code-level |
