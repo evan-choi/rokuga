@@ -112,7 +112,7 @@ private struct AudioPane: View {
                 Text("Separate tracks require MOV.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-            } else {
+            } else if model.audioTrackLayout == .separate {
                 Text("Separate tracks are intended for editing. Some players may play only one track.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
