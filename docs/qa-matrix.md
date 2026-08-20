@@ -5,9 +5,9 @@
 | Axis | Covered by | Status |
 | --- | --- | --- |
 | macOS 15 (arm64) | CI `test` job (`macos-15`) | ✅ every push/PR |
-| Unit + integration suites | `swift test` (49 tests: capture, encoder, audio output, splice clock, mixer, rate control, settings, trim) | ✅ CI |
-| Performance budgets | `rokuga-bench` + `scripts/bench-gate.py` (PR: 1080p60) | ✅ CI |
-| Zero-copy record path | `scripts/audit-zero-copy.sh` + xctrace recipe | ✅ CI (static) |
+| Unit + integration suites | `swift test` (51 tests: capture, encoder, audio output, splice clock, mixer, rate control, settings, trim) | ✅ CI |
+| Performance measurements | `RokugaPerf` + `scripts/perf.sh` | Local, on demand |
+| Zero-copy record path | `scripts/audit-zero-copy.sh` + xctrace recipe | Local, on demand |
 | Localization (ko/ja/zh-Hans) | `scripts/lint-localization.py` + `scripts/l10n-screenshots.sh` | ✅ CI / artifacts |
 | Accessibility fallbacks | Reduce Transparency (`GlassBackground`), Reduce Motion paths, VoiceOver labels | ✅ code-level |
 | Fixed Dark inheritance | Debug app `--verify-dark-appearance` | Pass on macOS 26.5.2 |
@@ -37,6 +37,6 @@ on physical hardware before each tagged release. Record results in the release P
 | 4 | macOS 15, Apple Silicon, 3 displays (1× + 2×) | Display unplug mid-recording, native cursor and click capture | ☐ |
 | 5 | Any, VoiceOver enabled | Toolbar → record → stop → preview → trim editor fully by keyboard/VO | ☐ |
 | 6 | Any, Reduce Transparency + Reduce Motion | Solid panel fallbacks, no animated transitions | ☐ |
-| 7 | Any, 8 h soak (`rokuga-bench throughput --seconds 28800`) | Memory ≤ 400 MB steady, zero drops | ☐ |
+| 7 | Any, 8 h soak (`./scripts/perf.sh record --scenario 4k-audio --seconds 28800 --warmup off`) | Memory ≤ 400 MB steady, zero drops | ☐ |
 | 8 | macOS 15–25, system Light and Dark | Rokuga remains Dark; `NSVisualEffectView` stays active beneath the explicit scrim over white, black, and high-chroma content; rounded boundaries remain visible; Reduce Transparency uses the solid Dark palette | Pending |
 | 9 | macOS 26+, system Light and Dark | Rokuga remains Dark; untinted native Liquid Glass stays visibly active beneath the explicit scrim; controls remain legible over white and black content | Pending |

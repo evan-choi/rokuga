@@ -87,7 +87,7 @@ python3 scripts/lint-localization.py
 
 ## Performance testing
 
-CI runs synthetic encoder and latency checks through `rokuga-bench`; its committed comparison values live in [`benchmarks/baseline.json`](benchmarks/baseline.json). The separate `RokugaPerf` app in [`Perf`](Perf) exercises the production capture path against a deterministic on-screen workload. It requires local code signing and Screen Recording permission, so it runs through `./scripts/perf.sh` instead of shared CI runners.
+The `RokugaPerf` app in [`Perf`](Perf) exercises the production capture path against a deterministic Retina 4K workload. Run it through `./scripts/perf.sh`; it requires local code signing and Screen Recording permission, so performance measurements do not run in CI.
 
 ## License
 

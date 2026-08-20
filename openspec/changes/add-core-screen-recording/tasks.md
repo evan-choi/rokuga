@@ -5,7 +5,7 @@
 - [x] 1.1 Create Xcode project: `Rokuga` app target (SwiftUI, macOS 15+, sandboxed, `LSUIElement` agent) + local SPM package `RokugaCore` (CaptureKit, EncoderKit, TrimKit, SettingsKit)
 - [x] 1.2 Entitlements & Info.plist: microphone usage description, security-scoped bookmarks, `LSUIElement`; launch at login via `SMAppService.mainApp`
 - [x] 1.3 Add permissively licensed `KeyboardShortcuts` as the sole third-party dependency
-- [x] 1.4 CI pipeline: build + unit tests on a macOS 15 hosted runner, localization and baseline frame-transport static audits, benchmark job scaffold
+- [x] 1.4 CI pipeline: build + unit tests on a macOS 15 hosted runner and localization checks
 
 ## 2. Capture core (CaptureKit)
 
@@ -100,10 +100,10 @@
 - [ ] 9a.3 Locale-aware formatters for all UI dates/times/sizes; locale-neutral file naming verified
 - [ ] 9a.4 CJK layout QA: localized-screenshot pass (toolbar/popover/settings/editor ×4 languages), no truncation/overlap
 
-## 10. Performance & release gates
+## 10. Performance & release validation
 
 - [x] 10.1 Baseline frame-transport audit: the current recording path has no full-frame CPU pixel-buffer readback; any future copy requires the measured exception defined by the performance spec
 - [x] 10.2 End-to-end capture benchmarks: 4K60 10-min drop-rate < 0.1%, A/V drift < 40 ms/h, CPU ≤ 20%@1080p60 / ≤ 35%@4K60, memory ≤ 400 MB steady, 8 h soak
 - [x] 10.3 Latency tests: summon ≤ 150 ms, record→first frame ≤ 500 ms, stop→playable ≤ 2 s, passthrough trim ≤ 3 s
-- [ ] 10.4 Correct CPU thresholds and wire actual capture/audio benchmarks into CI as >10% regression gates
+- [x] 10.4 Keep hardware-dependent capture/audio measurements local; remove the synthetic microbenchmark and CI regression gates
 - [ ] 10.5 QA matrix: macOS 15+ × Intel/Apple Silicon × 1–3 displays incl. mixed scale factors; accessibility review

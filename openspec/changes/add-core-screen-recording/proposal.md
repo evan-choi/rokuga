@@ -19,7 +19,7 @@ This change defines the core product: three recording modes, system and micropho
 - Built-in lossless trim editor: select the range to keep, save as a new file with custom name and destination
 - Output controls: MP4/MOV containers, H.264/HEVC codecs, VBR/CBR rate control, quality 0–100, resolution cap up to 5K (5120×2880), up to 60 FPS, AAC audio at 128–320 kbps
 - Recording lifecycle controls: record from the toolbar (summoned via menu bar or ⇧⌘6 at the bottom-center of the display under the mouse); while recording the toolbar disappears and the menu bar shows elapsed time with a one-click stop control; Esc cancels preparation/countdown globally, and ⌃⌘Esc stops an active recording; countdown choices are off, 3, 5, or 10 seconds
-- Performance contract: reuse captured surfaces by default, allow measured copy exceptions that reduce total CPU or memory cost, keep < 0.1% dropped frames at 4K60 on baseline Apple Silicon, bound memory, and enforce interaction latency and regression gates tracked in `tasks.md`
+- Performance contract: reuse captured surfaces by default, allow measured copy exceptions that reduce total CPU or memory cost, keep < 0.1% dropped frames at 4K60 on baseline Apple Silicon, bound memory, and validate interaction latency with the local performance harness
 - Capture exclusion: always hide the app's own windows; optionally hide desktop icons from Selected Area and Full Screen recordings
 - Post-recording delivery: recordings save straight to the output folder (Finder is the library — no library window); a floating thumbnail appears briefly and expands into a preview panel (play/scrub + Edit/Delete/Done) when clicked — Edit opens the trim editor; M4A audio extraction via the trim editor's export options
 - First-run experience: output folder selection and guided permission flows (screen & system audio recording, microphone)
@@ -40,7 +40,7 @@ Out of scope for this change (planned as follow-ups): webcam/camera recording of
 - `output-settings`: Container/codec/rate-control/quality/resolution/FPS/audio-bitrate configuration and output folder management
 - `capture-exclusion`: Excluding the app's own windows and desktop icons from captured content
 - `post-recording`: Windowless post-recording delivery — save-to-folder, floating thumbnail, notifications, and Finder/menu-bar access to recordings
-- `performance`: Measurable performance budgets — resource-efficient frame transport, frame integrity, system responsiveness, interaction latency, and CI regression gates
+- `performance`: Measurable performance budgets — resource-efficient frame transport, frame integrity, system responsiveness, interaction latency, and repeatable local experiments
 - `localization`: Full localization in English (base), Korean, Japanese, and Simplified Chinese — String Catalogs, system language resolution, locale-aware formatting, CJK layout QA
 - `permissions-onboarding`: First-run output folder selection and guided macOS permission acquisition/recovery flows
 - `app-preferences`: General app options — fixed Dark appearance, launch at login, post-recording behavior, settings reset

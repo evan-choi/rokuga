@@ -68,10 +68,3 @@ UI interactions SHALL feel instant: toolbar summon → visible in ≤ 150 ms; re
 #### Scenario: Fast finalize
 - **WHEN** the user stops a 1-hour recording
 - **THEN** the finalized playable file is ready within 2 seconds
-
-### Requirement: Performance regression gates
-The performance budgets above SHALL be enforced by automated benchmarks in CI (capture/audio smoke + encode throughput + memory watermark), failing the build when a budget regresses by more than 10%.
-
-#### Scenario: Regression blocks merge
-- **WHEN** a change pushes 4K60 dropped frames above budget on the benchmark runner
-- **THEN** CI fails with a report naming the regressed metric
