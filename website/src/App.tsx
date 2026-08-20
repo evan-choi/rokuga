@@ -147,7 +147,7 @@ export default function App() {
         <section className="section" id="features">
           <div className="container">
             <div className="section-heading">
-              <p className="section-kicker">Capture</p>
+              <p className="section-kicker">Record</p>
               <h2>{copy.features.title}<br />{copy.features.accent}</h2>
             </div>
 
