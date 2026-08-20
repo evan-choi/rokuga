@@ -149,10 +149,15 @@ export default function App() {
             </a>
             <label className="language-picker">
               <span className="visually-hidden">{copy.languageLabel}</span>
+              <svg className="language-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M3 12h18M12 3c2.4 2.5 3.6 5.5 3.6 9s-1.2 6.5-3.6 9c-2.4-2.5-3.6-5.5-3.6-9S9.6 5.5 12 3Z" />
+              </svg>
               <select
                 className="language-select"
                 value={language}
                 aria-label={copy.languageLabel}
+                title={copy.languageLabel}
                 onChange={(event) => {
                   if (isLanguage(event.target.value)) setLanguage(event.target.value)
                 }}
@@ -284,7 +289,6 @@ export default function App() {
                   </button>
                   <span className="toolbar-record">{copy.product.record}</span>
                 </div>
-                <span className="mode-status" aria-live="polite">{copy.product[captureMode]}</span>
               </div>
               <div className="product-demo-meta">
                 <strong>{copy.product.demoLabel}</strong>
@@ -411,7 +415,6 @@ export default function App() {
                         ? <path d="m5 12 4 4L19 6" />
                         : <><rect width="13" height="13" x="9" y="9" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></>}
                     </svg>
-                    <span>{brewCopyLabel}</span>
                   </button>
                 </div>
               </article>
