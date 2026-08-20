@@ -6,7 +6,7 @@ options:
   deploymentTarget:
     macOS: "15.0"
   createIntermediateGroups: true
-  xcodeVersion: "16.0"
+  xcodeVersion: "26.0"
 
 packages:
   RokugaCore:
