@@ -37,6 +37,7 @@ final class ThumbnailPanelController {
                     }
                 }
             )
+            .appLocale()
         )
         panel.onEscape = { [weak self] in self?.dismiss() }
     }

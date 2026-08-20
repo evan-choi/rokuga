@@ -13,6 +13,7 @@ struct RokugaApp: App {
         // plain NSStatusItem so a single click can stop immediately (menus can't do that).
         MenuBarExtra(isInserted: .constant(!appState.recordingState.isActive)) {
             MenuBarContentView(appState: appState)
+                .appLocale()
         } label: {
             Image(systemName: "record.circle")
         }
@@ -20,6 +21,7 @@ struct RokugaApp: App {
 
         Settings {
             SettingsView()
+                .appLocale()
         }
     }
 }
@@ -56,10 +58,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         NSApp.activate(ignoringOtherApps: true)
         let alert = NSAlert()
-        alert.messageText = String(localized: "Stop recording and quit?")
-        alert.informativeText = String(localized: "The current recording will be saved before Rokuga quits.")
-        alert.addButton(withTitle: String(localized: "Save & Quit"))
-        alert.addButton(withTitle: String(localized: "Cancel"))
+        alert.messageText = L10n.string("Stop recording and quit?")
+        alert.informativeText = L10n.string("The current recording will be saved before Rokuga quits.")
+        alert.addButton(withTitle: L10n.string("Save & Quit"))
+        alert.addButton(withTitle: L10n.string("Cancel"))
 
         guard alert.runModal() == .alertFirstButtonReturn else { return .terminateCancel }
 
@@ -113,6 +115,52 @@ struct SettingsMenuItem: View {
             openSettings()
         }
         .keyboardShortcut(",", modifiers: .command)
+    }
+}
+
+enum L10n {
+    private static let supportedLanguageCodes = AppLanguage.allCases.compactMap(\.languageCode)
+
+    static func locale(for language: AppLanguage) -> Locale {
+        Locale(identifier: languageCode(for: language))
+    }
+
+    static func string(_ key: String) -> String {
+        let code = languageCode(for: SettingsStore.shared.appLanguage)
+        guard code != "en",
+              let path = Bundle.main.path(forResource: code, ofType: "lproj"),
+              let bundle = Bundle(path: path)
+        else { return key }
+        return bundle.localizedString(forKey: key, value: key, table: nil)
+    }
+
+    private static func languageCode(for language: AppLanguage) -> String {
+        if let code = language.languageCode {
+            return code
+        }
+        let systemLanguages = UserDefaults.standard
+            .persistentDomain(forName: UserDefaults.globalDomain)?["AppleLanguages"] as? [String]
+        return Bundle.preferredLocalizations(
+            from: supportedLanguageCodes,
+            forPreferences: systemLanguages ?? Locale.preferredLanguages
+        ).first ?? "en"
+    }
+}
+
+private struct AppLocaleModifier: ViewModifier {
+    @AppStorage(SettingsStore.Key.appLanguage.rawValue) private var languageRaw = AppLanguage.system.rawValue
+
+    func body(content: Content) -> some View {
+        content.environment(
+            \.locale,
+            L10n.locale(for: AppLanguage(rawValue: languageRaw) ?? .system)
+        )
+    }
+}
+
+extension View {
+    func appLocale() -> some View {
+        modifier(AppLocaleModifier())
     }
 }
 

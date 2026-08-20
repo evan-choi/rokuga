@@ -14,7 +14,6 @@ final class SettingsModel: ObservableObject {
             guard newValue != store.appLanguage else { return }
             objectWillChange.send()
             store.appLanguage = newValue
-            offerRelaunch()
         }
     }
 
@@ -120,37 +119,14 @@ final class SettingsModel: ObservableObject {
     /// Reset All (task 9.4): preferences only — recordings on disk are never touched.
     func resetAll() {
         let alert = NSAlert()
-        alert.messageText = String(localized: "Reset all settings?")
-        alert.informativeText = String(localized: "Preferences return to their defaults. Your recordings are not affected.")
-        alert.addButton(withTitle: String(localized: "Reset"))
-        alert.addButton(withTitle: String(localized: "Cancel"))
+        alert.messageText = L10n.string("Reset all settings?")
+        alert.informativeText = L10n.string("Preferences return to their defaults. Your recordings are not affected.")
+        alert.addButton(withTitle: L10n.string("Reset"))
+        alert.addButton(withTitle: L10n.string("Cancel"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
-        let resetsLanguage = store.appLanguage != .system
         objectWillChange.send()
         store.resetAll()
         LaunchAtLogin.set(enabled: store.launchAtLogin)
-        if resetsLanguage {
-            offerRelaunch()
-        }
-    }
-
-    private func offerRelaunch() {
-        let alert = NSAlert()
-        alert.messageText = String(localized: "Restart Rokuga to apply the language change?")
-        alert.informativeText = String(localized: "The new language will be used after Rokuga restarts.")
-        alert.addButton(withTitle: String(localized: "Relaunch"))
-        alert.addButton(withTitle: String(localized: "Later"))
-        guard alert.runModal() == .alertFirstButtonReturn else { return }
-
-        let configuration = NSWorkspace.OpenConfiguration()
-        configuration.createsNewApplicationInstance = true
-        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: configuration) { _, error in
-            if let error {
-                NSAlert(error: error).runModal()
-            } else {
-                NSApp.terminate(nil)
-            }
-        }
     }
 
     private func update(_ mutate: (SettingsStore) -> Void) {

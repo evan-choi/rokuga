@@ -1133,28 +1133,6 @@
         }
       }
     },
-    "Later" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "後で"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "나중에"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "稍后"
-          }
-        }
-      }
-    },
     "Launch at login" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1927,28 +1905,6 @@
         }
       }
     },
-    "Relaunch" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "再起動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "다시 실행"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重新启动"
-          }
-        }
-      }
-    },
     "Reset" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2014,28 +1970,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重置所有设置…"
-          }
-        }
-      }
-    },
-    "Restart Rokuga to apply the language change?" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "言語の変更を適用するためにRokugaを再起動しますか？"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "언어 변경을 적용하려면 Rokuga를 다시 실행할까요?"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "是否重新启动 Rokuga 以应用语言更改？"
           }
         }
       }
@@ -2534,28 +2468,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rokuga 退出前将保存当前录制。"
-          }
-        }
-      }
-    },
-    "The new language will be used after Rokuga restarts." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rokugaを再起動すると新しい言語が使用されます。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rokuga를 다시 실행하면 새 언어가 적용됩니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rokuga 重新启动后将使用新语言。"
           }
         }
       }

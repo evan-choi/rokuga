@@ -15,6 +15,7 @@ final class ToolbarPanelController {
             rootView: AnyView(
                 ToolbarView(appState: appState)
                     .environmentObject(appState)
+                    .appLocale()
             )
         )
         panel = CapturePanel(

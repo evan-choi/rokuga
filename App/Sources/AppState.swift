@@ -222,10 +222,10 @@ final class AppState: ObservableObject {
     private func presentScreenPermissionRecovery() {
         NSApp.activate(ignoringOtherApps: true)
         let alert = NSAlert()
-        alert.messageText = String(localized: "Screen recording permission required")
-        alert.informativeText = String(localized: "Allow Rokuga in System Settings › Privacy & Security › Screen Recording, then relaunch.")
-        alert.addButton(withTitle: String(localized: "Open System Settings…"))
-        alert.addButton(withTitle: String(localized: "Cancel"))
+        alert.messageText = L10n.string("Screen recording permission required")
+        alert.informativeText = L10n.string("Allow Rokuga in System Settings › Privacy & Security › Screen Recording, then relaunch.")
+        alert.addButton(withTitle: L10n.string("Open System Settings…"))
+        alert.addButton(withTitle: L10n.string("Cancel"))
         if alert.runModal() == .alertFirstButtonReturn {
             PermissionLinks.openScreenRecording()
         }
@@ -235,11 +235,11 @@ final class AppState: ObservableObject {
     private func presentMicDeniedChoice() -> Bool {
         NSApp.activate(ignoringOtherApps: true)
         let alert = NSAlert()
-        alert.messageText = String(localized: "Microphone access denied")
-        alert.informativeText = String(localized: "Record without the microphone, or grant access in System Settings.")
-        alert.addButton(withTitle: String(localized: "Record Without Mic"))
-        alert.addButton(withTitle: String(localized: "Open System Settings…"))
-        alert.addButton(withTitle: String(localized: "Cancel"))
+        alert.messageText = L10n.string("Microphone access denied")
+        alert.informativeText = L10n.string("Record without the microphone, or grant access in System Settings.")
+        alert.addButton(withTitle: L10n.string("Record Without Mic"))
+        alert.addButton(withTitle: L10n.string("Open System Settings…"))
+        alert.addButton(withTitle: L10n.string("Cancel"))
         switch alert.runModal() {
         case .alertFirstButtonReturn:
             return true

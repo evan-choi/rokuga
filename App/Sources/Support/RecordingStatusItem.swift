@@ -37,7 +37,7 @@ final class RecordingStatusItemController {
         if let button = item.button {
             button.image = NSImage(
                 systemSymbolName: "stop.circle.fill",
-                accessibilityDescription: String(localized: "Stop Recording")
+                accessibilityDescription: L10n.string("Stop Recording")
             )
             button.imagePosition = .imageLeading
             button.font = .monospacedDigitSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)

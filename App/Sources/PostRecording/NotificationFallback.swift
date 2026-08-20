@@ -7,7 +7,7 @@ enum NotificationFallback {
         center.requestAuthorization(options: [.alert]) { granted, _ in
             guard granted else { return }
             let content = UNMutableNotificationContent()
-            content.title = String(localized: "Recording saved")
+            content.title = L10n.string("Recording saved")
             content.body = url.lastPathComponent
             center.add(
                 UNNotificationRequest(

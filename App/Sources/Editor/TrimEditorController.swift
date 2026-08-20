@@ -28,6 +28,7 @@ final class TrimEditorController: NSObject, NSWindowDelegate {
             rootView: TrimEditorView(model: model) { [weak self] in
                 self?.requestClose()
             }
+            .appLocale()
         )
     }
 
@@ -46,10 +47,10 @@ final class TrimEditorController: NSObject, NSWindowDelegate {
     func windowShouldClose(_ sender: NSWindow) -> Bool {
         guard model.isDirty else { return true }
         let alert = NSAlert()
-        alert.messageText = String(localized: "Discard trim changes?")
-        alert.informativeText = String(localized: "The trimmed range has not been exported.")
-        alert.addButton(withTitle: String(localized: "Discard"))
-        alert.addButton(withTitle: String(localized: "Cancel"))
+        alert.messageText = L10n.string("Discard trim changes?")
+        alert.informativeText = L10n.string("The trimmed range has not been exported.")
+        alert.addButton(withTitle: L10n.string("Discard"))
+        alert.addButton(withTitle: L10n.string("Cancel"))
         return alert.runModal() == .alertFirstButtonReturn
     }
 

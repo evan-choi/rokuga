@@ -205,6 +205,7 @@ final class ToolbarTooltipPresenter {
                 .padding(.vertical, 6)
                 .captureWindowChrome(cornerRadius: CaptureWindowChrome.tooltipCornerRadius)
                 .fixedSize()
+                .appLocale()
         )
         let size = hostingView.fittingSize
         let tooltipPanel = panel ?? makePanel(size: size)

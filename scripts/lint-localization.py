@@ -19,6 +19,7 @@ REQUIRED_LANGUAGES = ["ko", "ja", "zh-Hans"]
 LITERAL_PATTERNS = [
     r'Text\("((?:[^"\\]|\\.)+)"\)',
     r'String\(localized:\s*"((?:[^"\\]|\\.)+)"\)',
+    r'L10n\.string\("((?:[^"\\]|\\.)+)"\)',
     r'Label\("((?:[^"\\]|\\.)+)",',
     r'Button\("((?:[^"\\]|\\.)+)"[,)]',
     r'Toggle\("((?:[^"\\]|\\.)+)",',

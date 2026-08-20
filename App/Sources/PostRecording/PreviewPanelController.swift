@@ -32,6 +32,7 @@ final class PreviewPanelController {
                 onDelete: { [weak self] in self?.deleteRecording() },
                 onDone: { [weak self] in self?.close() }
             )
+            .appLocale()
         )
         panel.clipContent(toRoundedRect: CaptureWindowChrome.panelCornerRadius)
         panel.onEscape = { [weak self] in self?.close() }
@@ -53,10 +54,10 @@ final class PreviewPanelController {
 
     private func deleteRecording() {
         let alert = NSAlert()
-        alert.messageText = String(localized: "Move recording to Trash?")
+        alert.messageText = L10n.string("Move recording to Trash?")
         alert.informativeText = model.url.lastPathComponent
-        alert.addButton(withTitle: String(localized: "Move to Trash"))
-        alert.addButton(withTitle: String(localized: "Cancel"))
+        alert.addButton(withTitle: L10n.string("Move to Trash"))
+        alert.addButton(withTitle: L10n.string("Cancel"))
         NSApp.activate(ignoringOtherApps: true)
         guard alert.runModal() == .alertFirstButtonReturn else { return }
 

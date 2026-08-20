@@ -32,6 +32,7 @@ final class OnboardingController: NSObject, NSWindowDelegate {
                 self?.finish()
                 self?.onComplete()
             }
+            .appLocale()
         )
     }
 
@@ -264,8 +265,8 @@ struct OnboardingView: View {
 
     private var doneLabel: String {
         if model.step == .screenPermission, model.permissionGranted != true {
-            return String(localized: "Finish Anyway")
+            return L10n.string("Finish Anyway")
         }
-        return String(localized: "Done")
+        return L10n.string("Done")
     }
 }

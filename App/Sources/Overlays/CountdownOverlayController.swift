@@ -14,7 +14,7 @@ final class CountdownOverlayController {
             y: display.frame.midY - size.height / 2
         )
         panel = CapturePanel(contentRect: NSRect(origin: origin, size: size), level: .screenSaver)
-        panel.contentView = NSHostingView(rootView: CountdownOverlayView(model: model))
+        panel.contentView = NSHostingView(rootView: CountdownOverlayView(model: model).appLocale())
         panel.onEscape = onCancel
     }
 
