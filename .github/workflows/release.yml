@@ -100,7 +100,7 @@ jobs:
             security import "$APP_CERTIFICATE_PATH" -k "$KEYCHAIN_PATH" \
               -P "$APP_STORE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
             security import "$INSTALLER_CERTIFICATE_PATH" -k "$KEYCHAIN_PATH" \
-              -P "$APP_STORE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+              -P "$APP_STORE_CERTIFICATE_PASSWORD" -T /usr/bin/productbuild
             security cms -D -i "$PROFILE_PATH" > "$PROFILE_PLIST"
 
             PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$PROFILE_PLIST")
@@ -148,43 +148,14 @@ jobs:
           codesign -d --extract-certificates="$RUNNER_TEMP/archive-bundle-cert" "$BUNDLE_PATH"
           cmp "$RUNNER_TEMP/archive-app-cert0" "$RUNNER_TEMP/archive-bundle-cert0"
 
-      - name: Export App Store package
+      - name: Create App Store package
         if: startsWith(github.ref, 'refs/tags/v') || inputs.deploy
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          PROFILE_NAME: ${{ steps.signing.outputs.profile_name }}
         run: |
-          cat > "$RUNNER_TEMP/AppStoreExportOptions.plist" <<EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>app-store-connect</string>
-            <key>destination</key>
-            <string>export</string>
-            <key>teamID</key>
-            <string>$APPLE_TEAM_ID</string>
-            <key>signingStyle</key>
-            <string>manual</string>
-            <key>signingCertificate</key>
-            <string>Apple Distribution</string>
-            <key>installerSigningCertificate</key>
-            <string>3rd Party Mac Developer Installer</string>
-            <key>manageAppVersionAndBuildNumber</key>
-            <false/>
-            <key>provisioningProfiles</key>
-            <dict>
-              <key>$APP_BUNDLE_ID</key>
-              <string>$PROFILE_NAME</string>
-            </dict>
-          </dict>
-          </plist>
-          EOF
-          xcodebuild -exportArchive \
-            -archivePath "$RUNNER_TEMP/$APP_NAME-AppStore.xcarchive" \
-            -exportOptionsPlist "$RUNNER_TEMP/AppStoreExportOptions.plist" \
-            -exportPath "$RUNNER_TEMP/app-store-export"
+          APP_PATH="$RUNNER_TEMP/$APP_NAME-AppStore.xcarchive/Products/Applications/$APP_NAME.app"
+          mkdir -p "$RUNNER_TEMP/app-store-export"
+          productbuild --component "$APP_PATH" /Applications \
+            --sign "3rd Party Mac Developer Installer" \
+            "$RUNNER_TEMP/app-store-export/$APP_NAME.pkg"
 
       - name: Verify exported App Store package
         if: startsWith(github.ref, 'refs/tags/v') || inputs.deploy
