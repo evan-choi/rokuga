@@ -54,28 +54,40 @@ private struct GeneralPane: View {
     let locked: Bool
 
     var body: some View {
-        Form {
-            Picker("Language", selection: $model.appLanguage) {
-                Text("System Default").tag(AppLanguage.system)
-                Text("English").tag(AppLanguage.english)
-                Text("Korean").tag(AppLanguage.korean)
-                Text("Japanese").tag(AppLanguage.japanese)
-                Text("Simplified Chinese").tag(AppLanguage.simplifiedChinese)
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsRow(Text("Language")) {
+                Picker("Language", selection: $model.appLanguage) {
+                    Text("System Default").tag(AppLanguage.system)
+                    Text("English").tag(AppLanguage.english)
+                    Text("Korean").tag(AppLanguage.korean)
+                    Text("Japanese").tag(AppLanguage.japanese)
+                    Text("Simplified Chinese").tag(AppLanguage.simplifiedChinese)
+                }
+                .labelsHidden()
+                .disabled(locked)
             }
-            .disabled(locked)
-            Toggle("Launch at login", isOn: $model.launchAtLogin)
-            Toggle("Show floating thumbnail after recording", isOn: $model.showFloatingThumbnail)
-            Picker("Countdown", selection: $model.countdown) {
-                Text("Off").tag(CountdownDuration.off)
-                Text(verbatim: "3s").tag(CountdownDuration.three)
-                Text(verbatim: "5s").tag(CountdownDuration.five)
-                Text(verbatim: "10s").tag(CountdownDuration.ten)
+            SettingsRow {
+                Toggle("Launch at login", isOn: $model.launchAtLogin)
+            }
+            SettingsRow {
+                Toggle("Show floating thumbnail after recording", isOn: $model.showFloatingThumbnail)
+            }
+            SettingsRow(Text("Countdown")) {
+                Picker("Countdown", selection: $model.countdown) {
+                    Text("Off").tag(CountdownDuration.off)
+                    Text(verbatim: "3s").tag(CountdownDuration.three)
+                    Text(verbatim: "5s").tag(CountdownDuration.five)
+                    Text(verbatim: "10s").tag(CountdownDuration.ten)
+                }
+                .labelsHidden()
             }
             Divider()
-            HStack {
-                Spacer()
-                Button("Reset All Settings…", action: model.resetAll)
-                    .disabled(locked)
+            SettingsRow {
+                HStack {
+                    Spacer()
+                    Button("Reset All Settings…", action: model.resetAll)
+                        .disabled(locked)
+                }
             }
         }
         .padding(20)
@@ -86,13 +98,18 @@ private struct RecordingPane: View {
     @ObservedObject var model: SettingsModel
 
     var body: some View {
-        Form {
-            Picker("Default mode", selection: $model.recordingMode) {
-                Text("Selected Area").tag(RecordingMode.selectedArea)
-                Text("Full Screen").tag(RecordingMode.fullScreen)
-                Text("Window").tag(RecordingMode.window)
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsRow(Text("Default mode")) {
+                Picker("Default mode", selection: $model.recordingMode) {
+                    Text("Selected Area").tag(RecordingMode.selectedArea)
+                    Text("Full Screen").tag(RecordingMode.fullScreen)
+                    Text("Window").tag(RecordingMode.window)
+                }
+                .labelsHidden()
             }
-            Toggle("Hide desktop icons in recordings", isOn: $model.excludeDesktopIcons)
+            SettingsRow {
+                Toggle("Hide desktop icons in recordings", isOn: $model.excludeDesktopIcons)
+            }
         }
         .padding(20)
     }
@@ -102,16 +119,23 @@ private struct AudioPane: View {
     @ObservedObject var model: SettingsModel
 
     var body: some View {
-        Form {
-            Toggle("Record system audio", isOn: $model.captureSystemAudio)
-            Toggle("Record microphone", isOn: $model.captureMicrophone)
-            Picker("Audio quality", selection: $model.audioBitrate) {
-                ForEach(AudioBitrate.allCases, id: \.self) { bitrate in
-                    Text(verbatim: "\(bitrate.rawValue) kbps").tag(bitrate)
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsRow {
+                Toggle("Record system audio", isOn: $model.captureSystemAudio)
+            }
+            SettingsRow {
+                Toggle("Record microphone", isOn: $model.captureMicrophone)
+            }
+            SettingsRow(Text("Audio quality")) {
+                Picker("Audio quality", selection: $model.audioBitrate) {
+                    ForEach(AudioBitrate.allCases, id: \.self) { bitrate in
+                        Text(verbatim: "\(bitrate.rawValue) kbps").tag(bitrate)
+                    }
                 }
+                .labelsHidden()
             }
             if model.captureSystemAudio, model.captureMicrophone {
-                LabeledContent("Audio tracks") {
+                SettingsRow(Text("Audio tracks")) {
                     VStack(alignment: .leading, spacing: 6) {
                         Picker("Audio tracks", selection: $model.audioTrackLayout) {
                             Text("Mixed").tag(AudioTrackLayout.mixed)
@@ -135,7 +159,6 @@ private struct AudioPane: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
-                    .frame(width: 230, alignment: .leading)
                 }
             }
         }
@@ -147,9 +170,13 @@ private struct MousePane: View {
     @ObservedObject var model: SettingsModel
 
     var body: some View {
-        Form {
-            Toggle("Show cursor", isOn: $model.showCursor)
-            Toggle("Animate clicks", isOn: $model.animateClicks)
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsRow {
+                Toggle("Show cursor", isOn: $model.showCursor)
+            }
+            SettingsRow {
+                Toggle("Animate clicks", isOn: $model.animateClicks)
+            }
         }
         .padding(20)
     }
@@ -157,9 +184,12 @@ private struct MousePane: View {
 
 struct ShortcutsPane: View {
     var body: some View {
-        Form {
-            KeyboardShortcuts.Recorder("Open Recording Toolbar", name: .summonToolbar)
-                .keyboardShortcutsConflictPolicy(.init(systemShortcut: .allow))
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsRow(Text("Open Recording Toolbar")) {
+                KeyboardShortcuts.Recorder(for: .summonToolbar)
+                    .keyboardShortcutsConflictPolicy(.init(systemShortcut: .allow))
+                    .accessibilityLabel(Text("Open Recording Toolbar"))
+            }
         }
         .padding(20)
     }
@@ -169,8 +199,8 @@ private struct OutputPane: View {
     @ObservedObject var model: SettingsModel
 
     var body: some View {
-        Form {
-            LabeledContent("Save to") {
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsRow(Text("Save to")) {
                 HStack {
                     Text(model.outputFolderPath)
                         .truncationMode(.middle)
@@ -178,24 +208,36 @@ private struct OutputPane: View {
                     Button("Choose…", action: model.chooseOutputFolder)
                 }
             }
-            Picker("Codec", selection: $model.videoCodec) {
-                Text(verbatim: "H.264 (AVC)").tag(VideoCodec.h264)
-                Text(verbatim: "H.265 (HEVC)").tag(VideoCodec.hevc)
+            SettingsRow(Text("Codec")) {
+                Picker("Codec", selection: $model.videoCodec) {
+                    Text(verbatim: "H.264 (AVC)").tag(VideoCodec.h264)
+                    Text(verbatim: "H.265 (HEVC)").tag(VideoCodec.hevc)
+                }
+                .labelsHidden()
             }
-            Picker("Format", selection: $model.containerFormat) {
-                Text(verbatim: "MP4").tag(ContainerFormat.mp4)
-                Text(verbatim: "MOV").tag(ContainerFormat.mov)
+            SettingsRow(Text("Format")) {
+                Picker("Format", selection: $model.containerFormat) {
+                    Text(verbatim: "MP4").tag(ContainerFormat.mp4)
+                    Text(verbatim: "MOV").tag(ContainerFormat.mov)
+                }
+                .labelsHidden()
             }
-            Picker("Frame rate", selection: $model.frameRate) {
-                Text(verbatim: "30 fps").tag(FrameRate.fps30)
-                Text(verbatim: "60 fps").tag(FrameRate.fps60)
-                Text("Match Display").tag(FrameRate.matchDisplay)
+            SettingsRow(Text("Frame rate")) {
+                Picker("Frame rate", selection: $model.frameRate) {
+                    Text(verbatim: "30 fps").tag(FrameRate.fps30)
+                    Text(verbatim: "60 fps").tag(FrameRate.fps60)
+                    Text("Match Display").tag(FrameRate.matchDisplay)
+                }
+                .labelsHidden()
             }
-            Picker("Frame rate mode", selection: $model.frameRateMode) {
-                Text("Variable (VFR)").tag(FrameRateMode.variable)
-                Text("Constant (CFR)").tag(FrameRateMode.constant)
+            SettingsRow(Text("Frame rate mode")) {
+                Picker("Frame rate mode", selection: $model.frameRateMode) {
+                    Text("Variable (VFR)").tag(FrameRateMode.variable)
+                    Text("Constant (CFR)").tag(FrameRateMode.constant)
+                }
+                .labelsHidden()
             }
-            LabeledContent("Quality") {
+            SettingsRow(Text("Quality")) {
                 HStack(spacing: 8) {
                     Slider(value: qualityBinding, in: 0 ... 100, step: 5) {
                         Text("Quality")
@@ -216,6 +258,31 @@ private struct OutputPane: View {
             get: { Double(model.videoQuality) },
             set: { model.videoQuality = Int($0) }
         )
+    }
+}
+
+private struct SettingsRow<Content: View>: View {
+    private let label: Text?
+    private let content: Content
+
+    init(_ label: Text? = nil, @ViewBuilder content: () -> Content) {
+        self.label = label
+        self.content = content()
+    }
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            ZStack(alignment: .trailing) {
+                if let label {
+                    label
+                }
+            }
+            .frame(width: 120, alignment: .trailing)
+
+            content
+                .frame(width: 230, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 }
 
