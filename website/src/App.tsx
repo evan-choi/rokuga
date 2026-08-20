@@ -150,6 +150,7 @@ export default function App() {
               <div
                 className="product-stage"
                 ref={productStageRef}
+                data-mode={captureMode}
                 onPointerMove={updateSelectionDrag}
                 onPointerUp={endSelectionDrag}
                 onPointerCancel={endSelectionDrag}
@@ -159,11 +160,17 @@ export default function App() {
                   <strong>Finder</strong><span>{copy.product.file}</span><span>{copy.product.edit}</span><span>{copy.product.view}</span>
                   <span className="grow"></span><span>{copy.product.date}</span>
                 </div>
+                <div className="full-screen-target" aria-hidden="true" />
+                <div className="window-target" aria-hidden="true">
+                  <div className="window-target-bar"><i /><i /><i /></div>
+                  <div className="window-target-body"><span /><span /><span /></div>
+                </div>
                 <div
                   className="selection"
                   role="group"
-                  tabIndex={0}
+                  tabIndex={captureMode === 'selectedArea' ? 0 : -1}
                   aria-label={copy.product.selectedArea}
+                  aria-hidden={captureMode !== 'selectedArea'}
                   data-dragging={selectionDrag ?? undefined}
                   style={{
                     top: `${selection.y * 100}%`,
@@ -188,7 +195,7 @@ export default function App() {
                 </div>
                 <div className="actual-toolbar" role="toolbar" aria-label={copy.product.toolbarLabel}>
                   <span className="toolbar-close">
-                    <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" /><path d="m7 7 6 6m0-6-6 6" /></svg>
+                    <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9.5" /><path d="m7 7 6 6m0-6-6 6" /></svg>
                   </span>
                   <div className="toolbar-modes">
                     <button
@@ -199,7 +206,7 @@ export default function App() {
                       data-tooltip={copy.product.selectedArea}
                       onClick={() => setCaptureMode('selectedArea')}
                     >
-                      <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2" /></svg>
+                      <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="1" y="3" width="18" height="14" rx="2" /></svg>
                     </button>
                     <button
                       className="toolbar-mode"
@@ -209,7 +216,7 @@ export default function App() {
                       data-tooltip={copy.product.fullScreen}
                       onClick={() => setCaptureMode('fullScreen')}
                     >
-                      <svg className="full-screen-icon" viewBox="0 0 20 20" aria-hidden="true"><rect x="2.5" y="3" width="15" height="14" rx="1.5" /><rect x="4.5" y="5" width="11" height="10" rx=".7" /></svg>
+                      <svg className="full-screen-icon" viewBox="0 0 20 20" aria-hidden="true"><path fillRule="evenodd" d="M2 2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm2 3v10h12V5H4Z" /></svg>
                     </button>
                     <button
                       className="toolbar-mode"
@@ -219,28 +226,41 @@ export default function App() {
                       data-tooltip={copy.product.window}
                       onClick={() => setCaptureMode('window')}
                     >
-                      <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2.5" y="3" width="15" height="14" rx="2" /><path d="M3 7h14" /><path d="M6 5h.01M8.5 5h.01" /></svg>
+                      <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="1" y="3" width="18" height="14" rx="2" /><path d="M2 7h16" /><path d="M5 5h.01M7.5 5h.01" /></svg>
                     </button>
                   </div>
                   <span className="toolbar-drag" />
                   <span className="toolbar-options">
-                    <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 5h12M4 10h12M4 15h12" /><circle cx="8" cy="5" r="1.5" /><circle cx="13" cy="10" r="1.5" /><circle cx="7" cy="15" r="1.5" /></svg>
+                    <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6h12M4 10h12M4 14h12" /><circle cx="8" cy="6" r="1.35" /><circle cx="13" cy="10" r="1.35" /><circle cx="7" cy="14" r="1.35" /></svg>
                   </span>
                   <span className="toolbar-record">{copy.product.record}</span>
                 </div>
+                <span className="mode-status" aria-live="polite">{copy.product[captureMode]}</span>
+              </div>
+              <div className="product-demo-meta">
+                <strong>{copy.product.demoLabel}</strong>
+                <span>{copy.product.hint}</span>
               </div>
             </div>
           </div>
         </section>
 
-        <div className="trust-strip container" aria-label={copy.trust.label}>
-          <div className="trust-item"><strong>H.265</strong><span>{copy.trust.codec}</span></div>
-          <div className="trust-item"><strong>60 fps+</strong><span>{copy.trust.frameRate}</span></div>
-          <div className="trust-item"><strong>5K</strong><span>{copy.trust.resolution}</span></div>
-          <div className="trust-item"><strong>{copy.free.title}</strong><span>{copy.trust.free}</span></div>
-        </div>
+        <section className="highlights">
+          <div className="container">
+            <div className="section-heading highlights-heading">
+              <p className="section-kicker">Highlights</p>
+              <h2>{copy.trust.title}</h2>
+            </div>
+            <div className="trust-strip" aria-label={copy.trust.label}>
+              <div className="trust-item"><strong>H.265</strong><span>{copy.trust.codec}</span></div>
+              <div className="trust-item"><strong>60 fps+</strong><span>{copy.trust.frameRate}</span></div>
+              <div className="trust-item"><strong>5K</strong><span>{copy.trust.resolution}</span></div>
+              <div className="trust-item"><strong>{copy.free.title}</strong><span>{copy.trust.free}</span></div>
+            </div>
+          </div>
+        </section>
 
-        <section className="section" id="features">
+        <section className="section features-section" id="features">
           <div className="container">
             <div className="section-heading">
               <p className="section-kicker">Record</p>
@@ -248,7 +268,7 @@ export default function App() {
             </div>
 
             <div className="bento">
-              <article className="feature-card feature-card-wide">
+              <article className="feature-card feature-card-wide feature-card-dark">
                 <h3>{copy.features.frameRateTitle}</h3>
                 <p>{copy.features.frameRateDescription}</p>
                 <div className="rate-visual" aria-hidden="true">
@@ -258,7 +278,7 @@ export default function App() {
                 </div>
               </article>
 
-              <article className="feature-card">
+              <article className="feature-card feature-card-codec">
                 <h3>{copy.features.codecTitle}</h3>
                 <p>{copy.features.codecDescription}</p>
                 <div className="codec-visual" aria-hidden="true">
@@ -267,7 +287,7 @@ export default function App() {
                 </div>
               </article>
 
-              <article className="feature-card">
+              <article className="feature-card feature-card-resolution">
                 <h3>{copy.features.resolutionTitle}</h3>
                 <p>{copy.features.resolutionDescription}</p>
                 <div className="resolution-visual" aria-hidden="true">
