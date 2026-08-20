@@ -301,6 +301,7 @@ final class AssetWriterSinkTests: XCTestCase {
             outputURL: outputURL,
             configuration: makeConfiguration(capturesSystemAudio: true, frameRateMode: .constant)
         )
+        let audioTemplate = try makeAudioSampleBuffer(pts: .zero)
         try await sink.start()
         try sink.append(makeVideoSampleBuffer(pts: .zero), of: .video)
         let startedAt = DispatchTime.now().uptimeNanoseconds
@@ -309,10 +310,21 @@ final class AssetWriterSinkTests: XCTestCase {
                 try await Task.sleep(nanoseconds: 33_000_000)
             }
             let elapsed = DispatchTime.now().uptimeNanoseconds - startedAt
-            try sink.append(
-                makeAudioSampleBuffer(pts: CMTime(value: CMTimeValue(elapsed), timescale: 1_000_000_000)),
-                of: .systemAudio
+            var timing = CMSampleTimingInfo(
+                duration: CMSampleBufferGetDuration(audioTemplate),
+                presentationTimeStamp: CMTime(value: CMTimeValue(elapsed), timescale: 1_000_000_000),
+                decodeTimeStamp: .invalid
             )
+            var audioSample: CMSampleBuffer?
+            let status = CMSampleBufferCreateCopyWithNewTiming(
+                allocator: kCFAllocatorDefault,
+                sampleBuffer: audioTemplate,
+                sampleTimingEntryCount: 1,
+                sampleTimingArray: &timing,
+                sampleBufferOut: &audioSample
+            )
+            XCTAssertEqual(status, noErr)
+            try sink.append(XCTUnwrap(audioSample), of: .systemAudio)
         }
 
         let url = try await sink.finish()
