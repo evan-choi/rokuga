@@ -573,9 +573,17 @@ h1 .accent {
 .toolbar-mode:hover { background: rgba(255, 255, 255, .045); }
 .toolbar-mode[aria-pressed="true"] { background: #3d3d3d; }
 .toolbar-mode:focus-visible { outline: 2px solid rgba(255, 255, 255, .55); outline-offset: -2px; }
-.toolbar-mode svg { width: 20px; height: 20px; stroke-width: 1.7; }
-.toolbar-mode:first-child svg { stroke-dasharray: 2.5 2; }
-.toolbar-mode .full-screen-icon { fill: currentColor; stroke: none; }
+
+.toolbar-symbol {
+  width: 24px;
+  height: 19px;
+  background: currentColor;
+  mask: center / 24px 19px no-repeat;
+}
+
+.selected-area-symbol { mask-image: url("./assets/rectangle-dashed@2x.png"); }
+.full-screen-symbol { mask-image: url("./assets/rectangle-inset-filled@2x.png"); }
+.window-symbol { mask-image: url("./assets/macwindow@2x.png"); }
 
 .toolbar-mode::after {
   position: absolute;
