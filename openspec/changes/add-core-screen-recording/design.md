@@ -51,9 +51,9 @@ Real-time writing uses `AVAssetWriter` with `AVVideoCodecType.h264` / `.hevc` an
 
 ### D3. Audio: mix system audio + microphone into a single AAC track
 
-System audio arrives as `CMSampleBuffer`s from `SCStream` and is written to the AAC track. `AudioMixer` and `MicrophoneCapture` exist, but microphone samples are not yet connected to the recording session.
+System audio arrives as `CMSampleBuffer`s from `SCStream`. `MicrophoneCapture` uses `AVCaptureSession` with the default input device and follows the same start, pause, resume, finish, and cancel lifecycle as the screen stream. `AudioMixer` converts microphone input to 48 kHz stereo and sums it with system audio before the writer encodes one AAC track. Mic-only recordings write the microphone stream directly to that track.
 
-- **Planned**: connect `MicrophoneCapture`, add input-device selection and disconnect fallback, and expose a live level meter.
+- **Planned**: add input-device selection and disconnect fallback, and expose a live level meter.
 
 - **Why single track**: multi-track MP4 audio has inconsistent player behavior (VLC plays one track, web players ignore extras). One mixed track plays everywhere.
 - **Trade-off**: sources can't be separated post-hoc. Acceptable for v1; a "separate tracks (MOV)" advanced option can ship later without spec changes to defaults.

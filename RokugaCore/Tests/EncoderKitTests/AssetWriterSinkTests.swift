@@ -20,6 +20,7 @@ final class AssetWriterSinkTests: XCTestCase {
 
     private func makeConfiguration(
         capturesSystemAudio: Bool = false,
+        capturesMicrophone: Bool = false,
         frameRateMode: FrameRateMode = .variable,
         codec: VideoCodec = .h264,
         container: ContainerFormat = .mp4,
@@ -37,7 +38,7 @@ final class AssetWriterSinkTests: XCTestCase {
             quality: quality,
             audioBitrate: .kbps128,
             capturesSystemAudio: capturesSystemAudio,
-            capturesMicrophone: false
+            capturesMicrophone: capturesMicrophone
         )
     }
 
@@ -345,6 +346,55 @@ final class AssetWriterSinkTests: XCTestCase {
         let url = try await sink.finish()
         let asset = AVAsset(url: url)
         let audioTracks = try await asset.loadTracks(withMediaType: .audio)
+        XCTAssertEqual(audioTracks.count, 1)
+        let duration = try await audioTracks[0].load(.timeRange).duration
+        XCTAssertEqual(duration.seconds, 1.0, accuracy: 0.2)
+    }
+
+    func testWritesMicrophoneAudioTrackWhenEnabled() async throws {
+        let sink = AssetWriterSink(
+            outputURL: outputURL,
+            configuration: makeConfiguration(capturesMicrophone: true)
+        )
+        try await sink.start()
+
+        for frame in 0 ..< 30 {
+            try sink.append(
+                makeVideoSampleBuffer(pts: CMTime(value: CMTimeValue(frame), timescale: 30)),
+                of: .video
+            )
+            try sink.append(
+                makeSystemAudioSampleBuffer(pts: CMTime(value: CMTimeValue(frame * 1600), timescale: 48000)),
+                of: .microphone
+            )
+            try await Task.sleep(nanoseconds: 33_000_000)
+        }
+
+        let url = try await sink.finish()
+        let audioTracks = try await AVAsset(url: url).loadTracks(withMediaType: .audio)
+        XCTAssertEqual(audioTracks.count, 1)
+        let duration = try await audioTracks[0].load(.timeRange).duration
+        XCTAssertEqual(duration.seconds, 1.0, accuracy: 0.2)
+    }
+
+    func testWritesSystemAndMicrophoneAsSingleAudioTrack() async throws {
+        let sink = AssetWriterSink(
+            outputURL: outputURL,
+            configuration: makeConfiguration(capturesSystemAudio: true, capturesMicrophone: true)
+        )
+        try await sink.start()
+
+        for frame in 0 ..< 30 {
+            let videoPTS = CMTime(value: CMTimeValue(frame), timescale: 30)
+            let audioPTS = CMTime(value: CMTimeValue(frame * 1600), timescale: 48000)
+            try sink.append(makeVideoSampleBuffer(pts: videoPTS), of: .video)
+            try sink.append(makeSystemAudioSampleBuffer(pts: audioPTS), of: .microphone)
+            try sink.append(makeSystemAudioSampleBuffer(pts: audioPTS), of: .systemAudio)
+            try await Task.sleep(nanoseconds: 33_000_000)
+        }
+
+        let url = try await sink.finish()
+        let audioTracks = try await AVAsset(url: url).loadTracks(withMediaType: .audio)
         XCTAssertEqual(audioTracks.count, 1)
         let duration = try await audioTracks[0].load(.timeRange).duration
         XCTAssertEqual(duration.seconds, 1.0, accuracy: 0.2)

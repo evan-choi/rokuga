@@ -196,25 +196,27 @@ final class AppState: ObservableObject {
     func requestRecord() {
         guard recordingState.canStart else { return }
         Task { @MainActor in
-            guard await preflightPermissions() else { return }
-            proceedWithRecordFlow()
+            guard let capturesMicrophone = await preflightPermissions() else { return }
+            proceedWithRecordFlow(capturesMicrophone: capturesMicrophone)
         }
     }
 
     /// Per-attempt permission re-check (task 9.2): screen permission is probed every time;
     /// mic permission is requested just-in-time only when mic capture is enabled.
-    private func preflightPermissions() async -> Bool {
+    /// Returns the recording-scoped mic state, or `nil` when recording should not start.
+    private func preflightPermissions() async -> Bool? {
         guard await ShareableContentService.hasScreenRecordingPermission() else {
             presentScreenPermissionRecovery()
-            return false
+            return nil
         }
         if settings.captureMicrophone {
             let granted = await MicrophoneCapture.requestPermission()
             if !granted {
-                return presentMicDeniedChoice()
+                return presentMicDeniedChoice() ? false : nil
             }
+            return true
         }
-        return true
+        return false
     }
 
     private func presentScreenPermissionRecovery() {
@@ -249,23 +251,23 @@ final class AppState: ObservableObject {
         }
     }
 
-    private func proceedWithRecordFlow() {
+    private func proceedWithRecordFlow(capturesMicrophone: Bool) {
         switch settings.recordingMode {
         case .selectedArea:
             let display = areaController?.display ?? displayUnderMouse()
             let region = areaController?.currentRegion
                 ?? settings.selectedRegions[String(display.displayID)]?.integral
             if let region {
-                startRecording(target: .display(display, crop: region))
+                startRecording(target: .display(display, crop: region), capturesMicrophone: capturesMicrophone)
             } else {
                 summonToolbar()
             }
         case .fullScreen:
             let display = displaySelectController?.hoveredDisplay ?? displayUnderMouse()
-            startRecording(target: .display(display, crop: nil))
+            startRecording(target: .display(display, crop: nil), capturesMicrophone: capturesMicrophone)
         case .window:
             if let target = windowHoverController?.hoveredWindow {
-                startRecording(target: .window(target))
+                startRecording(target: .window(target), capturesMicrophone: capturesMicrophone)
             } else {
                 summonToolbar()
             }
@@ -275,12 +277,12 @@ final class AppState: ObservableObject {
     /// Click-to-record from selection layers (window hover / display select) with the same permission preflight.
     private func recordAfterPreflight(target: CaptureTarget) {
         Task { @MainActor in
-            guard await preflightPermissions() else { return }
-            startRecording(target: target)
+            guard let capturesMicrophone = await preflightPermissions() else { return }
+            startRecording(target: target, capturesMicrophone: capturesMicrophone)
         }
     }
 
-    func startRecording(target: CaptureTarget) {
+    func startRecording(target: CaptureTarget, capturesMicrophone: Bool) {
         dismissToolbar()
         if case let .display(display, crop) = target, let crop {
             punchController = PunchOverlayController(display: display, region: crop)
@@ -289,7 +291,8 @@ final class AppState: ObservableObject {
         let outputURL = OutputFolderStore.newRecordingURL(settings: settings)
         activeRecordingURL = outputURL
         let frameRate = settings.frameRate.resolved(displayRefreshRate: target.displayRefreshRate)
-        let encoderConfiguration = makeEncoderConfiguration(for: target, frameRate: frameRate)
+        var encoderConfiguration = makeEncoderConfiguration(for: target, frameRate: frameRate)
+        encoderConfiguration.capturesMicrophone = capturesMicrophone
         let captureConfiguration = CaptureConfiguration.fromSettings(settings, frameRate: frameRate)
         let coordinator = coordinator
 
@@ -299,7 +302,8 @@ final class AppState: ObservableObject {
                 return SCCaptureSession(
                     target: target,
                     configuration: captureConfiguration,
-                    sink: sink
+                    sink: sink,
+                    microphoneCapture: capturesMicrophone ? MicrophoneCapture() : nil
                 ) { _ in
                     Task { await coordinator.handleSessionInterruption() }
                 }

@@ -107,6 +107,7 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
     private let target: CaptureTarget
     private let configuration: CaptureConfiguration
     private let sink: MediaSink
+    private let microphoneCapture: MicrophoneCapture?
     private let metrics: CaptureMetrics?
     private let onInterruption: @Sendable (Error?) -> Void
 
@@ -120,12 +121,14 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         target: CaptureTarget,
         configuration: CaptureConfiguration,
         sink: MediaSink,
+        microphoneCapture: MicrophoneCapture? = nil,
         metrics: CaptureMetrics? = nil,
         onInterruption: @escaping @Sendable (Error?) -> Void
     ) {
         self.target = target
         self.configuration = configuration
         self.sink = sink
+        self.microphoneCapture = microphoneCapture
         self.metrics = metrics
         self.onInterruption = onInterruption
     }
@@ -154,8 +157,10 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
 
             try await sinkStart
             try await preparedStream.startCapture()
+            try microphoneCapture?.start(sink: sink)
             stateLock.withLock { self.stream = preparedStream }
         } catch {
+            microphoneCapture?.stop()
             if let stream {
                 try? await stream.stopCapture()
             }
@@ -166,11 +171,13 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
 
     public func pause() async throws {
         stateLock.withLock { isPaused = true }
+        microphoneCapture?.pause()
         sink.markPaused()
     }
 
     public func resume() async throws {
         sink.markResumed()
+        microphoneCapture?.resume()
         stateLock.withLock { isPaused = false }
     }
 
@@ -180,6 +187,7 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
             defer { self.stream = nil }
             return self.stream
         }
+        microphoneCapture?.stop()
         if let stream {
             // stopCapture throws if the stream already died (e.g. display unplug) — the sink still holds valid data, so finalize regardless.
             try? await stream.stopCapture()
@@ -193,6 +201,7 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
             defer { self.stream = nil }
             return self.stream
         }
+        microphoneCapture?.stop()
         if let stream {
             try? await stream.stopCapture()
         }

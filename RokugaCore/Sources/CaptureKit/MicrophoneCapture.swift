@@ -39,7 +39,10 @@ public final class MicrophoneCapture: NSObject, @unchecked Sendable {
         output.setSampleBufferDelegate(self, queue: queue)
         session.commitConfiguration()
 
-        stateLock.withLock { self.sink = sink }
+        stateLock.withLock {
+            isPaused = false
+            self.sink = sink
+        }
         session.startRunning()
     }
 
