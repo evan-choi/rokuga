@@ -7,12 +7,85 @@
       name="description"
       content="Rokuga is a free native screen recorder for macOS with H.265, up to 5K, and frame rates matched to your display."
     />
+    <meta name="author" content="Rokuga contributors" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="theme-color" content="#ffffff" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Rokuga" />
+    <meta property="og:title" content="Rokuga — Every frame, just as it is" />
+    <meta
+      property="og:description"
+      content="A free native screen recorder for macOS with H.265, up to 5K, and display-matched frame rates."
+    />
+    <meta property="og:url" content="https://evan-choi.github.io/rokuga/" />
+    <meta property="og:image" content="https://raw.githubusercontent.com/evan-choi/rokuga/main/docs/logo.png" />
+    <meta property="og:image:width" content="1024" />
+    <meta property="og:image:height" content="1024" />
+    <meta property="og:image:alt" content="Rokuga app icon" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Rokuga — Every frame, just as it is" />
+    <meta
+      name="twitter:description"
+      content="A free native screen recorder for macOS with H.265, up to 5K, and display-matched frame rates."
+    />
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/evan-choi/rokuga/main/docs/logo.png" />
+    <link rel="canonical" href="https://evan-choi.github.io/rokuga/" />
+    <link rel="sitemap" type="application/xml" href="https://evan-choi.github.io/rokuga/sitemap.xml" />
+    <link rel="alternate" type="text/plain" href="https://evan-choi.github.io/rokuga/llms.txt" title="Rokuga for AI agents" />
     <link rel="icon" type="image/png" href="../docs/logo.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "@id": "https://evan-choi.github.io/rokuga/#software",
+        "name": "Rokuga",
+        "url": "https://evan-choi.github.io/rokuga/",
+        "image": "https://raw.githubusercontent.com/evan-choi/rokuga/main/docs/logo.png",
+        "description": "Rokuga is a free native screen recorder for macOS with H.265, up to 5K, and frame rates matched to your display.",
+        "applicationCategory": "MultimediaApplication",
+        "applicationSubCategory": "Screen recorder",
+        "operatingSystem": "macOS 15 Sequoia or later",
+        "softwareVersion": "0.1.0 Preview",
+        "isAccessibleForFree": true,
+        "license": "https://github.com/evan-choi/rokuga/blob/main/LICENSE",
+        "sameAs": "https://github.com/evan-choi/rokuga",
+        "inLanguage": ["en", "ko", "ja", "zh-Hans"],
+        "featureList": [
+          "Selected-area, full-screen, and window recording",
+          "H.264 and H.265 encoding to MP4 or MOV",
+          "Up to 5K resolution",
+          "Display-matched recording frame rates",
+          "No time limits or watermarks"
+        ]
+      }
+    </script>
     <title>Rokuga — Every frame, just as it is</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main>
+        <header>
+          <p>Rokuga for Mac</p>
+          <h1>Every frame, just as it is</h1>
+          <p>Rokuga is a free, native, open-source screen recorder for macOS.</p>
+          <p><a href="https://github.com/evan-choi/rokuga">View the source code on GitHub</a></p>
+        </header>
+        <section>
+          <h2>Screen recording for macOS</h2>
+          <ul>
+            <li>Record a selected area, full screen, or individual window.</li>
+            <li>Encode H.264 or H.265 video to MP4 or MOV at up to 5K.</li>
+            <li>Match the recording frame rate to the display.</li>
+            <li>Record without time limits or watermarks.</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Availability</h2>
+          <p>Rokuga requires macOS 15 Sequoia or later. A signed public build is not available yet.</p>
+          <p><a href="https://github.com/evan-choi/rokuga#build-from-source">Build Rokuga from source</a></p>
+        </section>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
