@@ -4,7 +4,7 @@
 
 - [x] 1.1 Create Xcode project: `Rokuga` app target (SwiftUI, macOS 15+, sandboxed, `LSUIElement` agent) + local SPM package `RokugaCore` (CaptureKit, EncoderKit, TrimKit, SettingsKit)
 - [x] 1.2 Entitlements & Info.plist: microphone usage description, security-scoped bookmarks, `LSUIElement`; launch at login via `SMAppService.mainApp`
-- [x] 1.3 Add `KeyboardShortcuts` (MIT) as the sole third-party dependency
+- [x] 1.3 Add permissively licensed `KeyboardShortcuts` as the sole third-party dependency
 - [x] 1.4 CI pipeline: build + unit tests on a macOS 15 hosted runner, localization and baseline frame-transport static audits, benchmark job scaffold
 
 ## 2. Capture core (CaptureKit)

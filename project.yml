@@ -62,7 +62,7 @@ targets:
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.video
         NSMicrophoneUsageDescription: Rokuga records your voice only when you enable microphone capture for a recording.
-        NSHumanReadableCopyright: © 2026 Rokuga contributors. MIT License.
+        NSHumanReadableCopyright: © 2026 Rokuga contributors. Apache License 2.0.
         ITSAppUsesNonExemptEncryption: false
     dependencies:
       - package: RokugaCore

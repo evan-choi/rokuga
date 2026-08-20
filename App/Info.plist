@@ -29,7 +29,7 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2026 Rokuga contributors. MIT License.</string>
+	<string>© 2026 Rokuga contributors. Apache License 2.0.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Rokuga records your voice only when you enable microphone capture for a recording.</string>
 </dict>

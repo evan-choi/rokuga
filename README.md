@@ -9,7 +9,7 @@
 No watermarks. No time limits. No accounts. No paywalls.
 
 [![CI](https://github.com/evan-choi/rokuga/actions/workflows/ci.yml/badge.svg)](https://github.com/evan-choi/rokuga/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-macOS%2015%2B-black?logo=apple)](https://www.apple.com/macos/)
 
 </div>
@@ -92,4 +92,4 @@ Check [`tasks.md`](openspec/changes/add-core-screen-recording/tasks.md) for impl
 
 ## License
 
-[MIT](LICENSE) © Rokuga contributors
+[Apache License 2.0](LICENSE) © Rokuga contributors

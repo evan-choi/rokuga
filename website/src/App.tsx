@@ -428,7 +428,7 @@ export default function App() {
           <a className="brand" href="#top"><img src={logoUrl} alt="" /><span>Rokuga</span></a>
           <span>© 2026 Rokuga contributors</span>
           <a href="https://github.com/evan-choi/rokuga">GitHub</a>
-          <a href="https://github.com/evan-choi/rokuga/blob/main/LICENSE">MIT License</a>
+          <a href="https://github.com/evan-choi/rokuga/blob/main/LICENSE">Apache License 2.0</a>
         </div>
       </footer>
 

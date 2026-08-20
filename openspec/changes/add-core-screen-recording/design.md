@@ -10,7 +10,7 @@ Constraints:
 
 - macOS 15+ (Sequoia). This floor provides ScreenCaptureKit's native mouse-click indicator alongside driver-free system audio capture and SwiftUI `MenuBarExtra`.
 - App Sandbox enabled from day one (future Mac App Store distribution must not require a re-architecture).
-- MIT license: dependencies must be permissively licensed; prefer zero third-party dependencies in the capture/encode path.
+- Apache License 2.0: dependencies must be permissively licensed; prefer zero third-party dependencies in the capture/encode path.
 
 ## Goals / Non-Goals
 
@@ -47,7 +47,7 @@ Real-time writing uses `AVAssetWriter` with `AVVideoCodecType.h264` / `.hevc` an
 - **Planned**: expose VBR and capped-VBR choices in Settings. True CBR is not exposed by the hardware encoders.
 - **Existing, core only**: the splice clock can remove pause gaps by shifting audio and video PTS by the same accumulated duration. Pause/resume has no app UI or global shortcut.
 - **Planned**: require hardware encoding explicitly and report when the hardware encoder cannot be created.
-- **Alternatives**: FFmpeg — LGPL/GPL friction for MIT distribution, huge binary, unnecessary since VideoToolbox covers H.264/HEVC.
+- **Alternatives**: FFmpeg — LGPL/GPL distribution friction, huge binary, unnecessary since VideoToolbox covers H.264/HEVC.
 
 ### D3. Audio: mix system audio + microphone into a single AAC track
 
@@ -88,9 +88,9 @@ Rokuga.xcodeproj
 
 State machine at the center: `idle → preparing → countdown → recording → finishing → idle`, owned by a `RecordingCoordinator` actor. The core retains `paused` transitions for splice-clock tests, but the app UI does not expose them. All entry points observe the coordinator state.
 
-### D7. Global lifecycle shortcuts: KeyboardShortcuts (MIT, sindresorhus)
+### D7. Global lifecycle shortcuts: KeyboardShortcuts (permissive license, sindresorhus)
 
-Use the existing Carbon `RegisterEventHotKey` wrapper for the configurable toolbar shortcut and fixed lifecycle shortcuts. ⇧⌘6 summons the toolbar. Esc is registered only while capture is preparing or counting down, and ⌃⌘Esc is registered only while recording or internally paused. Idle and finishing states disable both lifecycle shortcuts. This keeps cancellation and stop independent of app focus without reserving Esc outside the pending-capture state. The library is sandbox-safe, MIT-licensed, and remains the only third-party dependency.
+Use the existing Carbon `RegisterEventHotKey` wrapper for the configurable toolbar shortcut and fixed lifecycle shortcuts. ⇧⌘6 summons the toolbar. Esc is registered only while capture is preparing or counting down, and ⌃⌘Esc is registered only while recording or internally paused. Idle and finishing states disable both lifecycle shortcuts. This keeps cancellation and stop independent of app focus without reserving Esc outside the pending-capture state. The library is sandbox-safe, permissively licensed, and remains the only third-party dependency.
 
 ### D8. Capture exclusion mechanics
 
@@ -122,7 +122,7 @@ Use the existing Carbon `RegisterEventHotKey` wrapper for the configurable toolb
 - **Windows and panels**: onboarding, Settings, and the trim editor are regular windows. The recording toolbar, selection layers, floating thumbnail, and preview are transient panels.
 - **Material and appearance**: app-owned chrome inherits an application-wide Dark Aqua appearance. `captureWindowChrome` is the shared visual contract for the toolbar, tooltip, preview, and trim editor. It places untinted native material below an identically clipped `#1e1e23` scrim at 0.70 opacity. Each owning window clips to the same corner radius and disables the rectangular window shadow; tooltip chrome uses its smaller shared radius. Active chrome uses full-strength semantic Dark foregrounds and system selection/control surfaces. Increase Contrast strengthens the scrim and border; Reduce Transparency replaces both layers with the opaque Dark palette. Capture overlays and controls drawn over video keep fixed-contrast colors. Menu bar items, menus, dialogs, and system recording indicators remain system-rendered under Dark Aqua.
 - **Chrome buttons**: icon actions in panel/toolbar chrome are borderless (`.buttonStyle(.borderless)`) — icon-only, neutral monochrome (no red tint on destructive icons; danger is communicated by the confirmation dialog), shape revealed on hover only, hit target kept ≥ 28pt regardless of visual size.
-- **Iconography**: in-app icons are real SF Symbols via `Image(systemName:)` (`pencil`, `trash`, etc.) — legal on Apple platforms; SF Symbols assets MUST NOT be committed to the MIT repo. AppKit renders the bundled 32×32 `screenshotwindow.svg` and `resize*.svg` assets as custom capture and resize cursors. Other repo-shipped artwork (mockups, web, README) uses Lucide (ISC) equivalents tuned to SF stroke weight (~1.8/24).
+- **Iconography**: in-app icons are real SF Symbols via `Image(systemName:)` (`pencil`, `trash`, etc.) — legal on Apple platforms; SF Symbols assets MUST NOT be committed to the source repository. AppKit renders the bundled 32×32 `screenshotwindow.svg` and `resize*.svg` assets as custom capture and resize cursors. Other repo-shipped artwork (mockups, web, README) uses Lucide (ISC) equivalents tuned to SF stroke weight (~1.8/24).
 - **Visual language**: native Liquid Glass — untinted `.glassEffect`/glass background APIs where available (macOS 26+), graceful fallback to `NSVisualEffectView`/`.ultraThinMaterial` on macOS 15–25. The fixed Dark contrast scrim is separate from, and does not replace, those system materials. Reduce Transparency replaces the layered background with the opaque Dark palette.
 - **Cursor tracking**: non-key capture panels use one `ActiveCursorView` path backed by `NSTrackingArea` mouse enter/move events with `.activeAlways`. The same path owns drag-handle, area-resize, click-to-record, and trim-handle cursor updates. It trusts AppKit's delivered event window and visible view bounds as cursor ownership; it does not re-check WindowServer stacking or write an arrow on exit, so transparent overlays and delayed exit events cannot suppress or overwrite the destination cursor.
 - **Why**: zero learning curve (users already know ⇧⌘5), no focus-stealing during capture workflows, and the smallest possible UI surface for a recorder — the screen itself is the canvas.

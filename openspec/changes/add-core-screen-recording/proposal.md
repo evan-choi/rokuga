@@ -2,7 +2,7 @@
 
 ## Why
 
-Rokuga is a free, MIT-licensed native macOS screen recorder with no time limits, watermarks, ads, accounts, or network processing. It combines screen capture, local encoding, post-recording preview, and trim editing in a menu bar app.
+Rokuga is a free, Apache-2.0-licensed native macOS screen recorder with no time limits, watermarks, ads, accounts, or network processing. It combines screen capture, local encoding, post-recording preview, and trim editing in a menu bar app.
 
 This change defines the core product: three recording modes, system and microphone audio, native cursor and click controls, built-in trim editing, output controls, permissions onboarding, countdown, a toolbar shortcut, menu bar control, capture exclusion, and native glass UI. It also defines measurable performance budgets.
 
