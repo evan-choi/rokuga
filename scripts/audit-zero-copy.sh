@@ -4,7 +4,7 @@
 # pixel-access APIs appear in record-path sources.
 #
 # For the dynamic proof, run:
-#   xctrace record --template 'Metal System Trace' --launch rokuga-bench throughput
+#   ./scripts/perf.sh profile metal --scenario 4k-motion --seconds 10
 # and verify no CVPixelBuffer lock intervals on the capture/encode queues.
 set -euo pipefail
 

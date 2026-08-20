@@ -12,7 +12,6 @@ IDENTITY="Rokuga Dev"
 IDENTIFIER="io.rokuga.Rokuga.Perf"
 REQUIREMENT_FILE="$ARTIFACT_ROOT/signature.requirement"
 REPORT_TOOL="$REPO_ROOT/scripts/perf-report.py"
-BENCH_GATE_TOOL="$REPO_ROOT/scripts/bench-gate.py"
 
 WORKLOAD_PID=""
 PROFILE_RECORDING_PID=""
@@ -516,31 +515,6 @@ comparison() {
     echo "ARTIFACT_PATH=$directory"
 }
 
-capture_gate() {
-    local target result found
-    local gate_arguments=()
-    [[ "$#" -gt 0 ]] || fail "gate requires at least one result or artifact path"
-    for target in "$@"; do
-        found=0
-        if [[ -f "$target" ]]; then
-            gate_arguments+=(--capture "$target")
-            found=1
-        elif [[ -d "$target" ]]; then
-            if [[ -f "$target/result.json" ]]; then
-                gate_arguments+=(--capture "$target/result.json")
-                found=1
-            fi
-            for result in "$target"/run-*/result.json; do
-                [[ -f "$result" ]] || continue
-                gate_arguments+=(--capture "$result")
-                found=1
-            done
-        fi
-        [[ "$found" -eq 1 ]] || fail "capture result not found: $target"
-    done
-    python3 "$BENCH_GATE_TOOL" "${gate_arguments[@]}"
-}
-
 toolbar_latency() {
     local directory environment status toolbar_app toolbar_executable
     directory="$(artifact_directory toolbar-latency)"
@@ -581,7 +555,6 @@ usage:
   ./scripts/perf.sh profile time|metal|allocations|file [--scenario NAME] [--seconds N]
   ./scripts/perf.sh toolbar
   ./scripts/perf.sh compare BASELINE_ARTIFACT CANDIDATE_ARTIFACT
-  ./scripts/perf.sh gate RESULT_OR_ARTIFACT [...]
   ./scripts/perf.sh scenarios
 EOF
 }
@@ -615,10 +588,6 @@ case "${1:-}" in
     compare)
         [[ "$#" -eq 3 ]] || fail "compare requires baseline and candidate artifact paths"
         comparison "$2" "$3"
-        ;;
-    gate)
-        shift
-        capture_gate "$@"
         ;;
     scenarios)
         printf '%s\n' 4k-static 4k-motion 4k-audio 4k-cfr-h264

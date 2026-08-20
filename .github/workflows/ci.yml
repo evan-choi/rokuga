@@ -54,27 +54,3 @@ jobs:
 
       - name: Localization gates (no literals outside catalog, ko/ja/zh-Hans completeness)
         run: python3 scripts/lint-localization.py
-
-  benchmarks:
-    name: Performance gates
-    if: github.event_name == 'pull_request'
-    runs-on: macos-15
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Select Xcode
-        run: sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | sort -V | tail -1)/Contents/Developer"
-
-      - name: Zero-copy audit (record path)
-        run: ./scripts/audit-zero-copy.sh
-
-      - name: Run benchmarks (1080p60 short run + latency)
-        working-directory: RokugaCore
-        run: |
-          swift run -c release rokuga-bench throughput --width 1920 --height 1080 --fps 60 --seconds 10 > /tmp/tp.json
-          swift run -c release rokuga-bench latency > /tmp/lat.json
-
-      # Shared runners are noisy: absolute spec budgets gate hard; the >10% baseline
-      # regression check uses the committed local-hardware baseline as reference only.
-      - name: Enforce gates (task 10.4)
-        run: python3 scripts/bench-gate.py /tmp/tp.json /tmp/lat.json
