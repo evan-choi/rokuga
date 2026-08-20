@@ -107,6 +107,7 @@ class CapturePanel: NSPanel {
         isOpaque = false
         backgroundColor = .clear
         isReleasedWhenClosed = false
+        sharingType = .none
         // Disable for rounded glass surfaces: this shadow follows the rectangular
         // window backing and can appear as black edge lines around their corners.
         hasShadow = showsWindowShadow
