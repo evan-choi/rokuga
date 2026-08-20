@@ -208,19 +208,6 @@ public final class SCCaptureSession: NSObject, CaptureSession, @unchecked Sendab
         await sink.cancel()
     }
 
-    /// Re-resolves the content filter so newly created windows (e.g. the floating thumbnail) honor the exclusion rules mid-recording (task 2.4).
-    public func refreshContentFilter() async {
-        guard let stream = stateLock.withLock({ self.stream }) else { return }
-        guard let content = try? await ShareableContentService.currentContent(),
-              let filter = ContentFilterBuilder.filter(
-                  for: target,
-                  content: content,
-                  exclusion: configuration.exclusion
-              )
-        else { return }
-        try? await stream.updateContentFilter(filter)
-    }
-
     // MARK: Stream configuration
 
     func makeStreamConfiguration() -> SCStreamConfiguration {
