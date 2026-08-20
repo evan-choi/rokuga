@@ -7,7 +7,7 @@ import VideoToolbox
 /// AVAssetWriter-backed `MediaSink` (task 3.1).
 ///
 /// Video: SCStream's IOSurface-backed BGRA buffers are appended untouched — VideoToolbox reads them zero-copy, no CPU pixel path.
-/// Audio: one AAC track; the mic is summed into system audio by `AudioMixer` when both are enabled.
+/// Audio: one mixed AAC track by default, or independent system/microphone tracks in MOV.
 public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     private let outputURL: URL
     private let configuration: EncoderConfiguration
@@ -16,6 +16,8 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     private var writer: AVAssetWriter?
     private var videoInput: AVAssetWriterInput?
     private var audioInput: AVAssetWriterInput?
+    private var systemAudioInput: AVAssetWriterInput?
+    private var microphoneInput: AVAssetWriterInput?
     private var spliceClock = SpliceClock()
     private var mixer: AudioMixer?
     private var sessionStarted = false
@@ -59,33 +61,57 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     public func start() async throws {
         try DiskSpaceMonitor.preflight(outputFolder: outputURL.deletingLastPathComponent())
 
-        let fileType: AVFileType = configuration.container == .mov ? .mov : .mp4
-        let writer = try AVAssetWriter(outputURL: outputURL, fileType: fileType)
-        if configuration.container == .mov {
-            // Fragmented QuickTime keeps partials playable after a crash or power loss (task 3.6); AVAssetWriter only supports this for .mov.
-            writer.movieFragmentInterval = CMTime(value: 2, timescale: 1)
-        }
+        let outputExisted = FileManager.default.fileExists(atPath: outputURL.path)
+        var preparedWriter: AVAssetWriter?
+        do {
+            let fileType: AVFileType = configuration.container == .mov ? .mov : .mp4
+            let writer = try AVAssetWriter(outputURL: outputURL, fileType: fileType)
+            preparedWriter = writer
+            if configuration.container == .mov {
+                // Fragmented QuickTime keeps partials playable after a crash or power loss (task 3.6); AVAssetWriter only supports this for .mov.
+                writer.movieFragmentInterval = CMTime(value: 2, timescale: 1)
+            }
 
-        let videoInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoOutputSettings())
-        videoInput.expectsMediaDataInRealTime = true
-        writer.add(videoInput)
+            let videoInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoOutputSettings())
+            videoInput.expectsMediaDataInRealTime = true
+            try add(videoInput, named: "video", to: writer)
 
-        if configuration.capturesSystemAudio || configuration.capturesMicrophone {
-            let audioInput = AVAssetWriterInput(mediaType: .audio, outputSettings: audioOutputSettings())
-            audioInput.expectsMediaDataInRealTime = true
-            writer.add(audioInput)
-            self.audioInput = audioInput
-        }
+            if configuration.audioTrackLayout == .separate {
+                if configuration.capturesSystemAudio {
+                    let input = makeAudioInput(title: "System Audio")
+                    try add(input, named: "system audio", to: writer)
+                    systemAudioInput = input
+                }
+                if configuration.capturesMicrophone {
+                    let input = makeAudioInput(title: "Microphone")
+                    try add(input, named: "microphone", to: writer)
+                    microphoneInput = input
+                }
+            } else if configuration.capturesSystemAudio || configuration.capturesMicrophone {
+                let input = makeAudioInput()
+                try add(input, named: "audio", to: writer)
+                audioInput = input
+                if configuration.capturesSystemAudio, configuration.capturesMicrophone {
+                    mixer = AudioMixer()
+                }
+            }
 
-        if configuration.capturesSystemAudio, configuration.capturesMicrophone {
-            mixer = AudioMixer()
+            guard writer.startWriting() else {
+                throw RecordingSinkError.writerFailed(writer.error?.localizedDescription ?? "startWriting")
+            }
+            self.writer = writer
+            self.videoInput = videoInput
+        } catch {
+            preparedWriter?.cancelWriting()
+            audioInput = nil
+            systemAudioInput = nil
+            microphoneInput = nil
+            mixer = nil
+            if !outputExisted {
+                try? FileManager.default.removeItem(at: outputURL)
+            }
+            throw error
         }
-
-        guard writer.startWriting() else {
-            throw RecordingSinkError.writerFailed(writer.error?.localizedDescription ?? "startWriting")
-        }
-        self.writer = writer
-        self.videoInput = videoInput
     }
 
     public func append(_ sampleBuffer: CMSampleBuffer, of kind: MediaKind) {
@@ -160,6 +186,8 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
                     stopConstantFrameOutput(clearFrame: true)
                     videoInput?.markAsFinished()
                     audioInput?.markAsFinished()
+                    systemAudioInput?.markAsFinished()
+                    microphoneInput?.markAsFinished()
                     continuation.resume(returning: self.writer)
                 }
             }
@@ -319,21 +347,22 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     // MARK: Audio path
 
     private func appendSystemAudio(_ sampleBuffer: CMSampleBuffer) {
-        guard sessionStarted, let audioInput, terminalError == nil else { return }
+        let targetInput = configuration.audioTrackLayout == .separate ? systemAudioInput : audioInput
+        guard sessionStarted, let targetInput, terminalError == nil else { return }
         let sourcePTS = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
         let adjustedPTS = spliceClock.adjusted(sourcePTS)
         spliceClock.observe(pts: sourcePTS, duration: CMSampleBufferGetDuration(sampleBuffer))
 
-        guard audioInput.isReadyForMoreMediaData else { return }
+        guard targetInput.isReadyForMoreMediaData else { return }
 
         if let mixer {
             guard let pcm = AudioSampleBufferFactory.pcmBuffer(from: sampleBuffer),
                   let mixed = mixer.mix(system: pcm),
                   let retimed = AudioSampleBufferFactory.sampleBuffer(from: mixed, presentationTime: adjustedPTS)
             else { return }
-            appendAudio(retimed)
+            appendAudio(retimed, to: targetInput)
         } else if let retimed = retime(sampleBuffer, to: adjustedPTS) {
-            appendAudio(retimed)
+            appendAudio(retimed, to: targetInput)
         }
     }
 
@@ -346,19 +375,19 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
             return
         }
 
-        // Mic-only mode: the mic stream drives the audio track directly.
-        guard sessionStarted, let audioInput, audioInput.isReadyForMoreMediaData else { return }
+        let targetInput = configuration.audioTrackLayout == .separate ? microphoneInput : audioInput
+        guard sessionStarted, let targetInput, targetInput.isReadyForMoreMediaData else { return }
         let sourcePTS = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
         let adjustedPTS = spliceClock.adjusted(sourcePTS)
         spliceClock.observe(pts: sourcePTS, duration: CMSampleBufferGetDuration(sampleBuffer))
         if let retimed = retime(sampleBuffer, to: adjustedPTS) {
-            appendAudio(retimed)
+            appendAudio(retimed, to: targetInput)
         }
     }
 
-    private func appendAudio(_ sampleBuffer: CMSampleBuffer) {
-        guard let writer, let audioInput else { return }
-        if !audioInput.append(sampleBuffer) {
+    private func appendAudio(_ sampleBuffer: CMSampleBuffer, to input: AVAssetWriterInput) {
+        guard let writer else { return }
+        if !input.append(sampleBuffer) {
             terminalError = RecordingSinkError.writerFailed(writer.error?.localizedDescription ?? "audio append")
         }
     }
@@ -455,7 +484,27 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
         AVVideoYCbCrMatrixKey: AVVideoYCbCrMatrix_ITU_R_709_2
     ]
 
-    private func audioOutputSettings() -> [String: Any] {
+    private func add(_ input: AVAssetWriterInput, named name: String, to writer: AVAssetWriter) throws {
+        guard writer.canAdd(input) else {
+            throw RecordingSinkError.writerFailed("cannot add \(name) input")
+        }
+        writer.add(input)
+    }
+
+    private func makeAudioInput(title: String? = nil) -> AVAssetWriterInput {
+        let input = AVAssetWriterInput(mediaType: .audio, outputSettings: audioOutputSettings())
+        input.expectsMediaDataInRealTime = true
+        if let title {
+            let metadata = AVMutableMetadataItem()
+            metadata.identifier = .quickTimeMetadataTitle
+            metadata.value = title as NSString
+            metadata.extendedLanguageTag = "und"
+            input.metadata = [metadata]
+        }
+        return input
+    }
+
+    func audioOutputSettings() -> [String: Any] {
         [
             AVFormatIDKey: kAudioFormatMPEG4AAC,
             AVSampleRateKey: 48000,
