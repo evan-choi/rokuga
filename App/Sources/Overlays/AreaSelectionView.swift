@@ -9,21 +9,32 @@ enum RegionMetrics {
 enum RegionHandle: CaseIterable {
     case topLeft, top, topRight, left, right, bottomLeft, bottom, bottomRight
 
-    var movesLeft: Bool { [.topLeft, .left, .bottomLeft].contains(self) }
-    var movesRight: Bool { [.topRight, .right, .bottomRight].contains(self) }
-    var movesTop: Bool { [.topLeft, .top, .topRight].contains(self) }
-    var movesBottom: Bool { [.bottomLeft, .bottom, .bottomRight].contains(self) }
+    var movesLeft: Bool {
+        [.topLeft, .left, .bottomLeft].contains(self)
+    }
+
+    var movesRight: Bool {
+        [.topRight, .right, .bottomRight].contains(self)
+    }
+
+    var movesTop: Bool {
+        [.topLeft, .top, .topRight].contains(self)
+    }
+
+    var movesBottom: Bool {
+        [.bottomLeft, .bottom, .bottomRight].contains(self)
+    }
 
     func position(in rect: CGRect) -> CGPoint {
         switch self {
-        case .topLeft: return CGPoint(x: rect.minX, y: rect.minY)
-        case .top: return CGPoint(x: rect.midX, y: rect.minY)
-        case .topRight: return CGPoint(x: rect.maxX, y: rect.minY)
-        case .left: return CGPoint(x: rect.minX, y: rect.midY)
-        case .right: return CGPoint(x: rect.maxX, y: rect.midY)
-        case .bottomLeft: return CGPoint(x: rect.minX, y: rect.maxY)
-        case .bottom: return CGPoint(x: rect.midX, y: rect.maxY)
-        case .bottomRight: return CGPoint(x: rect.maxX, y: rect.maxY)
+        case .topLeft: CGPoint(x: rect.minX, y: rect.minY)
+        case .top: CGPoint(x: rect.midX, y: rect.minY)
+        case .topRight: CGPoint(x: rect.maxX, y: rect.minY)
+        case .left: CGPoint(x: rect.minX, y: rect.midY)
+        case .right: CGPoint(x: rect.maxX, y: rect.midY)
+        case .bottomLeft: CGPoint(x: rect.minX, y: rect.maxY)
+        case .bottom: CGPoint(x: rect.midX, y: rect.maxY)
+        case .bottomRight: CGPoint(x: rect.maxX, y: rect.maxY)
         }
     }
 }
@@ -47,9 +58,13 @@ final class AreaSelectionView: NSView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { nil }
+    required init?(coder: NSCoder) {
+        nil
+    }
 
-    override var isFlipped: Bool { true }
+    override var isFlipped: Bool {
+        true
+    }
 
     override func draw(_ dirtyRect: NSRect) {
         guard let ctx = NSGraphicsContext.current?.cgContext else { return }
@@ -96,7 +111,7 @@ final class AreaSelectionView: NSView {
     private func drawBadge(text: String, centerX: CGFloat, y: CGFloat) {
         let attributes: [NSAttributedString.Key: Any] = [
             .font: NSFont.monospacedDigitSystemFont(ofSize: 11.5, weight: .medium),
-            .foregroundColor: NSColor.white,
+            .foregroundColor: NSColor.white
         ]
         let size = text.size(withAttributes: attributes)
         let padding: CGFloat = 8
@@ -142,10 +157,17 @@ final class RegionInteractionView: ActiveCursorView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { nil }
+    required init?(coder: NSCoder) {
+        nil
+    }
 
-    override var isFlipped: Bool { true }
-    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+    override var isFlipped: Bool {
+        true
+    }
+
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        true
+    }
 
     /// `region` mapped into this (flipped) view's coordinates via the window's global frame.
     private var regionInView: CGRect {
@@ -222,10 +244,10 @@ final class RegionInteractionView: ActiveCursorView {
 
     private static func cursor(for handle: RegionHandle) -> NSCursor {
         switch handle {
-        case .left, .right: return westEastCursor
-        case .top, .bottom: return northSouthCursor
-        case .topLeft, .bottomRight: return northWestSouthEastCursor
-        case .topRight, .bottomLeft: return northEastSouthWestCursor
+        case .left, .right: westEastCursor
+        case .top, .bottom: northSouthCursor
+        case .topLeft, .bottomRight: northWestSouthEastCursor
+        case .topRight, .bottomLeft: northEastSouthWestCursor
         }
     }
 
@@ -253,10 +275,18 @@ final class RegionInteractionView: ActiveCursorView {
         var maxY = rect.maxY
         let edge = RegionMetrics.minimumEdge
 
-        if handle.movesLeft { minX = min(minX + dx, maxX - edge) }
-        if handle.movesRight { maxX = max(maxX + dx, minX + edge) }
-        if handle.movesTop { minY = min(minY + dy, maxY - edge) }
-        if handle.movesBottom { maxY = max(maxY + dy, minY + edge) }
+        if handle.movesLeft {
+            minX = min(minX + dx, maxX - edge)
+        }
+        if handle.movesRight {
+            maxX = max(maxX + dx, minX + edge)
+        }
+        if handle.movesTop {
+            minY = min(minY + dy, maxY - edge)
+        }
+        if handle.movesBottom {
+            maxY = max(maxY + dy, minY + edge)
+        }
 
         return CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
     }
