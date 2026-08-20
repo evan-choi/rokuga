@@ -4,7 +4,7 @@
 
 Rokuga is a free, Apache-2.0-licensed native macOS screen recorder with no time limits, watermarks, ads, accounts, or network processing. It combines screen capture, local encoding, post-recording preview, and trim editing in a menu bar app.
 
-This change defines the core product: three recording modes, system and microphone audio, mouse effects, built-in trim editing, output controls, permissions onboarding, countdown, a toolbar shortcut, menu bar control, capture exclusion, and native glass UI. It also defines measurable performance budgets.
+This change defines the core product: three recording modes, system and microphone audio, native cursor and click controls, built-in trim editing, output controls, permissions onboarding, countdown, a toolbar shortcut, menu bar control, capture exclusion, and native glass UI. It also defines measurable performance budgets.
 
 `tasks.md` is the implementation-status source of truth. Checked items have implementation evidence; unchecked items remain part of the target contract but are not complete.
 
@@ -15,7 +15,7 @@ This change defines the core product: three recording modes, system and micropho
   - **Full screen**: entire display capture with multi-display selection
   - **Window**: single application window capture, isolated from overlapping windows
 - System audio capture with no driver installation, plus microphone capture with device selection; both independently toggleable and recordable simultaneously
-- Mouse effects rendered into recordings: cursor visibility toggle, pointer style (system cursor or dot), highlight halo, and the native macOS click indicator
+- Native mouse controls rendered by ScreenCaptureKit: cursor visibility and the macOS click indicator
 - Built-in lossless trim editor: select the range to keep, save as a new file with custom name and destination
 - Output controls: MP4/MOV containers, H.264/HEVC codecs, VBR/CBR rate control, quality 0–100, resolution cap up to 5K (5120×2880), up to 60 FPS, AAC audio at 128–320 kbps
 - Recording lifecycle controls: record from the toolbar (summoned via menu bar or ⇧⌘6 at the bottom-center of the display under the mouse); while recording the toolbar disappears and the menu bar shows elapsed time with a one-click stop control; Esc cancels preparation/countdown globally, and ⌃⌘Esc stops an active recording; countdown choices are off, 3, 5, or 10 seconds
@@ -35,7 +35,7 @@ Out of scope for this change (planned as follow-ups): webcam/camera recording of
 - `recording-modes`: The three capture modes (selected area, full screen, window), their selection UI, target pickers, and per-mode behavior
 - `recording-controls`: Recording lifecycle (start/stop), countdown, the global toolbar shortcut, menu bar status item controls, and recording state feedback. Pause/resume remains an internal encoder capability and is not a user-facing control.
 - `audio-capture`: System audio and microphone capture, device selection, toggles, mixing into the recording, and failure/permission states
-- `mouse-effects`: Cursor rendering in recordings, pointer style, highlight halo, and the native click-indicator toggle
+- `mouse-effects`: ScreenCaptureKit-owned cursor rendering and native click-indicator toggles
 - `video-trimming`: Keep-range trim editing of recordings, preview scrubbing, and lossless export of the trimmed result
 - `output-settings`: Container/codec/rate-control/quality/resolution/FPS/audio-bitrate configuration and output folder management
 - `capture-exclusion`: Excluding the app's own windows and desktop icons from captured content

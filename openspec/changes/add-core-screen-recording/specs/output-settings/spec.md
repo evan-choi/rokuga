@@ -33,7 +33,7 @@ The app SHALL provide a quality control from 0 to 100 (default: 80) and a rate-c
 - **THEN** the file's bitrate stays within the configured target band rather than spiking
 
 ### Requirement: Color fidelity
-The capture stream SHALL be color-matched to sRGB at the source, and every output file MUST carry color metadata that matches the encoded pixel values — BT.709 primaries, sRGB (IEC 61966-2-1) transfer function, and BT.709 YCbCr matrix — for all codecs and quality settings. Cursor-composited frames MUST carry the same color tags as passthrough frames. The writer MUST NOT tag color properties that differ from the capture buffers' actual color space.
+The capture stream SHALL be color-matched to sRGB at the source, and every output file MUST carry color metadata that matches the encoded pixel values — BT.709 primaries, sRGB (IEC 61966-2-1) transfer function, and BT.709 YCbCr matrix — for all codecs and quality settings. The writer MUST NOT tag color properties that differ from the capture buffers' actual color space.
 
 #### Scenario: Color metadata present
 - **WHEN** any recording finishes
