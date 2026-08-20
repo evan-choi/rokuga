@@ -46,14 +46,17 @@ final class AreaSelectionView: NSView {
         didSet { needsDisplay = true }
     }
 
+    let pointToPixelScale: CGFloat
+
     /// Only the region's host display draws the size badge; its off-screen clamp
     /// would otherwise produce ghost badges on neighboring displays.
     var showsBadge = false {
         didSet { needsDisplay = true }
     }
 
-    init(frame: NSRect, region: CGRect) {
+    init(frame: NSRect, region: CGRect, pointToPixelScale: CGFloat) {
         self.region = region
+        self.pointToPixelScale = pointToPixelScale
         super.init(frame: frame)
     }
 
@@ -101,7 +104,7 @@ final class AreaSelectionView: NSView {
 
         if showsBadge {
             drawBadge(
-                text: "\(Int(region.width)) × \(Int(region.height))",
+                text: "\(Int(region.width * pointToPixelScale)) × \(Int(region.height * pointToPixelScale))",
                 centerX: region.midX,
                 y: max(region.minY - 26, 8)
             )

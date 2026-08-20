@@ -33,7 +33,7 @@ Rokuga runs as a menu bar app with a floating recording toolbar instead of a lib
 ### Known limitations
 
 - Microphone capture and system-audio/microphone mixing are not connected to the recording session yet.
-- Selected-area recording supports a movable, resizable crop. Drawing a new marquee, Retina pixel labels, and the pixel loupe remain in progress.
+- Selected-area recording supports a movable, resizable crop. Drawing a new marquee and the pixel loupe remain in progress.
 
 ## Requirements
 

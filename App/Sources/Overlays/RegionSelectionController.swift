@@ -64,7 +64,8 @@ final class RegionSelectionController {
             guard let target = ScreenCoords.displayTarget(for: screen) else { continue }
             let view = AreaSelectionView(
                 frame: NSRect(origin: .zero, size: screen.frame.size),
-                region: .zero
+                region: .zero,
+                pointToPixelScale: target.pointToPixelScale
             )
             let panel = CapturePanel(contentRect: screen.frame, level: .screenSaver)
             panel.ignoresMouseEvents = true
