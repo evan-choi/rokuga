@@ -52,6 +52,11 @@ final class SettingsModel: ObservableObject {
         set { update { $0.audioBitrate = newValue } }
     }
 
+    var audioTrackLayout: AudioTrackLayout {
+        get { store.audioTrackLayout }
+        set { update { $0.audioTrackLayout = newValue } }
+    }
+
     var showCursor: Bool {
         get { store.showCursor }
         set { update { $0.showCursor = newValue } }

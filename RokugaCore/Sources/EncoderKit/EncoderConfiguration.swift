@@ -14,6 +14,7 @@ public struct EncoderConfiguration: Equatable, Sendable {
     public var audioBitrate: AudioBitrate
     public var capturesSystemAudio: Bool
     public var capturesMicrophone: Bool
+    public var audioTrackLayout: AudioTrackLayout
 
     public init(
         codec: VideoCodec,
@@ -25,7 +26,8 @@ public struct EncoderConfiguration: Equatable, Sendable {
         quality: Int,
         audioBitrate: AudioBitrate,
         capturesSystemAudio: Bool,
-        capturesMicrophone: Bool
+        capturesMicrophone: Bool,
+        audioTrackLayout: AudioTrackLayout = .mixed
     ) {
         self.codec = codec
         self.container = container
@@ -38,6 +40,7 @@ public struct EncoderConfiguration: Equatable, Sendable {
         self.audioBitrate = audioBitrate
         self.capturesSystemAudio = capturesSystemAudio
         self.capturesMicrophone = capturesMicrophone
+        self.audioTrackLayout = container == .mov ? audioTrackLayout : .mixed
     }
 
     /// Snapshot the user's current preferences for a source of the given size.
@@ -57,7 +60,8 @@ public struct EncoderConfiguration: Equatable, Sendable {
             quality: settings.videoQuality,
             audioBitrate: settings.audioBitrate,
             capturesSystemAudio: settings.captureSystemAudio,
-            capturesMicrophone: settings.captureMicrophone
+            capturesMicrophone: settings.captureMicrophone,
+            audioTrackLayout: settings.audioTrackLayout
         )
     }
 }

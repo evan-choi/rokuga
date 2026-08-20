@@ -26,6 +26,7 @@ public final class SettingsStore: @unchecked Sendable {
         case audioBitrate = "output.audioBitrate"
         case captureSystemAudio = "audio.system"
         case captureMicrophone = "audio.microphone"
+        case audioTrackLayout = "audio.trackLayout"
         case showCursor = "mouse.showCursor"
         case animateClicks = "mouse.clicks"
         case countdown = "recording.countdown"
@@ -57,7 +58,12 @@ public final class SettingsStore: @unchecked Sendable {
 
     public var containerFormat: ContainerFormat {
         get { rawRepresentable(.containerFormat) ?? .mov }
-        set { setRawRepresentable(newValue, for: .containerFormat) }
+        set {
+            setRawRepresentable(newValue, for: .containerFormat)
+            if newValue == .mp4 {
+                audioTrackLayout = .mixed
+            }
+        }
     }
 
     public var frameRate: FrameRate {
@@ -89,6 +95,11 @@ public final class SettingsStore: @unchecked Sendable {
     public var captureMicrophone: Bool {
         get { bool(.captureMicrophone, default: false) }
         set { set(newValue, for: .captureMicrophone) }
+    }
+
+    public var audioTrackLayout: AudioTrackLayout {
+        get { rawRepresentable(.audioTrackLayout) ?? .mixed }
+        set { setRawRepresentable(newValue, for: .audioTrackLayout) }
     }
 
     public var showCursor: Bool {

@@ -1,8 +1,8 @@
 ## 1. Settings contract
 
-- [ ] 1.1 Add `AudioTrackLayout` with a Mixed default, persist it in `SettingsStore`, and cover default, round-trip, reset, and unknown-value fallback in SettingsKit tests.
-- [ ] 1.2 Snapshot the layout in `EncoderConfiguration` and normalize Separate to Mixed for MP4 while preserving Separate for MOV recordings with one or two enabled sources.
-- [ ] 1.3 Add the Mixed/Separate control to Settings › Audio, disable Separate for MP4, reset Separate to Mixed when the container changes to MP4, lock the control during recording, and add complete en/ko/ja/zh-Hans strings and guidance.
+- [x] 1.1 Add `AudioTrackLayout` with a Mixed default, persist it in `SettingsStore`, and cover default, round-trip, reset, and unknown-value fallback in SettingsKit tests.
+- [x] 1.2 Snapshot the layout in `EncoderConfiguration` and normalize Separate to Mixed for MP4 while preserving Separate for MOV recordings with one or two enabled sources.
+- [x] 1.3 Add the Mixed/Separate control to Settings › Audio, disable Separate for MP4, reset Separate to Mixed when the container changes to MP4, lock the control during recording, and add complete en/ko/ja/zh-Hans strings and guidance.
 
 ## 2. Writer routing
 

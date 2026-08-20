@@ -57,6 +57,11 @@ public enum AudioBitrate: Int, CaseIterable, Codable, Sendable {
     case kbps320 = 320
 }
 
+public enum AudioTrackLayout: String, CaseIterable, Codable, Sendable {
+    case mixed
+    case separate
+}
+
 // MARK: - Countdown
 
 public enum CountdownDuration: Int, CaseIterable, Codable, Sendable {

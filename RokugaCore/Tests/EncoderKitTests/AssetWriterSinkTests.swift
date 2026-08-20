@@ -26,7 +26,8 @@ final class AssetWriterSinkTests: XCTestCase {
         container: ContainerFormat = .mp4,
         width: Int = 640,
         height: Int = 360,
-        quality: Int = 60
+        quality: Int = 60,
+        audioTrackLayout: AudioTrackLayout = .mixed
     ) -> EncoderConfiguration {
         EncoderConfiguration(
             codec: codec,
@@ -38,7 +39,8 @@ final class AssetWriterSinkTests: XCTestCase {
             quality: quality,
             audioBitrate: .kbps128,
             capturesSystemAudio: capturesSystemAudio,
-            capturesMicrophone: capturesMicrophone
+            capturesMicrophone: capturesMicrophone,
+            audioTrackLayout: audioTrackLayout
         )
     }
 
@@ -122,6 +124,25 @@ final class AssetWriterSinkTests: XCTestCase {
         }
         XCTAssertEqual(reader.status, .completed)
         return times
+    }
+
+    func testMP4NormalizesSeparateAudioTracksToMixed() {
+        let configuration = makeConfiguration(
+            capturesSystemAudio: true,
+            capturesMicrophone: true,
+            container: .mp4,
+            audioTrackLayout: .separate
+        )
+        XCTAssertEqual(configuration.audioTrackLayout, .mixed)
+    }
+
+    func testMOVPreservesSeparateAudioTracksWithOneSource() {
+        let configuration = makeConfiguration(
+            capturesSystemAudio: true,
+            container: .mov,
+            audioTrackLayout: .separate
+        )
+        XCTAssertEqual(configuration.audioTrackLayout, .separate)
     }
 
     func testWritesPlayableFile() async throws {

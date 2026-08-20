@@ -249,6 +249,28 @@
         }
       }
     },
+    "Audio tracks" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オーディオトラック"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오디오 트랙"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音轨"
+          }
+        }
+      }
+    },
     "Auto" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1109,6 +1131,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "匹配显示器"
+          }
+        }
+      }
+    },
+    "Mixed" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ミックス"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "혼합"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "混合"
           }
         }
       }
@@ -1974,6 +2018,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "所选区域"
+          }
+        }
+      }
+    },
+    "Separate" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分離"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "분리"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分离"
+          }
+        }
+      }
+    },
+    "Separate tracks are intended for editing. Some players may play only one track." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分離トラックは編集向けです。一部のプレーヤーでは1つのトラックしか再生されない場合があります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "분리된 트랙은 편집용입니다. 일부 플레이어에서는 한 트랙만 재생될 수 있습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分离音轨适用于编辑。某些播放器可能只播放一个音轨。"
+          }
+        }
+      }
+    },
+    "Separate tracks require MOV." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トラック分離にはMOVが必要です。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "트랙 분리는 MOV에서만 사용할 수 있습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分离音轨需要使用 MOV 格式。"
           }
         }
       }

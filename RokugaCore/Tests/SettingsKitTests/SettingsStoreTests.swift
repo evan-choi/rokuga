@@ -21,6 +21,7 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertEqual(store.videoQuality, 80)
         XCTAssertTrue(store.captureSystemAudio)
         XCTAssertFalse(store.captureMicrophone)
+        XCTAssertEqual(store.audioTrackLayout, .mixed)
         XCTAssertEqual(store.countdown, .three)
     }
 
@@ -30,6 +31,7 @@ final class SettingsStoreTests: XCTestCase {
         store.frameRate = .matchDisplay
         store.frameRateMode = .constant
         store.videoQuality = 55
+        store.audioTrackLayout = .separate
 
         let reread = SettingsStore(defaults: defaults)
         XCTAssertEqual(reread.recordingMode, .window)
@@ -37,6 +39,7 @@ final class SettingsStoreTests: XCTestCase {
         XCTAssertEqual(reread.frameRate, .matchDisplay)
         XCTAssertEqual(reread.frameRateMode, .constant)
         XCTAssertEqual(reread.videoQuality, 55)
+        XCTAssertEqual(reread.audioTrackLayout, .separate)
     }
 
     func testMatchDisplayFrameRateResolution() {
@@ -56,10 +59,23 @@ final class SettingsStoreTests: XCTestCase {
         store.videoCodec = .h264
         store.frameRateMode = .constant
         store.captureMicrophone = true
+        store.audioTrackLayout = .separate
         store.resetAll()
         XCTAssertEqual(store.videoCodec, .hevc)
         XCTAssertEqual(store.frameRateMode, .variable)
         XCTAssertFalse(store.captureMicrophone)
+        XCTAssertEqual(store.audioTrackLayout, .mixed)
+    }
+
+    func testUnknownAudioTrackLayoutFallsBackToMixed() {
+        defaults.set("future-layout", forKey: SettingsStore.Key.audioTrackLayout.rawValue)
+        XCTAssertEqual(store.audioTrackLayout, .mixed)
+    }
+
+    func testMP4NormalizesAudioTrackLayoutToMixed() {
+        store.audioTrackLayout = .separate
+        store.containerFormat = .mp4
+        XCTAssertEqual(store.audioTrackLayout, .mixed)
     }
 
     func testCaptureLimitsClamp5K() {

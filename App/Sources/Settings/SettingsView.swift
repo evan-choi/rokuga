@@ -102,6 +102,21 @@ private struct AudioPane: View {
                     Text(verbatim: "\(bitrate.rawValue) kbps").tag(bitrate)
                 }
             }
+            Picker("Audio tracks", selection: $model.audioTrackLayout) {
+                Text("Mixed").tag(AudioTrackLayout.mixed)
+                Text("Separate")
+                    .tag(AudioTrackLayout.separate)
+                    .disabled(model.containerFormat == .mp4)
+            }
+            if model.containerFormat == .mp4 {
+                Text("Separate tracks require MOV.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Separate tracks are intended for editing. Some players may play only one track.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
         .padding(20)
     }
