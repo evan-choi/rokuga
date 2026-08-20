@@ -4,7 +4,7 @@
 
 | Axis | Covered by | Status |
 | --- | --- | --- |
-| macOS 14 / 15 (arm64) | CI `test` job (`macos-14`, `macos-15`) | ✅ every push/PR |
+| macOS 15 (arm64) | CI `test` job (`macos-15`) | ✅ every push/PR |
 | Unit + integration suites | `swift test` (49 tests: capture, encoder, audio output, splice clock, mixer, rate control, settings, trim) | ✅ CI |
 | Performance budgets | `rokuga-bench` + `scripts/bench-gate.py` (PR: 1080p60; nightly: 4K60 10 min) | ✅ CI |
 | Zero-copy record path | `scripts/audit-zero-copy.sh` + xctrace recipe | ✅ CI (static) |
