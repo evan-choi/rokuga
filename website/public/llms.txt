@@ -6,7 +6,7 @@ Rokuga is a menu bar app with a floating recording toolbar. It records directly 
 
 ## Download
 
-Get Rokuga from the Mac App Store or install it with Homebrew. The app is free and requires macOS 15 Sequoia or later.
+Install Rokuga now with `brew install --cask evan-choi/tap/rokuga`. The Mac App Store release is coming soon. The app is free and requires macOS 15 Sequoia or later.
 
 ## Recording
 
@@ -15,7 +15,7 @@ Get Rokuga from the Mac App Store or install it with Homebrew. The app is free a
 - Frame rates: 30 fps, 60 fps, or matched to the display
 - Audio: driver-free system audio capture
 - Limits: no time limit and no watermark
-- Distribution: Mac App Store and Homebrew
+- Distribution: Homebrew now; Mac App Store coming soon
 
 ## Languages
 

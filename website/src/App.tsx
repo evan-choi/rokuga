@@ -378,21 +378,6 @@ export default function App() {
             </div>
 
             <div className="download-grid">
-              <article className="download-main">
-                <div className="app-lockup">
-                  <div className="app-icon"><img src={logoUrl} alt="" /></div>
-                  <div><h3>Rokuga</h3><p>{copy.download.appDescription}</p></div>
-                </div>
-                <div className="release-copy">
-                  <h2>{copy.download.appStoreName}</h2>
-                  <p>{copy.download.appStoreDescription}</p>
-                </div>
-                <button className="button button-disabled download-button" type="button" disabled>
-                  {copy.download.appStoreButton}
-                </button>
-                <p className="release-meta">{copy.download.requirements}</p>
-              </article>
-
               <article className="install-card brew-card">
                 <div className="brew-lockup" aria-hidden="true"><span>&gt;_</span></div>
                 <div className="release-copy">
@@ -417,6 +402,21 @@ export default function App() {
                     </svg>
                   </button>
                 </div>
+              </article>
+
+              <article className="download-main">
+                <div className="app-lockup">
+                  <div className="app-icon"><img src={logoUrl} alt="" /></div>
+                  <div><h3>Rokuga</h3><p>{copy.download.appDescription}</p></div>
+                </div>
+                <div className="release-copy">
+                  <h2>{copy.download.appStoreName}</h2>
+                  <p>{copy.download.appStoreDescription}</p>
+                </div>
+                <button className="button button-disabled download-button" type="button" disabled>
+                  {copy.download.appStoreButton}
+                </button>
+                <p className="release-meta">{copy.download.requirements}</p>
               </article>
             </div>
           </div>
