@@ -206,7 +206,7 @@ export default function App() {
                       data-tooltip={copy.product.selectedArea}
                       onClick={() => setCaptureMode('selectedArea')}
                     >
-                      <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="1" y="3" width="18" height="14" rx="2" /></svg>
+                      <span className="toolbar-symbol selected-area-symbol" aria-hidden="true" />
                     </button>
                     <button
                       className="toolbar-mode"
@@ -216,7 +216,7 @@ export default function App() {
                       data-tooltip={copy.product.fullScreen}
                       onClick={() => setCaptureMode('fullScreen')}
                     >
-                      <svg className="full-screen-icon" viewBox="0 0 20 20" aria-hidden="true"><path fillRule="evenodd" d="M2 2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm2 3v10h12V5H4Z" /></svg>
+                      <span className="toolbar-symbol full-screen-symbol" aria-hidden="true" />
                     </button>
                     <button
                       className="toolbar-mode"
@@ -226,7 +226,7 @@ export default function App() {
                       data-tooltip={copy.product.window}
                       onClick={() => setCaptureMode('window')}
                     >
-                      <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="1" y="3" width="18" height="14" rx="2" /><path d="M2 7h16" /><path d="M5 5h.01M7.5 5h.01" /></svg>
+                      <span className="toolbar-symbol window-symbol" aria-hidden="true" />
                     </button>
                   </div>
                   <span className="toolbar-drag" />
