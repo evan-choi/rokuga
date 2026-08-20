@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://evan-choi.github.io/rokuga/sitemap.xml
