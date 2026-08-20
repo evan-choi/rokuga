@@ -297,12 +297,16 @@ final class AssetWriterSinkTests: XCTestCase {
         )
         try await sink.start()
         try sink.append(makeVideoSampleBuffer(pts: .zero), of: .video)
+        let startedAt = DispatchTime.now().uptimeNanoseconds
         for chunk in 0 ..< 11 {
+            if chunk > 0 {
+                try await Task.sleep(nanoseconds: 33_000_000)
+            }
+            let elapsed = DispatchTime.now().uptimeNanoseconds - startedAt
             try sink.append(
-                makeSystemAudioSampleBuffer(pts: CMTime(value: CMTimeValue(chunk * 1600), timescale: 48000)),
+                makeSystemAudioSampleBuffer(pts: CMTime(value: CMTimeValue(elapsed), timescale: 1_000_000_000)),
                 of: .systemAudio
             )
-            try await Task.sleep(nanoseconds: 33_000_000)
         }
 
         let url = try await sink.finish()
