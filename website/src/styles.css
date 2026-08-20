@@ -132,7 +132,7 @@ a { color: inherit; }
 
 .language-picker {
   position: relative;
-  width: 62px;
+  width: 32px;
   min-height: 32px;
   display: inline-flex;
   align-items: center;
@@ -142,25 +142,12 @@ a { color: inherit; }
 }
 
 .language-picker:hover { color: #fff; }
-.language-picker:focus-within { outline: 2px solid rgba(255, 255, 255, .8); outline-offset: 2px; }
+.language-picker:focus-within { color: #fff; }
 
 .language-icon {
   width: 16px;
   height: 16px;
-  margin-right: 12px;
   pointer-events: none;
-}
-
-.language-picker::after {
-  position: absolute;
-  right: 10px;
-  width: 5px;
-  height: 5px;
-  border-right: 1.5px solid rgba(255, 255, 255, .62);
-  border-bottom: 1.5px solid rgba(255, 255, 255, .62);
-  content: "";
-  pointer-events: none;
-  transform: translateY(-2px) rotate(45deg);
 }
 
 .language-select {
@@ -170,6 +157,7 @@ a { color: inherit; }
   height: 100%;
   border: 0;
   opacity: 0;
+  outline: none;
   cursor: pointer;
 }
 
