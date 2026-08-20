@@ -27,6 +27,7 @@ type Copy = {
   }
   product: {
     label: string
+    record: string
     file: string
     edit: string
     view: string
@@ -106,6 +107,7 @@ export const translations: Record<Language, Copy> = {
     },
     product: {
       label: 'Rokuga의 실제 영역 선택 화면과 녹화 toolbar',
+      record: '녹화',
       file: '파일',
       edit: '편집',
       view: '보기',
@@ -180,6 +182,7 @@ export const translations: Record<Language, Copy> = {
     },
     product: {
       label: 'Rokuga area selection screen and recording toolbar',
+      record: 'Record',
       file: 'File',
       edit: 'Edit',
       view: 'View',
@@ -254,6 +257,7 @@ export const translations: Record<Language, Copy> = {
     },
     product: {
       label: 'Rokugaの範囲選択画面と録画toolbar',
+      record: '録画',
       file: 'ファイル',
       edit: '編集',
       view: '表示',
@@ -328,6 +332,7 @@ export const translations: Record<Language, Copy> = {
     },
     product: {
       label: 'Rokuga 区域选择界面和录制工具栏',
+      record: '录制',
       file: '文件',
       edit: '编辑',
       view: '显示',
