@@ -131,8 +131,8 @@ export const translations: Record<Language, Copy> = {
     features: {
       title: '60 fps를 넘어',
       accent: '화면과 같은 속도로',
-      frameRateTitle: '주사율에 맞춘 프레임 레이트',
-      frameRateDescription: '모니터를 감지해 녹화 fps를 맞춥니다.',
+      frameRateTitle: '화면의 흐름까지 그대로',
+      frameRateDescription: '디스플레이 주사율에 맞춰 모든 움직임을 자연스럽게 담아냅니다.',
       matchedRate: 'fps · 144 Hz에 맞춤',
       codecTitle: '더 선명하게, 더 가볍게',
       codecDescription: 'H.264 또는 H.265',
@@ -210,8 +210,8 @@ export const translations: Record<Language, Copy> = {
     features: {
       title: 'Beyond 60 fps',
       accent: 'At the speed of your display',
-      frameRateTitle: 'Frame rate matched to your display',
-      frameRateDescription: 'Rokuga detects your display and matches the recording frame rate.',
+      frameRateTitle: 'As smooth as your display',
+      frameRateDescription: 'Rokuga matches your display’s refresh rate, so every movement looks natural.',
       matchedRate: 'fps · Matched to 144 Hz',
       codecTitle: 'Sharper. Lighter.',
       codecDescription: 'H.264 or H.265',
@@ -289,8 +289,8 @@ export const translations: Record<Language, Copy> = {
     features: {
       title: '60 fpsを超えて',
       accent: '画面と同じ速さで',
-      frameRateTitle: 'リフレッシュレートに合うフレームレート',
-      frameRateDescription: 'ディスプレイを検出し、録画fpsを合わせます。',
+      frameRateTitle: '画面の動きまで、そのまま',
+      frameRateDescription: 'ディスプレイのリフレッシュレートに合わせて、すべての動きをなめらかに記録します。',
       matchedRate: 'fps · 144 Hzに合わせて',
       codecTitle: 'より鮮明に、より軽く',
       codecDescription: 'H.264またはH.265',
@@ -368,8 +368,8 @@ export const translations: Record<Language, Copy> = {
     features: {
       title: '超越 60 fps',
       accent: '与屏幕同速',
-      frameRateTitle: '匹配刷新率的录制帧率',
-      frameRateDescription: '自动检测显示器，并匹配录制帧率。',
+      frameRateTitle: '画面流畅，录制依旧',
+      frameRateDescription: '自动匹配显示器刷新率，让每个画面都自然流畅。',
       matchedRate: 'fps · 匹配 144 Hz',
       codecTitle: '更清晰，更轻巧',
       codecDescription: 'H.264 或 H.265',
