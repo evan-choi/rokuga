@@ -115,17 +115,12 @@ private struct AudioPane: View {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(.yellow)
                 }
-                .font(.caption)
+                .font(.callout)
                 .foregroundStyle(.secondary)
             } else if model.audioTrackLayout == .separate {
-                Label {
-                    Text("Separate tracks are intended for editing.\nSome players may play only one track.")
-                } icon: {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.yellow)
-                }
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                Text("Separate tracks are intended for editing.\nSome players may play only one track.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
             }
         }
         .padding(20)
