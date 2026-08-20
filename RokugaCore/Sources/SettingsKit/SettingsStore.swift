@@ -72,7 +72,7 @@ public final class SettingsStore: @unchecked Sendable {
 
     /// VBR quality 0...100 (see output-settings spec §rate-control).
     public var videoQuality: Int {
-        get { clampedInt(.videoQuality, default: 80, range: 0...100) }
+        get { clampedInt(.videoQuality, default: 80, range: 0 ... 100) }
         set { set(min(max(newValue, 0), 100), for: .videoQuality) }
     }
 
@@ -186,7 +186,7 @@ public final class SettingsStore: @unchecked Sendable {
         }
     }
 
-    private func setRawRepresentable<T: RawRepresentable>(_ value: T, for key: Key) {
+    private func setRawRepresentable(_ value: some RawRepresentable, for key: Key) {
         lock.withLock {
             defaults.set(value.rawValue, forKey: key.rawValue)
         }

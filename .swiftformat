@@ -10,4 +10,4 @@
 --commas inline
 --trimwhitespace always
 --disable wrapMultilineStatementBraces, andOperator
---exclude .build, design, docs, openspec
+--exclude .build, artifacts, design, docs, openspec

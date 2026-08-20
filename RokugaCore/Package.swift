@@ -5,32 +5,39 @@ let package = Package(
     name: "RokugaCore",
     defaultLocalization: "en",
     platforms: [
-        .macOS("13.3"),
+        .macOS("13.3")
     ],
     products: [
         .executable(name: "rokuga-bench", targets: ["rokuga-bench"]),
         .library(name: "CaptureKit", targets: ["CaptureKit"]),
         .library(name: "EncoderKit", targets: ["EncoderKit"]),
         .library(name: "TrimKit", targets: ["TrimKit"]),
-        .library(name: "SettingsKit", targets: ["SettingsKit"]),
+        .library(name: "SettingsKit", targets: ["SettingsKit"])
     ],
     targets: [
         // MARK: Capture — ScreenCaptureKit session management, recording state machine
+
         .target(
             name: "CaptureKit",
             dependencies: ["EncoderKit", "SettingsKit"]
         ),
+
         // MARK: Encode — AVAssetWriter/VideoToolbox pipeline, audio mixing
+
         .target(
             name: "EncoderKit",
             dependencies: ["SettingsKit"]
         ),
+
         // MARK: Trim — passthrough export, timeline model
+
         .target(
             name: "TrimKit",
             dependencies: ["SettingsKit"]
         ),
+
         // MARK: Settings — UserDefaults-backed preferences, shared model types
+
         .target(
             name: "SettingsKit"
         ),
@@ -53,6 +60,6 @@ let package = Package(
         .executableTarget(
             name: "rokuga-bench",
             dependencies: ["EncoderKit", "TrimKit"]
-        ),
+        )
     ]
 )

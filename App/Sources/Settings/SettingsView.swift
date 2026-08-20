@@ -8,7 +8,9 @@ struct SettingsView: View {
     @ObservedObject private var appState = AppState.shared
     @State private var paneHeight: CGFloat?
 
-    private var locked: Bool { appState.recordingState.isActive }
+    private var locked: Bool {
+        appState.recordingState.isActive
+    }
 
     var body: some View {
         TabView {
@@ -158,7 +160,7 @@ private struct OutputPane: View {
             }
             LabeledContent("Quality") {
                 HStack(spacing: 8) {
-                    Slider(value: qualityBinding, in: 0...100, step: 5) {
+                    Slider(value: qualityBinding, in: 0 ... 100, step: 5) {
                         Text("Quality")
                     }
                     .labelsHidden()
