@@ -1,9 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import logoUrl from '../../docs/logo.png'
 import { isLanguage, languageLabels, languages, selectLanguage, translations } from './i18n'
+import { initialSelection, mobileInitialSelection, moveSelection, resizeSelection, type SelectionHandle, type SelectionRegion } from './selection'
 
 const LANGUAGE_STORAGE_KEY = 'rokuga-language'
 type CaptureMode = 'selectedArea' | 'fullScreen' | 'window'
+type SelectionDrag = {
+  pointerId: number
+  startX: number
+  startY: number
+  region: SelectionRegion
+  handle: SelectionHandle | null
+}
 
 export default function App() {
   const [language, setLanguage] = useState(() => selectLanguage(
@@ -11,6 +19,13 @@ export default function App() {
     navigator.languages,
   ))
   const [captureMode, setCaptureMode] = useState<CaptureMode>('selectedArea')
+  const [selectionBaseline] = useState(() => (
+    window.matchMedia('(max-width: 660px)').matches ? mobileInitialSelection : initialSelection
+  ))
+  const [selection, setSelection] = useState(selectionBaseline)
+  const [selectionDrag, setSelectionDrag] = useState<SelectionHandle | 'move' | null>(null)
+  const productStageRef = useRef<HTMLDivElement>(null)
+  const selectionDragRef = useRef<SelectionDrag | null>(null)
   const copy = translations[language]
 
   useEffect(() => {
@@ -22,6 +37,59 @@ export default function App() {
     description?.setAttribute('content', localizedCopy.metaDescription)
     localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
   }, [language])
+
+  const startSelectionDrag = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return
+
+    const handle = (event.target as HTMLElement).closest<HTMLElement>('[data-handle]')
+      ?.dataset.handle as SelectionHandle | undefined
+    selectionDragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      region: selection,
+      handle: handle ?? null,
+    }
+    setSelectionDrag(handle ?? 'move')
+    productStageRef.current?.setPointerCapture(event.pointerId)
+    event.preventDefault()
+  }
+
+  const updateSelectionDrag = (event: PointerEvent<HTMLDivElement>) => {
+    const drag = selectionDragRef.current
+    const stage = productStageRef.current?.getBoundingClientRect()
+    if (!drag || drag.pointerId !== event.pointerId || !stage) return
+
+    const dx = (event.clientX - drag.startX) / stage.width
+    const dy = (event.clientY - drag.startY) / stage.height
+    setSelection(drag.handle
+      ? resizeSelection(drag.region, drag.handle, dx, dy, 50 / stage.width, 50 / stage.height)
+      : moveSelection(drag.region, dx, dy))
+  }
+
+  const endSelectionDrag = (event: PointerEvent<HTMLDivElement>) => {
+    if (selectionDragRef.current?.pointerId !== event.pointerId) return
+    selectionDragRef.current = null
+    setSelectionDrag(null)
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+  }
+
+  const moveSelectionWithKeyboard = (event: KeyboardEvent<HTMLDivElement>) => {
+    const step = event.shiftKey ? 0.05 : 0.01
+    let dx = 0
+    let dy = 0
+
+    if (event.key === 'ArrowLeft') dx = -step
+    else if (event.key === 'ArrowRight') dx = step
+    else if (event.key === 'ArrowUp') dy = -step
+    else if (event.key === 'ArrowDown') dy = step
+    else return
+
+    setSelection((region) => moveSelection(region, dx, dy))
+    event.preventDefault()
+  }
 
   return (
     <>
@@ -79,16 +147,44 @@ export default function App() {
             </div>
 
             <div className="product-shell" role="group" aria-label={copy.product.label}>
-              <div className="product-stage">
+              <div
+                className="product-stage"
+                ref={productStageRef}
+                onPointerMove={updateSelectionDrag}
+                onPointerUp={endSelectionDrag}
+                onPointerCancel={endSelectionDrag}
+              >
                 <div className="mac-menu" aria-hidden="true">
                   <span className="apple-logo"></span>
                   <strong>Finder</strong><span>{copy.product.file}</span><span>{copy.product.edit}</span><span>{copy.product.view}</span>
                   <span className="grow"></span><span>{copy.product.date}</span>
                 </div>
-                <div className="selection" aria-hidden="true">
-                  <span className="dimension-label">960 × 540</span>
-                  <i className="handle" /><i className="handle" /><i className="handle" /><i className="handle" />
-                  <i className="handle" /><i className="handle" /><i className="handle" /><i className="handle" />
+                <div
+                  className="selection"
+                  role="group"
+                  tabIndex={0}
+                  aria-label={copy.product.selectedArea}
+                  data-dragging={selectionDrag ?? undefined}
+                  style={{
+                    top: `${selection.y * 100}%`,
+                    left: `${selection.x * 100}%`,
+                    width: `${selection.width * 100}%`,
+                    height: `${selection.height * 100}%`,
+                  }}
+                  onKeyDown={moveSelectionWithKeyboard}
+                  onPointerDown={startSelectionDrag}
+                >
+                  <span className="dimension-label">
+                    {Math.round(960 * selection.width / selectionBaseline.width)} × {Math.round(540 * selection.height / selectionBaseline.height)}
+                  </span>
+                  <i className="handle" data-handle="topLeft" aria-hidden="true" />
+                  <i className="handle" data-handle="top" aria-hidden="true" />
+                  <i className="handle" data-handle="topRight" aria-hidden="true" />
+                  <i className="handle" data-handle="right" aria-hidden="true" />
+                  <i className="handle" data-handle="bottomRight" aria-hidden="true" />
+                  <i className="handle" data-handle="bottom" aria-hidden="true" />
+                  <i className="handle" data-handle="bottomLeft" aria-hidden="true" />
+                  <i className="handle" data-handle="left" aria-hidden="true" />
                 </div>
                 <div className="actual-toolbar" role="toolbar" aria-label={copy.product.toolbarLabel}>
                   <span className="toolbar-close">
