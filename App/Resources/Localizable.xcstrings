@@ -2044,24 +2044,24 @@
         }
       }
     },
-    "Separate tracks are intended for editing. Some players may play only one track." : {
+    "Separate tracks are intended for editing.\nSome players may play only one track." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "分離トラックは編集向けです。一部のプレーヤーでは1つのトラックしか再生されない場合があります。"
+            "value" : "分離トラックは編集向けです。\n一部のプレーヤーでは1つのトラックしか再生されない場合があります。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "분리된 트랙은 편집용입니다. 일부 플레이어에서는 한 트랙만 재생될 수 있습니다."
+            "value" : "분리된 트랙은 편집용입니다.\n일부 플레이어에서는 한 트랙만 재생될 수 있습니다."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "分离音轨适用于编辑。某些播放器可能只播放一个音轨。"
+            "value" : "分离音轨适用于编辑。\n某些播放器可能只播放一个音轨。"
           }
         }
       }
