@@ -248,7 +248,7 @@ export default function App() {
         <section className="highlights">
           <div className="container">
             <div className="section-heading highlights-heading">
-              <p className="section-kicker">Highlights</p>
+              <p className="section-kicker">{copy.trust.kicker}</p>
               <h2>{copy.trust.title}</h2>
             </div>
             <div className="trust-strip" aria-label={copy.trust.label}>
@@ -263,7 +263,7 @@ export default function App() {
         <section className="section features-section" id="features">
           <div className="container">
             <div className="section-heading">
-              <p className="section-kicker">Record</p>
+              <p className="section-kicker">{copy.features.kicker}</p>
               <h2>{copy.features.title}<br />{copy.features.accent}</h2>
             </div>
 
@@ -292,7 +292,7 @@ export default function App() {
                 <p>{copy.features.resolutionDescription}</p>
                 <div className="resolution-visual" aria-hidden="true">
                   <strong>5K</strong>
-                  <span>up to 5120 × 2880</span>
+                  <span>{copy.features.resolutionLimit}</span>
                 </div>
               </article>
             </div>
@@ -303,7 +303,7 @@ export default function App() {
           <div className="container">
             <div className="free-panel">
               <div className="free-copy">
-                <p className="section-kicker">Free</p>
+                <p className="section-kicker">{copy.free.kicker}</p>
                 <h2>{copy.free.title}<br />{copy.free.accent}</h2>
                 <p>{copy.free.description}</p>
                 <ul className="free-list">
@@ -319,7 +319,7 @@ export default function App() {
         <section className="section download-section" id="download">
           <div className="container">
             <div className="section-heading">
-              <p className="section-kicker">Download</p>
+              <p className="section-kicker">{copy.download.kicker}</p>
               <h2>{copy.download.title}<br />{copy.download.accent}</h2>
               <p className="section-lead">{copy.download.lead}</p>
             </div>
@@ -331,33 +331,31 @@ export default function App() {
                   <div><h3>Rokuga</h3><p>{copy.download.appDescription}</p></div>
                 </div>
                 <div className="release-copy">
-                  <h2>Rokuga 0.1.0 Preview</h2>
-                  <p>{copy.download.releaseDescription}</p>
+                  <h2>{copy.download.appStoreName}</h2>
+                  <p>{copy.download.appStoreDescription}</p>
                 </div>
                 <button className="button button-disabled download-button" type="button" disabled>
-                  {copy.download.button}
+                  {copy.download.appStoreButton}
                 </button>
                 <p className="release-meta">{copy.download.requirements}</p>
               </article>
 
-              <aside className="install-card" aria-labelledby="install-title">
-                <h3 id="install-title">{copy.download.installTitle}</h3>
-                <p className="install-intro">{copy.download.installIntro}</p>
-                <ol className="steps">
-                  {copy.download.steps.map((step) => (
-                    <li key={step.title}><strong>{step.title}</strong><span>{step.description}</span></li>
-                  ))}
-                </ol>
-                <details>
-                  <summary>{copy.download.detailsTitle}</summary>
-                  <p>{copy.download.detailsDescription}</p>
-                </details>
+              <article className="install-card brew-card">
+                <div className="brew-lockup" aria-hidden="true"><span>&gt;_</span></div>
+                <div className="release-copy">
+                  <h2>{copy.download.brewName}</h2>
+                  <p>{copy.download.brewDescription}</p>
+                </div>
+                <code className="brew-command">{copy.download.brewCommand}</code>
+                <button className="button button-disabled download-button" type="button" disabled>
+                  {copy.download.brewButton}
+                </button>
                 <div className="source-note">
                   {copy.download.sourceBefore}
                   <a href="https://github.com/evan-choi/rokuga#build-from-source">{copy.download.sourceLink}</a>
                   {copy.download.sourceAfter}
                 </div>
-              </aside>
+              </article>
             </div>
           </div>
         </section>

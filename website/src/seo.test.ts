@@ -17,7 +17,8 @@ describe('crawler metadata', () => {
       name: 'Rokuga',
       url: websiteUrl,
     })
-    expect(index).toContain('Rokuga is a free, native, open-source screen recorder for macOS.')
+    expect(index).toContain('Rokuga is a free, native, open-source screen recorder for Mac that records at display-matched frame rates, with H.265 and resolutions up to 5K.')
+    expect(index).toContain('Rokuga is coming to the Mac App Store and Homebrew.')
     expect(robots).toContain(`Sitemap: ${websiteUrl}sitemap.xml`)
     expect(sitemap).toContain(`<loc>${websiteUrl}</loc>`)
     expect(llms).toContain(`Website: ${websiteUrl}`)
