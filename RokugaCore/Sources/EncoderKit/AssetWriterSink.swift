@@ -136,22 +136,32 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     }
 
     public func finish() async throws -> URL {
+        let requestedAt = DispatchTime.now().uptimeNanoseconds
         let writer: AVAssetWriter? = await withCheckedContinuation { continuation in
             queue.async { [self] in
-                stopConstantFrameOutput(clearFrame: true)
+                stopConstantFrameOutput(clearFrame: false)
+                let endPTS: CMTime?
                 if let lastVideoPTS, let lastVideoUptimeNanoseconds {
-                    let endUptimeNanoseconds = pauseUptimeNanoseconds ?? DispatchTime.now().uptimeNanoseconds
+                    let endUptimeNanoseconds = pauseUptimeNanoseconds ?? requestedAt
                     let elapsed = endUptimeNanoseconds > lastVideoUptimeNanoseconds
                         ? endUptimeNanoseconds - lastVideoUptimeNanoseconds
                         : 0
-                    self.writer?.endSession(atSourceTime: CMTimeAdd(
+                    endPTS = CMTimeAdd(
                         lastVideoPTS,
                         CMTime(value: CMTimeValue(elapsed), timescale: 1_000_000_000)
-                    ))
+                    )
+                } else {
+                    endPTS = nil
                 }
-                videoInput?.markAsFinished()
-                audioInput?.markAsFinished()
-                continuation.resume(returning: self.writer)
+                finishConstantFrameOutput(until: endPTS) { [self] in
+                    if let endPTS {
+                        self.writer?.endSession(atSourceTime: endPTS)
+                    }
+                    stopConstantFrameOutput(clearFrame: true)
+                    videoInput?.markAsFinished()
+                    audioInput?.markAsFinished()
+                    continuation.resume(returning: self.writer)
+                }
             }
         }
         guard let writer else { throw RecordingSinkError.notStarted }
@@ -203,18 +213,21 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
         }
     }
 
-    private func appendVideoSample(_ sampleBuffer: CMSampleBuffer, at pts: CMTime, duration: CMTime? = nil) {
-        guard let writer, let videoInput, terminalError == nil else { return }
+    @discardableResult
+    private func appendVideoSample(_ sampleBuffer: CMSampleBuffer, at pts: CMTime, duration: CMTime? = nil) -> Bool {
+        guard let writer, let videoInput, terminalError == nil else { return false }
         guard videoInput.isReadyForMoreMediaData,
               let retimed = retime(sampleBuffer, to: pts, duration: duration)
         else {
             statistics.videoFramesDropped += 1
-            return
+            return false
         }
         if videoInput.append(retimed) {
             statistics.videoFramesAppended += 1
+            return true
         } else {
             terminalError = RecordingSinkError.writerFailed(writer.error?.localizedDescription ?? "video append")
+            return false
         }
     }
 
@@ -227,8 +240,12 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
 
         let duration = constantFrameDuration
         let outputPTS = nextConstantFramePTS ?? adjustedPTS
-        appendVideoSample(sampleBuffer, at: outputPTS, duration: duration)
-        nextConstantFramePTS = CMTimeAdd(outputPTS, duration)
+        if videoInput?.isReadyForMoreMediaData == true,
+           appendVideoSample(sampleBuffer, at: outputPTS, duration: duration) {
+            nextConstantFramePTS = CMTimeAdd(outputPTS, duration)
+        } else {
+            nextConstantFramePTS = outputPTS
+        }
         startConstantFrameTimer()
     }
 
@@ -249,10 +266,41 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
 
     private func emitConstantFrame() {
         guard let sampleBuffer = latestConstantFrame,
-              let pts = nextConstantFramePTS
+              let pts = nextConstantFramePTS,
+              videoInput?.isReadyForMoreMediaData == true
         else { return }
-        appendVideoSample(sampleBuffer, at: pts, duration: constantFrameDuration)
-        nextConstantFramePTS = CMTimeAdd(pts, constantFrameDuration)
+        if appendVideoSample(sampleBuffer, at: pts, duration: constantFrameDuration) {
+            nextConstantFramePTS = CMTimeAdd(pts, constantFrameDuration)
+        }
+    }
+
+    private func finishConstantFrameOutput(until endPTS: CMTime?, completion: @escaping @Sendable () -> Void) {
+        guard configuration.frameRateMode == .constant,
+              let endPTS,
+              let sampleBuffer = latestConstantFrame,
+              var pts = nextConstantFramePTS
+        else {
+            completion()
+            return
+        }
+
+        while CMTimeCompare(pts, endPTS) < 0,
+              videoInput?.isReadyForMoreMediaData == true,
+              appendVideoSample(sampleBuffer, at: pts, duration: constantFrameDuration) {
+            pts = CMTimeAdd(pts, constantFrameDuration)
+        }
+        nextConstantFramePTS = pts
+
+        guard CMTimeCompare(pts, endPTS) < 0,
+              terminalError == nil,
+              writer?.status == .writing
+        else {
+            completion()
+            return
+        }
+        queue.asyncAfter(deadline: .now() + .milliseconds(1)) { [self] in
+            finishConstantFrameOutput(until: endPTS, completion: completion)
+        }
     }
 
     private func stopConstantFrameOutput(clearFrame: Bool) {
