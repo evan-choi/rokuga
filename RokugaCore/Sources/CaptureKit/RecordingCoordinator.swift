@@ -22,7 +22,8 @@ public enum RecordingEvent: Equatable, Sendable {
 }
 
 /// Owns the recording state machine.
-/// All lifecycle mutations flow through this actor, giving single-flight semantics for free: concurrent `start()` calls are serialized, and the state check rejects the loser.
+/// All lifecycle mutations flow through this actor, giving single-flight semantics for free: concurrent `start()` calls are serialized, and the state check
+/// rejects the loser.
 public actor RecordingCoordinator {
     public private(set) var state: RecordingState = .idle
 
@@ -160,7 +161,9 @@ public actor RecordingCoordinator {
             try transition(to: .countdown(remaining: remaining))
             emit(.countdownTick(remaining: remaining))
             try await Task.sleep(nanoseconds: 1_000_000_000)
-            if state == .idle { return } // cancelled mid-countdown
+            if state == .idle {
+                return
+            } // cancelled mid-countdown
         }
         try transition(to: .countdown(remaining: 0))
     }

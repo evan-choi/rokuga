@@ -1,5 +1,5 @@
-import AVFoundation
 import AppKit
+import AVFoundation
 import Combine
 import TrimKit
 
@@ -48,14 +48,14 @@ final class TrimEditorModel: ObservableObject {
 
     private func load() async {
         let asset = AVURLAsset(url: url)
-        duration = (try? await asset.load(.duration).seconds) ?? 0
+        duration = await (try? asset.load(.duration).seconds) ?? 0
         endSeconds = duration
         if let track = try? await asset.loadTracks(withMediaType: .video).first,
            let fps = try? await track.load(.nominalFrameRate), fps > 0 {
             frameDuration = 1.0 / Double(fps)
         }
-        hasAudio = (try? await TrimExporter(sourceURL: url).hasAudioTrack()) ?? false
-        keyframes = (try? await KeyframeIndex.load(from: url))?.seconds ?? []
+        hasAudio = await (try? TrimExporter(sourceURL: url).hasAudioTrack()) ?? false
+        keyframes = await (try? KeyframeIndex.load(from: url))?.seconds ?? []
     }
 
     var trimRange: TrimRange {

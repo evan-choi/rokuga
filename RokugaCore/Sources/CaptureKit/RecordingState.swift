@@ -20,8 +20,8 @@ public enum RecordingState: Equatable, Sendable {
     /// Whether the session is actively producing or holding frames.
     public var isActive: Bool {
         switch self {
-        case .recording, .paused, .finishing: return true
-        case .idle, .preparing, .countdown: return false
+        case .recording, .paused, .finishing: true
+        case .idle, .preparing, .countdown: false
         }
     }
 
@@ -38,12 +38,12 @@ public enum RecordingState: Equatable, Sendable {
              (.recording, .finishing),
              (.paused, .finishing),
              (.finishing, .idle):
-            return true
+            true
         // Aborts: anything not yet finalizing can cancel to idle.
         case (.preparing, .idle), (.countdown, .idle):
-            return true
+            true
         default:
-            return false
+            false
         }
     }
 }

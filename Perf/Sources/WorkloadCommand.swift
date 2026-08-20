@@ -185,7 +185,7 @@ private final class WorkloadView: NSView {
             flash.keyTimes = [
                 0,
                 NSNumber(value: AVSyncMarker.pulseSeconds / AVSyncMarker.periodSeconds),
-                1,
+                1
             ]
             flash.calculationMode = .discrete
             flash.duration = AVSyncMarker.periodSeconds

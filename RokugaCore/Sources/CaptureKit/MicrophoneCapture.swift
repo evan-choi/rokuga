@@ -15,11 +15,11 @@ public final class MicrophoneCapture: NSObject, @unchecked Sendable {
     public static func requestPermission() async -> Bool {
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
         case .authorized:
-            return true
+            true
         case .notDetermined:
-            return await AVCaptureDevice.requestAccess(for: .audio)
+            await AVCaptureDevice.requestAccess(for: .audio)
         default:
-            return false
+            false
         }
     }
 

@@ -9,7 +9,7 @@ final class SpliceClockTests: XCTestCase {
 
     func testNoPauseIsIdentity() {
         var clock = SpliceClock()
-        for frame in 0..<10 {
+        for frame in 0 ..< 10 {
             let pts = time(Double(frame) / 60.0)
             XCTAssertEqual(clock.adjusted(pts), pts)
             clock.observe(pts: pts, duration: time(1.0 / 60.0))
@@ -21,7 +21,7 @@ final class SpliceClockTests: XCTestCase {
         let frameDuration = time(1.0 / 60.0)
 
         var lastAdjusted = CMTime.zero
-        for frame in 0..<60 {
+        for frame in 0 ..< 60 {
             let pts = time(Double(frame) / 60.0)
             lastAdjusted = clock.adjusted(pts)
             clock.observe(pts: pts, duration: frameDuration)
@@ -64,8 +64,8 @@ final class SpliceClockTests: XCTestCase {
         var sourceFrame: CMTimeValue = 0
         var previousAdjusted: CMTime?
 
-        for _ in 0..<3 {
-            for _ in 0..<30 {
+        for _ in 0 ..< 3 {
+            for _ in 0 ..< 30 {
                 let pts = CMTime(value: sourceFrame, timescale: 30)
                 let adjusted = clock.adjusted(pts)
                 if let previousAdjusted {

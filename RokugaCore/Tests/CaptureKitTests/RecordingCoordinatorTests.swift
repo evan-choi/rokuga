@@ -1,6 +1,6 @@
+import SettingsKit
 import XCTest
 @testable import CaptureKit
-import SettingsKit
 
 /// Test double driving the coordinator without any real capture.
 final class FakeSession: CaptureSession, @unchecked Sendable {
@@ -9,14 +9,27 @@ final class FakeSession: CaptureSession, @unchecked Sendable {
     private var _started = false
     private var _cancelled = false
 
-    var started: Bool { lock.withLock { _started } }
-    var cancelled: Bool { lock.withLock { _cancelled } }
+    var started: Bool {
+        lock.withLock { _started }
+    }
 
-    func start() async throws { lock.withLock { _started = true } }
+    var cancelled: Bool {
+        lock.withLock { _cancelled }
+    }
+
+    func start() async throws {
+        lock.withLock { _started = true }
+    }
+
     func pause() async throws {}
     func resume() async throws {}
-    func finish() async throws -> URL { outputURL }
-    func cancel() async { lock.withLock { _cancelled = true } }
+    func finish() async throws -> URL {
+        outputURL
+    }
+
+    func cancel() async {
+        lock.withLock { _cancelled = true }
+    }
 }
 
 final class RecordingCoordinatorTests: XCTestCase {

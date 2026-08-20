@@ -105,7 +105,10 @@ class SelectionTrackingView: ActiveCursorView {
         }
     }
 
-    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        true
+    }
+
     override func mouseMoved(with event: NSEvent) {
         onMouseMoved?()
         super.mouseMoved(with: event)
@@ -116,7 +119,9 @@ class SelectionTrackingView: ActiveCursorView {
         super.mouseEntered(with: event)
     }
 
-    override func mouseDown(with event: NSEvent) { onMouseDown?() }
+    override func mouseDown(with event: NSEvent) {
+        onMouseDown?()
+    }
 
     @discardableResult
     func reapplySelectionCursor() -> Bool {
@@ -327,7 +332,9 @@ final class PunchView: NSView {
     /// Captured region in display-local top-left coordinates (SCStream `sourceRect` space).
     var hole: CGRect = .zero
 
-    override var isFlipped: Bool { true }
+    override var isFlipped: Bool {
+        true
+    }
 
     override func draw(_ dirtyRect: NSRect) {
         guard let ctx = NSGraphicsContext.current?.cgContext else { return }

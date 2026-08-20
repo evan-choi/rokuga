@@ -4,7 +4,9 @@ import SwiftUI
 
 /// NSHostingView that lets the first click on a non-key panel start SwiftUI gestures immediately (system capture overlays never require a focus click).
 final class FirstMouseHostingView<Content: View>: NSHostingView<Content> {
-    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        true
+    }
 }
 
 /// WindowServer drops `NSCursor.set()` from apps that are not frontmost, and every
@@ -124,7 +126,9 @@ class CapturePanel: NSPanel {
         animationBehavior = .utilityWindow
     }
 
-    override var canBecomeKey: Bool { true }
+    override var canBecomeKey: Bool {
+        true
+    }
 
     override func keyDown(with event: NSEvent) {
         switch event.keyCode {

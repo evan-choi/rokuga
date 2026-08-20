@@ -16,7 +16,9 @@ struct TimelineRepresentable: NSViewRepresentable {
 
     func updateNSView(_ view: TimelineScrollView, context: Context) {}
 
-    func makeCoordinator() -> Coordinator { Coordinator() }
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
 
     @MainActor
     final class Coordinator {
@@ -52,7 +54,9 @@ final class TimelineScrollView: NSScrollView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { nil }
+    required init?(coder: NSCoder) {
+        nil
+    }
 
     override func magnify(with event: NSEvent) {
         zoomAnchored(factor: 1 + event.magnification, at: event)
@@ -83,11 +87,11 @@ final class TimelineScrollView: NSScrollView {
     func modelDidChange() {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            if self.lastZoom != self.model.pointsPerSecond {
-                self.lastZoom = self.model.pointsPerSecond
+            if lastZoom != model.pointsPerSecond {
+                lastZoom = model.pointsPerSecond
             }
-            self.layoutDocument()
-            self.timelineView.needsDisplay = true
+            layoutDocument()
+            timelineView.needsDisplay = true
         }
     }
 
@@ -118,11 +122,17 @@ final class TimelineNSView: ActiveCursorView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { nil }
+    required init?(coder: NSCoder) {
+        nil
+    }
 
-    override var isFlipped: Bool { true }
+    override var isFlipped: Bool {
+        true
+    }
 
-    private var pps: CGFloat { CGFloat(model.pointsPerSecond) }
+    private var pps: CGFloat {
+        CGFloat(model.pointsPerSecond)
+    }
 
     override func draw(_ dirtyRect: NSRect) {
         guard let ctx = NSGraphicsContext.current?.cgContext, model.duration > 0 else { return }
@@ -141,7 +151,7 @@ final class TimelineNSView: ActiveCursorView {
         let lastIndex = min(Int(ceil(model.duration / secondsPerTile)), Int(dirtyRect.maxX / tileW) + 1)
         guard firstIndex <= lastIndex else { return }
 
-        for index in firstIndex...lastIndex {
+        for index in firstIndex ... lastIndex {
             let key = ThumbnailStrip.TileKey(band: band, index: index)
             let rect = NSRect(x: CGFloat(index) * tileW, y: 8, width: tileW, height: bounds.height - 22)
             if let image = tileImages[key] {
@@ -165,10 +175,10 @@ final class TimelineNSView: ActiveCursorView {
         Task { @MainActor [weak self] in
             let image = await strip.tile(for: key)
             guard let self else { return }
-            self.pendingTiles.remove(key)
+            pendingTiles.remove(key)
             if let image {
-                self.tileImages[key] = image
-                self.needsDisplay = true
+                tileImages[key] = image
+                needsDisplay = true
             }
         }
     }

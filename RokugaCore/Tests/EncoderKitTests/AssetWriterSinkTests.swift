@@ -1,8 +1,8 @@
 import AVFoundation
 import CoreMedia
+import SettingsKit
 import XCTest
 @testable import EncoderKit
-import SettingsKit
 
 final class AssetWriterSinkTests: XCTestCase {
     private var outputURL: URL!
@@ -66,17 +66,17 @@ final class AssetWriterSinkTests: XCTestCase {
             decodeTimeStamp: .invalid
         )
         var sampleBuffer: CMSampleBuffer?
-        CMSampleBufferCreateReadyWithImageBuffer(
+        try CMSampleBufferCreateReadyWithImageBuffer(
             allocator: kCFAllocatorDefault,
             imageBuffer: buffer,
-            formatDescription: try XCTUnwrap(formatDescription),
+            formatDescription: XCTUnwrap(formatDescription),
             sampleTiming: &timing,
             sampleBufferOut: &sampleBuffer
         )
         return try XCTUnwrap(sampleBuffer)
     }
 
-    private func makeSystemAudioSampleBuffer(pts: CMTime, frames: AVAudioFrameCount = 1_600) throws -> CMSampleBuffer {
+    private func makeSystemAudioSampleBuffer(pts: CMTime, frames: AVAudioFrameCount = 1600) throws -> CMSampleBuffer {
         let buffer = try XCTUnwrap(
             AVAudioPCMBuffer(
                 pcmFormat: AudioMixer.canonicalFormat,
@@ -84,9 +84,9 @@ final class AssetWriterSinkTests: XCTestCase {
             )
         )
         buffer.frameLength = frames
-        for channel in 0..<Int(buffer.format.channelCount) {
+        for channel in 0 ..< Int(buffer.format.channelCount) {
             guard let samples = buffer.floatChannelData?[channel] else { continue }
-            for frame in 0..<Int(frames) {
+            for frame in 0 ..< Int(frames) {
                 samples[frame] = 0.1
             }
         }
@@ -97,7 +97,7 @@ final class AssetWriterSinkTests: XCTestCase {
     private func appendPaced(_ sink: AssetWriterSink, frames: Range<Int>, ptsOffset: CMTimeValue = 0) async throws {
         for frame in frames {
             let pts = CMTime(value: ptsOffset + CMTimeValue(frame), timescale: 30)
-            sink.append(try makeVideoSampleBuffer(pts: pts), of: .video)
+            try sink.append(makeVideoSampleBuffer(pts: pts), of: .video)
             try await Task.sleep(nanoseconds: 33_000_000)
         }
     }
@@ -127,7 +127,7 @@ final class AssetWriterSinkTests: XCTestCase {
         let sink = AssetWriterSink(outputURL: outputURL, configuration: makeConfiguration())
         try await sink.start()
 
-        try await appendPaced(sink, frames: 0..<30)
+        try await appendPaced(sink, frames: 0 ..< 30)
 
         let url = try await sink.finish()
         XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
@@ -154,7 +154,7 @@ final class AssetWriterSinkTests: XCTestCase {
             collectsDetailedStatistics: true
         )
         try await sink.start()
-        sink.append(try makeVideoSampleBuffer(pts: .zero), of: .video)
+        try sink.append(makeVideoSampleBuffer(pts: .zero), of: .video)
         try await Task.sleep(nanoseconds: 50_000_000)
         _ = try await sink.finish()
 
@@ -180,9 +180,9 @@ final class AssetWriterSinkTests: XCTestCase {
         )
         try await sink.start()
 
-        for frame in 0..<10 {
-            sink.append(
-                try makeVideoSampleBuffer(
+        for frame in 0 ..< 10 {
+            try sink.append(
+                makeVideoSampleBuffer(
                     pts: CMTime(value: CMTimeValue(frame), timescale: 30),
                     width: width,
                     height: height
@@ -239,9 +239,9 @@ final class AssetWriterSinkTests: XCTestCase {
             configuration: makeConfiguration(frameRateMode: .variable)
         )
         try await sink.start()
-        sink.append(try makeVideoSampleBuffer(pts: .zero), of: .video)
+        try sink.append(makeVideoSampleBuffer(pts: .zero), of: .video)
         try await Task.sleep(nanoseconds: 100_000_000)
-        sink.append(try makeVideoSampleBuffer(pts: CMTime(value: 1, timescale: 5)), of: .video)
+        try sink.append(makeVideoSampleBuffer(pts: CMTime(value: 1, timescale: 5)), of: .video)
         try await Task.sleep(nanoseconds: 100_000_000)
 
         let url = try await sink.finish()
@@ -258,7 +258,7 @@ final class AssetWriterSinkTests: XCTestCase {
             configuration: makeConfiguration(frameRateMode: .variable)
         )
         try await sink.start()
-        sink.append(try makeVideoSampleBuffer(pts: .zero), of: .video)
+        try sink.append(makeVideoSampleBuffer(pts: .zero), of: .video)
         try await Task.sleep(nanoseconds: 350_000_000)
 
         let url = try await sink.finish()
@@ -275,7 +275,7 @@ final class AssetWriterSinkTests: XCTestCase {
             configuration: makeConfiguration(frameRateMode: .constant)
         )
         try await sink.start()
-        sink.append(try makeVideoSampleBuffer(pts: .zero), of: .video)
+        try sink.append(makeVideoSampleBuffer(pts: .zero), of: .video)
         try await Task.sleep(nanoseconds: 350_000_000)
 
         let url = try await sink.finish()
@@ -296,10 +296,10 @@ final class AssetWriterSinkTests: XCTestCase {
             configuration: makeConfiguration(capturesSystemAudio: true, frameRateMode: .constant)
         )
         try await sink.start()
-        sink.append(try makeVideoSampleBuffer(pts: .zero), of: .video)
-        for chunk in 0..<11 {
-            sink.append(
-                try makeSystemAudioSampleBuffer(pts: CMTime(value: CMTimeValue(chunk * 1_600), timescale: 48_000)),
+        try sink.append(makeVideoSampleBuffer(pts: .zero), of: .video)
+        for chunk in 0 ..< 11 {
+            try sink.append(
+                makeSystemAudioSampleBuffer(pts: CMTime(value: CMTimeValue(chunk * 1600), timescale: 48000)),
                 of: .systemAudio
             )
             try await Task.sleep(nanoseconds: 33_000_000)
@@ -326,13 +326,13 @@ final class AssetWriterSinkTests: XCTestCase {
         )
         try await sink.start()
 
-        for frame in 0..<30 {
-            sink.append(
-                try makeVideoSampleBuffer(pts: CMTime(value: CMTimeValue(frame), timescale: 30)),
+        for frame in 0 ..< 30 {
+            try sink.append(
+                makeVideoSampleBuffer(pts: CMTime(value: CMTimeValue(frame), timescale: 30)),
                 of: .video
             )
-            sink.append(
-                try makeSystemAudioSampleBuffer(pts: CMTime(value: CMTimeValue(frame * 1_600), timescale: 48_000)),
+            try sink.append(
+                makeSystemAudioSampleBuffer(pts: CMTime(value: CMTimeValue(frame * 1600), timescale: 48000)),
                 of: .systemAudio
             )
             try await Task.sleep(nanoseconds: 33_000_000)
@@ -350,11 +350,11 @@ final class AssetWriterSinkTests: XCTestCase {
         let sink = AssetWriterSink(outputURL: outputURL, configuration: makeConfiguration())
         try await sink.start()
 
-        try await appendPaced(sink, frames: 0..<15)
+        try await appendPaced(sink, frames: 0 ..< 15)
         sink.markPaused()
         sink.markResumed()
         // Source clock jumped 10 seconds while paused.
-        try await appendPaced(sink, frames: 0..<15, ptsOffset: 300)
+        try await appendPaced(sink, frames: 0 ..< 15, ptsOffset: 300)
 
         let url = try await sink.finish()
         let duration = try await AVAsset(url: url).load(.duration)
@@ -365,7 +365,7 @@ final class AssetWriterSinkTests: XCTestCase {
     func testCancelRemovesPartialFile() async throws {
         let sink = AssetWriterSink(outputURL: outputURL, configuration: makeConfiguration())
         try await sink.start()
-        sink.append(try makeVideoSampleBuffer(pts: .zero), of: .video)
+        try sink.append(makeVideoSampleBuffer(pts: .zero), of: .video)
         await sink.cancel()
         XCTAssertFalse(FileManager.default.fileExists(atPath: outputURL.path))
     }

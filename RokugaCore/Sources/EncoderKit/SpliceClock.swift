@@ -6,7 +6,7 @@ import Foundation
 public struct SpliceClock: Sendable {
     private(set) var accumulatedOffset: CMTime = .zero
     private var lastSourcePTS: CMTime?
-    private var lastDuration: CMTime = CMTime(value: 1, timescale: 60)
+    private var lastDuration: CMTime = .init(value: 1, timescale: 60)
     private var awaitingResumeAnchor = false
 
     public init() {}

@@ -1,5 +1,5 @@
-import Foundation
 import CoreMedia
+import Foundation
 
 /// The keep-range selected in the trim editor.
 public struct TrimRange: Equatable, Sendable {

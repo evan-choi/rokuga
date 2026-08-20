@@ -37,7 +37,9 @@ public actor ThumbnailStrip {
     }
 
     public func tile(for key: TileKey) async -> CGImage? {
-        if let cached = cache[key] { return cached }
+        if let cached = cache[key] {
+            return cached
+        }
         guard !inFlight.contains(key) else { return nil }
         inFlight.insert(key)
         defer { inFlight.remove(key) }

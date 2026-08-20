@@ -57,7 +57,7 @@ public enum DisplayScale {
 
         var bestArea: CGFloat = -1
         var bestDisplayID: CGDirectDisplayID?
-        for index in 0..<Int(count) {
+        for index in 0 ..< Int(count) {
             let bounds = CGDisplayBounds(displays[index])
             let intersection = bounds.intersection(rect)
             let area = intersection.width * intersection.height
@@ -86,18 +86,18 @@ public enum CaptureTarget: Equatable, Sendable {
     public var globalFrame: CGRect {
         switch self {
         case let .display(display, _):
-            return display.frame
+            display.frame
         case let .window(window):
-            return window.frame
+            window.frame
         }
     }
 
     private var displayID: CGDirectDisplayID? {
         switch self {
         case let .display(display, _):
-            return display.displayID
+            display.displayID
         case let .window(window):
-            return DisplayScale.displayID(forCGRect: window.frame)
+            DisplayScale.displayID(forCGRect: window.frame)
         }
     }
 

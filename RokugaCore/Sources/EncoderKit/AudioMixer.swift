@@ -4,17 +4,18 @@ import Foundation
 /// Sums the microphone into the system-audio stream, producing the single AAC-bound track required by the audio-capture spec (task 3.3).
 ///
 /// The continuous SCStream system-audio clock drives output timing.
-/// Mic buffers queue in a bounded FIFO and are consumed sample-for-sample as system buffers arrive, which absorbs the two sources' independent buffer cadences without timestamp gymnastics.
+/// Mic buffers queue in a bounded FIFO and are consumed sample-for-sample as system buffers arrive, which absorbs the two sources' independent buffer cadences
+/// without timestamp gymnastics.
 public final class AudioMixer: @unchecked Sendable {
     public static let canonicalFormat = AVAudioFormat(
         commonFormat: .pcmFormatFloat32,
-        sampleRate: 48_000,
+        sampleRate: 48000,
         channels: 2,
         interleaved: false
     )!
 
     /// Bound the FIFO to 2 seconds so a stalled system stream cannot grow memory unbounded.
-    private static let maxQueuedFrames = 96_000
+    private static let maxQueuedFrames = 96000
 
     private let lock = NSLock()
     private var micFIFO: [[Float]] = [[], []]
@@ -28,7 +29,7 @@ public final class AudioMixer: @unchecked Sendable {
         guard frames > 0, let channelData = canonical.floatChannelData else { return }
 
         lock.withLock {
-            for channel in 0..<2 {
+            for channel in 0 ..< 2 {
                 let source = channelData[min(channel, Int(canonical.format.channelCount) - 1)]
                 micFIFO[channel].append(contentsOf: UnsafeBufferPointer(start: source, count: frames))
                 if micFIFO[channel].count > Self.maxQueuedFrames {
@@ -46,7 +47,7 @@ public final class AudioMixer: @unchecked Sendable {
         let frames = Int(canonical.frameLength)
 
         lock.withLock {
-            for channel in 0..<2 {
+            for channel in 0 ..< 2 {
                 let available = min(frames, micFIFO[channel].count)
                 guard available > 0 else { continue }
                 let mic = micFIFO[channel].prefix(available)
@@ -62,7 +63,9 @@ public final class AudioMixer: @unchecked Sendable {
 
     private func convertToCanonical(_ buffer: AVAudioPCMBuffer) -> AVAudioPCMBuffer? {
         let format = buffer.format
-        if format == Self.canonicalFormat { return buffer }
+        if format == Self.canonicalFormat {
+            return buffer
+        }
 
         let key = "\(format.sampleRate)-\(format.channelCount)-\(format.commonFormat.rawValue)-\(format.isInterleaved)"
         let converter: AVAudioConverter
