@@ -5,13 +5,13 @@ import Foundation
 import SettingsKit
 import TrimKit
 
-/// Performance benchmark harness (tasks 10.2/10.3/10.4).
-///
-/// `rokuga-bench throughput [--width W] [--height H] [--fps N] [--seconds S] [--codec hevc|h264]`
-///   Paces synthesized BGRA frames through the real encode sink at wall-clock rate and
-///   reports drop rate, PTS drift, CPU usage, and peak memory as JSON.
-/// `rokuga-bench latency`
-///   Measures record→first-frame, stop→playable, and passthrough-trim durations.
+// Performance benchmark harness (tasks 10.2/10.3/10.4).
+//
+// `rokuga-bench throughput [--width W] [--height H] [--fps N] [--seconds S] [--codec hevc|h264]`
+//   Paces synthesized BGRA frames through the real encode sink at wall-clock rate and
+//   reports drop rate, PTS drift, CPU usage, and peak memory as JSON.
+// `rokuga-bench latency`
+//   Measures record→first-frame, stop→playable, and passthrough-trim durations.
 
 struct BenchArgs {
     var width = 3840
@@ -64,7 +64,7 @@ final class FramePump {
             kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
             kCVPixelBufferWidthKey as String: width,
             kCVPixelBufferHeightKey as String: height,
-            kCVPixelBufferIOSurfacePropertiesKey as String: [:],
+            kCVPixelBufferIOSurfacePropertiesKey as String: [:]
         ] as CFDictionary, &pool)
         self.pool = pool!
     }
@@ -131,7 +131,7 @@ func runThroughput(_ args: BenchArgs) async throws -> [String: Any] {
     let cpuStart = cpuSecondsUsed()
     var generated = 0
 
-    for index in 0..<totalFrames {
+    for index in 0 ..< totalFrames {
         let deadline = wallStart + Double(index) * interval
         let now = CFAbsoluteTimeGetCurrent()
         if deadline > now {
@@ -171,7 +171,7 @@ func runThroughput(_ args: BenchArgs) async throws -> [String: Any] {
         "ptsDriftSeconds": abs(duration - expectedDuration),
         "cpuPercentOfOneCore": cpuSeconds / wallSeconds * 100,
         "peakMemoryMB": Double(peakMemoryBytes()) / 1_048_576,
-        "stopToPlayableSeconds": stopSeconds,
+        "stopToPlayableSeconds": stopSeconds
     ]
 }
 
@@ -190,7 +190,7 @@ func runLatency() async throws -> [String: Any] {
     sink.append(firstFrame, of: .video)
     let recordToFirstFrame = CFAbsoluteTimeGetCurrent() - startBegin
 
-    for index in 1..<180 {
+    for index in 1 ..< 180 {
         if let frame = pump.frame(index: index, fps: args.fps) {
             sink.append(frame, of: .video)
         }
@@ -217,7 +217,7 @@ func runLatency() async throws -> [String: Any] {
         "benchmark": "latency",
         "recordToFirstFrameSeconds": recordToFirstFrame,
         "stopToPlayableSeconds": stopToPlayable,
-        "passthroughTrimSeconds": trimSeconds,
+        "passthroughTrimSeconds": trimSeconds
     ]
 }
 

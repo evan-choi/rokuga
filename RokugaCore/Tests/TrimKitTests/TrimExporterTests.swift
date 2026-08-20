@@ -122,20 +122,20 @@ final class TrimExporterTests: XCTestCase {
         let input = AVAssetWriterInput(mediaType: .video, outputSettings: [
             AVVideoCodecKey: codec,
             AVVideoWidthKey: 320,
-            AVVideoHeightKey: 240,
+            AVVideoHeightKey: 240
         ])
         input.expectsMediaDataInRealTime = false
         let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input, sourcePixelBufferAttributes: [
             kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
             kCVPixelBufferWidthKey as String: 320,
-            kCVPixelBufferHeightKey as String: 240,
+            kCVPixelBufferHeightKey as String: 240
         ])
         writer.add(input)
         XCTAssertTrue(writer.startWriting())
         writer.startSession(atSourceTime: .zero)
 
         let frameCount = Int(fps) * durationSeconds
-        for frame in 0..<frameCount {
+        for frame in 0 ..< frameCount {
             while !input.isReadyForMoreMediaData {
                 try await Task.sleep(nanoseconds: 5_000_000)
             }
@@ -144,7 +144,11 @@ final class TrimExporterTests: XCTestCase {
             CVPixelBufferPoolCreatePixelBuffer(nil, pool, &pixelBuffer)
             guard let pixelBuffer else { throw TrimExportError.failed("no buffer") }
             CVPixelBufferLockBaseAddress(pixelBuffer, [])
-            memset(CVPixelBufferGetBaseAddress(pixelBuffer), UInt8(frame % 255).byteSwapped == 0 ? 0 : Int32(frame % 255), CVPixelBufferGetDataSize(pixelBuffer))
+            memset(
+                CVPixelBufferGetBaseAddress(pixelBuffer),
+                UInt8(frame % 255).byteSwapped == 0 ? 0 : Int32(frame % 255),
+                CVPixelBufferGetDataSize(pixelBuffer)
+            )
             CVPixelBufferUnlockBaseAddress(pixelBuffer, [])
             adaptor.append(pixelBuffer, withPresentationTime: CMTime(value: CMTimeValue(frame), timescale: fps))
         }
