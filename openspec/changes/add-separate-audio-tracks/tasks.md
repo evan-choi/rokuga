@@ -20,3 +20,8 @@
 
 - [x] 4.1 Update README audio capabilities to describe Mixed as the default and Separate as a MOV editing option.
 - [x] 4.2 Run `swift test`, unsigned `xcodebuild`, SwiftLint, SwiftFormat, localization checks, `git diff --check`, and `openspec validate add-separate-audio-tracks --strict`.
+
+## 5. MP4 separate tracks
+
+- [ ] 5.1 Preserve Separate across MP4/MOV changes, enable the option for both containers, update playback guidance, and cover settings/configuration behavior.
+- [ ] 5.2 Verify two titled, isolated AAC tracks in MP4, update README, and rerun all validation gates.

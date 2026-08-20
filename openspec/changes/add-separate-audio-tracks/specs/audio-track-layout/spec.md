@@ -8,7 +8,7 @@ The app SHALL provide a persisted Audio setting with `Mixed` and `Separate` valu
 - **THEN** the Audio setting shows `Mixed` and the next recording uses the mixed layout
 
 #### Scenario: Layout persists
-- **WHEN** the user selects `Separate`, quits, and relaunches the app while MOV remains selected
+- **WHEN** the user selects `Separate`, quits, and relaunches the app
 - **THEN** the Audio setting still shows `Separate`
 
 #### Scenario: Layout is locked during recording
@@ -30,11 +30,11 @@ In `Mixed` mode, the app SHALL preserve the existing output behavior. When syste
 - **WHEN** both audio sources are disabled
 - **THEN** the recording contains no audio track regardless of the saved layout
 
-### Requirement: Separate MOV tracks
-In `Separate` mode with both sources enabled, the app SHALL write a MOV file with two 48 kHz stereo AAC tracks instead of applying the audio-capture capability's default single-track mix: system audio first and microphone second. The system-audio track MUST NOT contain microphone samples, and the microphone track MUST NOT contain system-audio samples. The tracks SHALL carry locale-neutral titles `System Audio` and `Microphone`. The selected AAC bitrate SHALL apply to each track independently.
+### Requirement: Separate audio tracks
+In `Separate` mode with both sources enabled, the app SHALL write an MP4 or MOV file with two 48 kHz stereo AAC tracks instead of applying the audio-capture capability's default single-track mix: system audio first and microphone second. The system-audio track MUST NOT contain microphone samples, and the microphone track MUST NOT contain system-audio samples. The tracks SHALL carry locale-neutral titles `System Audio` and `Microphone`. The selected AAC bitrate SHALL apply to each track independently.
 
 #### Scenario: Both sources are separated
-- **WHEN** `Separate` and MOV are selected and both audio sources produce sound
+- **WHEN** `Separate` is selected for MP4 or MOV and both audio sources produce sound
 - **THEN** the file contains two AAC tracks whose first track contains only system audio and whose second track contains only microphone audio
 
 #### Scenario: Tracks are identified
@@ -43,18 +43,18 @@ In `Separate` mode with both sources enabled, the app SHALL write a MOV file wit
 
 #### Scenario: One source in Separate mode
 - **WHEN** `Separate` is selected and exactly one audio source is enabled
-- **THEN** the MOV file contains one titled AAC track for the enabled source
+- **THEN** the output file contains one titled AAC track for the enabled source
 
-### Requirement: MOV-only compatibility constraint
-The `Separate` option SHALL be available only when MOV is selected. While MP4 is selected, the option MUST be disabled with an explanation that separate tracks are intended for editing and are not consistently supported by MP4 players. If the user changes the container from MOV to MP4 while `Separate` is selected, the app SHALL change the saved layout to `Mixed` before the next recording.
+### Requirement: Container-independent separate layout
+The `Separate` option SHALL be available for MP4 and MOV. Changing the container MUST preserve the selected layout. The Audio settings SHALL explain that separate tracks are intended for editing and some players may play only one track.
 
-#### Scenario: Separate is unavailable for MP4
-- **WHEN** MP4 is selected
-- **THEN** the `Separate` option is disabled and the Audio settings explain the MOV requirement
+#### Scenario: Separate is available for MP4
+- **WHEN** MP4 is selected and both audio sources are enabled
+- **THEN** the user can select `Separate` and the next recording contains two audio tracks
 
 #### Scenario: Container changes to MP4
 - **WHEN** `Separate` is selected and the user changes the container to MP4
-- **THEN** the track layout changes to `Mixed` and the next recording contains at most one audio track
+- **THEN** the track layout remains `Separate` and the next recording contains separate audio tracks
 
 #### Scenario: Separate playback guidance
 - **WHEN** `Separate` is available in Audio settings
@@ -69,7 +69,7 @@ All audio tracks SHALL use source presentation timestamps adjusted by the record
 
 #### Scenario: Separate tracks finalize together
 - **WHEN** the user stops a recording with two audio tracks
-- **THEN** both tracks are finalized in the same playable MOV file
+- **THEN** both tracks are finalized in the same playable MP4 or MOV file
 
 #### Scenario: Start failure cleans up
 - **WHEN** either separate audio input cannot be configured before recording starts
