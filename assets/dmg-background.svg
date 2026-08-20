@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f3f4f8"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="360" fill="url(#background)"/>
+  <circle cx="239" cy="57" r="14" fill="#ff503f"/>
+  <circle cx="239" cy="57" r="6" fill="#ffffff"/>
+  <text x="263" y="66" fill="#202124" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="26" font-weight="650">Rokuga</text>
+  <text x="300" y="108" fill="#6e6e73" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" text-anchor="middle">Drag Rokuga to Applications</text>
+  <path d="M246 202H354M346 194L354 202L346 210" fill="none" stroke="#ff503f" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+</svg>

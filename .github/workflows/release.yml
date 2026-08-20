@@ -118,11 +118,46 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           DMG_FILENAME="$APP_NAME-$VERSION.dmg"
           DMG_TEMP="$RUNNER_TEMP/dmg-root"
-          mkdir -p "$DMG_TEMP"
+          DMG_RW="$RUNNER_TEMP/$APP_NAME-rw.dmg"
+          DMG_MOUNT="$RUNNER_TEMP/dmg-mount"
+          mkdir -p "$DMG_TEMP/.background" "$DMG_MOUNT"
           cp -R "$RUNNER_TEMP/export/$APP_NAME.app" "$DMG_TEMP/"
           ln -s /Applications "$DMG_TEMP/Applications"
+          sips -s format png assets/dmg-background.svg \
+            --out "$DMG_TEMP/.background/background.png" >/dev/null
+          touch "$DMG_TEMP/.metadata_never_index"
           hdiutil create -volname "$APP_NAME" -srcfolder "$DMG_TEMP" \
-            -ov -format UDZO "$RUNNER_TEMP/$DMG_FILENAME"
+            -ov -format UDRW "$DMG_RW"
+          DEVICE=$(hdiutil attach -readwrite -noverify -noautoopen \
+            -mountpoint "$DMG_MOUNT" "$DMG_RW" | awk '/^\/dev\// { print $1; exit }')
+          trap 'hdiutil detach "$DEVICE" >/dev/null 2>&1 || true' EXIT
+          osascript <<'APPLESCRIPT'
+          tell application "Finder"
+            tell disk "Rokuga"
+              open
+              set current view of container window to icon view
+              set toolbar visible of container window to false
+              set statusbar visible of container window to false
+              set bounds of container window to {100, 100, 700, 460}
+              set viewOptions to icon view options of container window
+              set arrangement of viewOptions to not arranged
+              set icon size of viewOptions to 96
+              set text size of viewOptions to 14
+              set background picture of viewOptions to file ".background:background.png"
+              set position of item "Rokuga.app" of container window to {160, 205}
+              set position of item "Applications" of container window to {440, 205}
+              close
+              open
+              update without registering applications
+              delay 2
+            end tell
+          end tell
+          APPLESCRIPT
+          sync
+          hdiutil detach "$DEVICE"
+          trap - EXIT
+          hdiutil convert "$DMG_RW" -ov -format UDZO \
+            -o "$RUNNER_TEMP/$DMG_FILENAME"
           codesign --force --sign "Developer ID Application" --timestamp \
             "$RUNNER_TEMP/$DMG_FILENAME"
           echo "dmg_path=$RUNNER_TEMP/$DMG_FILENAME" >> "$GITHUB_OUTPUT"
