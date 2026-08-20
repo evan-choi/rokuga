@@ -432,6 +432,7 @@
 					"@executable_path/../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.evan-choi.rokuga";
+				PROVISIONING_PROFILE_SPECIFIER = "$(ROKUGA_PROVISIONING_PROFILE_SPECIFIER)";
 				SDKROOT = macosx;
 			};
 			name = Release;
