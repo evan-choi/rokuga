@@ -11,14 +11,8 @@ concurrency:
 
 jobs:
   test:
-    name: Build & test (${{ matrix.os }})
-    # Spec targets macOS 13.3+; GitHub retired hosted macos-13 runners,
-    # so 13.x coverage moves to the QA matrix (task 10.5) on self-hosted hardware.
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-14, macos-15]
-    runs-on: ${{ matrix.os }}
+    name: Build & test
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
