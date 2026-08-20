@@ -431,7 +431,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.rokuga.Rokuga;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.evan-choi.rokuga";
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -463,7 +463,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.rokuga.Rokuga;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.evan-choi.rokuga";
 				SDKROOT = macosx;
 			};
 			name = Debug;

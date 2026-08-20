@@ -74,7 +74,7 @@ targets:
       - package: KeyboardShortcuts
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: io.rokuga.Rokuga
+        PRODUCT_BUNDLE_IDENTIFIER: com.evan-choi.rokuga
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         COMBINE_HIDPI_IMAGES: YES
 
