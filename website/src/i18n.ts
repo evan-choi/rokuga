@@ -27,10 +27,10 @@ type Copy = {
     selectedArea: string
     fullScreen: string
     window: string
+    options: string
     file: string
     edit: string
     view: string
-    date: string
     demoLabel: string
     hint: string
   }
@@ -79,10 +79,9 @@ type Copy = {
     brewName: string
     brewDescription: string
     brewCommand: string
-    brewButton: string
-    sourceBefore: string
-    sourceLink: string
-    sourceAfter: string
+    brewCopy: string
+    brewCopied: string
+    brewCopyFailed: string
   }
 }
 
@@ -119,10 +118,10 @@ export const translations: Record<Language, Copy> = {
       selectedArea: '선택 영역',
       fullScreen: '전체 화면',
       window: '창',
+      options: '옵션',
       file: '파일',
       edit: '편집',
       view: '보기',
-      date: '8월 19일 수요일  20:24',
       demoLabel: '직접 움직여 보세요',
       hint: '선택 영역을 드래그하거나 가장자리를 잡아 크기를 바꿀 수 있습니다.',
     },
@@ -143,7 +142,7 @@ export const translations: Record<Language, Copy> = {
       frameRateDescription: '30 fps와 60 fps는 물론, 디스플레이 주사율에 맞춰 빠른 움직임도 자연스럽게 기록합니다.',
       matchedRate: 'fps · 144 Hz와 일치',
       codecTitle: 'H.265. 선명함은 남기고, 용량은 덜고.',
-      codecDescription: 'H.264와 H.265 중에서 골라 MP4 또는 MOV로 저장하세요.',
+      codecDescription: 'H.264와 H.265. MP4와 MOV. 원하는 조합으로.',
       resolutionTitle: '최대 5K. 작은 디테일까지 크게.',
       resolutionDescription: 'Retina 디스플레이의 픽셀을 최대 5120 × 2880 해상도로 담습니다.',
       resolutionLimit: '최대 5120 × 2880',
@@ -159,10 +158,10 @@ export const translations: Record<Language, Copy> = {
       watermark: '워터마크 없음',
     },
     download: {
-      kicker: '출시',
-      title: '두 가지 방법으로,',
-      accent: '곧 만나요.',
-      lead: 'Mac App Store와 Homebrew 출시를 준비하고 있습니다.',
+      kicker: '다운로드',
+      title: '원하는 방식으로,',
+      accent: '바로 시작하세요.',
+      lead: 'Mac App Store에서 받거나, Homebrew로 설치하세요.',
       appDescription: 'Mac을 위한 네이티브 화면 녹화 앱',
       appStoreName: 'Mac App Store',
       appStoreDescription: '클릭 한 번으로 설치하고, 업데이트도 자동으로.',
@@ -171,10 +170,9 @@ export const translations: Record<Language, Copy> = {
       brewName: 'Homebrew',
       brewDescription: '터미널 한 줄로 설치하고, Homebrew로 간편하게 업데이트하세요.',
       brewCommand: 'brew install --cask rokuga',
-      brewButton: 'Homebrew 출시 예정',
-      sourceBefore: '코드부터 빌드 과정까지 궁금하다면 ',
-      sourceLink: 'GitHub 저장소',
-      sourceAfter: '에서 확인할 수 있습니다.',
+      brewCopy: '복사',
+      brewCopied: '복사됨',
+      brewCopyFailed: '복사 실패',
     },
   },
   en: {
@@ -202,10 +200,10 @@ export const translations: Record<Language, Copy> = {
       selectedArea: 'Selected Area',
       fullScreen: 'Full Screen',
       window: 'Window',
+      options: 'Options',
       file: 'File',
       edit: 'Edit',
       view: 'View',
-      date: 'Wed Aug 19  8:24 PM',
       demoLabel: 'Try it yourself',
       hint: 'Drag the selection or grab an edge to resize it.',
     },
@@ -242,10 +240,10 @@ export const translations: Record<Language, Copy> = {
       watermark: 'No watermark',
     },
     download: {
-      kicker: 'Availability',
-      title: 'Two ways to get it.',
-      accent: 'Both coming soon.',
-      lead: 'Rokuga is coming to the Mac App Store and Homebrew.',
+      kicker: 'Download',
+      title: 'Choose your way.',
+      accent: 'Start recording.',
+      lead: 'Get Rokuga from the Mac App Store or install it with Homebrew.',
       appDescription: 'A native screen recorder made for Mac',
       appStoreName: 'Mac App Store',
       appStoreDescription: 'Install with one click and keep Rokuga up to date automatically.',
@@ -254,10 +252,9 @@ export const translations: Record<Language, Copy> = {
       brewName: 'Homebrew',
       brewDescription: 'Install from the terminal with one command and update with Homebrew.',
       brewCommand: 'brew install --cask rokuga',
-      brewButton: 'Coming soon to Homebrew',
-      sourceBefore: 'Want to inspect the code and build process? Visit the ',
-      sourceLink: 'GitHub repository',
-      sourceAfter: '.',
+      brewCopy: 'Copy',
+      brewCopied: 'Copied',
+      brewCopyFailed: 'Copy failed',
     },
   },
   ja: {
@@ -285,10 +282,10 @@ export const translations: Record<Language, Copy> = {
       selectedArea: '選択範囲',
       fullScreen: 'フルスクリーン',
       window: 'ウインドウ',
+      options: 'オプション',
       file: 'ファイル',
       edit: '編集',
       view: '表示',
-      date: '8月19日 水曜日  20:24',
       demoLabel: '実際に動かしてみる',
       hint: '選択範囲をドラッグしたり、端をつかんでサイズを変更できます。',
     },
@@ -325,10 +322,10 @@ export const translations: Record<Language, Copy> = {
       watermark: 'ウォーターマークなし',
     },
     download: {
-      kicker: 'リリース',
-      title: '2つの方法で。',
-      accent: 'まもなく登場。',
-      lead: 'Mac App StoreとHomebrewでのリリースを準備しています。',
+      kicker: 'ダウンロード',
+      title: '好きな方法で。',
+      accent: 'すぐに始めよう。',
+      lead: 'Mac App Storeから入手するか、Homebrewでインストールできます。',
       appDescription: 'Macのためのネイティブ画面収録アプリ',
       appStoreName: 'Mac App Store',
       appStoreDescription: 'ワンクリックでインストール。アップデートも自動で。',
@@ -337,10 +334,9 @@ export const translations: Record<Language, Copy> = {
       brewName: 'Homebrew',
       brewDescription: 'ターミナルから1行でインストールし、Homebrewで手軽にアップデートできます。',
       brewCommand: 'brew install --cask rokuga',
-      brewButton: 'Homebrewで近日公開',
-      sourceBefore: 'コードやビルド手順を確認するなら、',
-      sourceLink: 'GitHubリポジトリ',
-      sourceAfter: 'をご覧ください。',
+      brewCopy: 'コピー',
+      brewCopied: 'コピー済み',
+      brewCopyFailed: 'コピー失敗',
     },
   },
   'zh-Hans': {
@@ -368,10 +364,10 @@ export const translations: Record<Language, Copy> = {
       selectedArea: '所选区域',
       fullScreen: '全屏',
       window: '窗口',
+      options: '选项',
       file: '文件',
       edit: '编辑',
       view: '显示',
-      date: '8月19日 周三  20:24',
       demoLabel: '亲手试一试',
       hint: '拖动所选区域，或抓住边缘调整大小。',
     },
@@ -408,10 +404,10 @@ export const translations: Record<Language, Copy> = {
       watermark: '无水印',
     },
     download: {
-      kicker: '发布',
-      title: '两种方式。',
-      accent: '即将推出。',
-      lead: 'Rokuga 正在准备登陆 Mac App Store 和 Homebrew。',
+      kicker: '下载',
+      title: '选择你的方式。',
+      accent: '立即开始。',
+      lead: '从 Mac App Store 获取 Rokuga，或通过 Homebrew 安装。',
       appDescription: '专为 Mac 打造的原生屏幕录制应用',
       appStoreName: 'Mac App Store',
       appStoreDescription: '一键安装，自动保持最新版本。',
@@ -420,10 +416,9 @@ export const translations: Record<Language, Copy> = {
       brewName: 'Homebrew',
       brewDescription: '在终端输入一行命令即可安装，并通过 Homebrew 轻松更新。',
       brewCommand: 'brew install --cask rokuga',
-      brewButton: '即将登陆 Homebrew',
-      sourceBefore: '想查看代码和构建过程？请访问',
-      sourceLink: 'GitHub 仓库',
-      sourceAfter: '。',
+      brewCopy: '复制',
+      brewCopied: '已复制',
+      brewCopyFailed: '复制失败',
     },
   },
 }

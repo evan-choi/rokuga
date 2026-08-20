@@ -4,9 +4,9 @@
 
 Rokuga is a menu bar app with a floating recording toolbar. It records directly to a Finder folder using ScreenCaptureKit and AVFoundation.
 
-## Current status
+## Download
 
-Rokuga is under active development. Distribution through the Mac App Store and Homebrew is planned, and both releases are currently in preparation. The app can be built from source and requires macOS 15 Sequoia or later.
+Get Rokuga from the Mac App Store or install it with Homebrew. The app is free and requires macOS 15 Sequoia or later.
 
 ## Recording
 
@@ -15,7 +15,7 @@ Rokuga is under active development. Distribution through the Mac App Store and H
 - Frame rates: 30 fps, 60 fps, or matched to the display
 - Audio: driver-free system audio capture
 - Limits: no time limit and no watermark
-- Planned distribution: Mac App Store and Homebrew
+- Distribution: Mac App Store and Homebrew
 
 ## Languages
 
@@ -24,5 +24,5 @@ English, Korean, Japanese, and Simplified Chinese.
 ## Links
 
 - Website: https://evan-choi.github.io/rokuga/
-- Source and build instructions: https://github.com/evan-choi/rokuga
+- Source: https://github.com/evan-choi/rokuga
 - License: https://github.com/evan-choi/rokuga/blob/main/LICENSE

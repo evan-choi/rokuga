@@ -344,7 +344,7 @@ h1 .accent {
   font-weight: 600;
 }
 
-.apple-logo { width: 12px; font-size: 14px; line-height: 1; text-align: center; }
+.apple-logo { width: 10px; height: 13px; opacity: .84; }
 .mac-menu .grow { flex: 1; }
 
 .full-screen-target,
@@ -363,17 +363,39 @@ h1 .accent {
 }
 
 .window-target {
-  top: 18%;
-  left: 20%;
-  width: 60%;
-  height: 58%;
+  z-index: 1;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, .42);
   border-radius: 18px;
   background: rgba(30, 32, 43, .76);
-  box-shadow: 0 30px 90px rgba(0, 0, 0, .44), 0 0 0 100vmax rgba(0, 0, 0, .36);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .44);
   backdrop-filter: blur(24px) saturate(140%);
   transform: scale(.96);
+}
+
+.window-target-primary {
+  top: 17%;
+  left: 13%;
+  width: 55%;
+  height: 54%;
+}
+
+.window-target-secondary {
+  top: 31%;
+  right: 12%;
+  z-index: 2;
+  width: 45%;
+  height: 43%;
+}
+
+.window-target::after {
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  border-radius: inherit;
+  background: transparent;
+  content: "";
+  pointer-events: none;
 }
 
 .window-target-bar {
@@ -420,6 +442,20 @@ h1 .accent {
 .product-stage[data-mode="window"] .window-target {
   opacity: 1;
   transform: scale(1);
+}
+
+.product-stage[data-mode="fullScreen"] {
+  cursor: url("../../App/Resources/Assets.xcassets/ScreenshotWindowCursor.imageset/screenshotwindow.svg") 16 16, crosshair;
+}
+
+.product-stage[data-mode="window"] .window-target {
+  pointer-events: auto;
+  cursor: url("../../App/Resources/Assets.xcassets/ScreenshotWindowCursor.imageset/screenshotwindow.svg") 16 16, crosshair;
+}
+
+.product-stage[data-mode="window"] .window-target:hover::after {
+  border-color: rgba(10, 132, 255, .6);
+  background: rgba(10, 132, 255, .25);
 }
 
 .product-stage:not([data-mode="selectedArea"]) .selection {
@@ -530,6 +566,7 @@ h1 .accent {
   background: rgba(30, 30, 35, .70);
   box-shadow: inset 0 1px rgba(255, 255, 255, .06);
   backdrop-filter: blur(18px) brightness(55%) saturate(140%);
+  cursor: default;
   filter: drop-shadow(0 18px 28px rgba(0, 0, 0, .42));
   transform: translateX(-50%);
 }
@@ -587,7 +624,8 @@ h1 .accent {
 .full-screen-symbol { mask-image: url("./assets/rectangle-inset-filled@2x.png"); }
 .window-symbol { mask-image: url("./assets/macwindow@2x.png"); }
 
-.toolbar-mode::after {
+.toolbar-mode::after,
+.toolbar-options::after {
   position: absolute;
   bottom: calc(100% + 17px);
   left: 50%;
@@ -612,7 +650,9 @@ h1 .accent {
 }
 
 .toolbar-mode:hover::after,
-.toolbar-mode:focus-visible::after {
+.toolbar-mode:focus-visible::after,
+.toolbar-options:hover::after,
+.toolbar-options:focus-visible::after {
   opacity: 1;
   transform: translate(-50%, 0);
   visibility: visible;
@@ -635,12 +675,21 @@ h1 .accent {
 }
 
 .toolbar-options {
+  position: relative;
   width: 30px;
   height: 30px;
+  padding: 0;
   display: grid;
   place-items: center;
+  border: 0;
+  border-radius: 7px;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
 }
 
+.toolbar-options:hover { background: rgba(255, 255, 255, .045); }
+.toolbar-options:focus-visible { outline: 2px solid rgba(255, 255, 255, .55); outline-offset: -2px; }
 .toolbar-options svg { width: 18px; height: 18px; }
 .toolbar-options circle {
   fill: #242429;
@@ -1090,6 +1139,7 @@ h2 {
 
 .download-main,
 .brew-card {
+  min-width: 0;
   min-height: 480px;
   display: flex;
   flex-direction: column;
@@ -1153,25 +1203,45 @@ h2 {
 .brew-command {
   margin: 0 0 28px;
   padding: 17px 18px;
-  overflow-x: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  overflow: hidden;
   border-radius: 14px;
   color: #f5f5f7;
   background: #17171a;
+}
+
+.brew-command code {
+  min-width: 0;
+  overflow-x: auto;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 13px;
   white-space: nowrap;
 }
 
-.source-note {
-  margin-top: 18px;
-  padding: 17px 19px;
-  border-radius: 14px;
-  color: #525650;
-  background: var(--surface);
-  font-size: 13px;
+.brew-copy-button {
+  min-height: 34px;
+  padding: 0 11px;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 9px;
+  color: #f5f5f7;
+  background: rgba(255, 255, 255, .12);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.source-note a { font-weight: 700; text-underline-offset: 3px; }
+.brew-copy-button:hover { background: rgba(255, 255, 255, .18); }
+.brew-copy-button:focus-visible { outline: none; box-shadow: inset 0 0 0 2px #fff; }
+.brew-copy-button[data-state="copied"] { color: #7ee787; }
+.brew-copy-button[data-state="error"] { color: #ff9f8f; }
+.brew-copy-button svg { width: 15px; height: 15px; }
 
 footer {
   padding: 34px 0 44px;
@@ -1230,7 +1300,8 @@ footer {
   .product-shell { margin-inline: -8px; padding: 6px; border-radius: 24px; }
   .product-stage { min-height: 420px; aspect-ratio: auto; border-radius: 19px; }
   .product-demo-meta { min-height: 72px; padding: 12px 14px; flex-direction: column; gap: 2px; text-align: center; }
-  .window-target { top: 20%; left: 10%; width: 80%; height: 55%; }
+  .window-target-primary { top: 18%; left: 7%; width: 72%; height: 52%; }
+  .window-target-secondary { top: 33%; right: 7%; width: 62%; height: 40%; }
   .mode-status { top: 42px; right: 11px; }
   .actual-toolbar { bottom: 25px; }
   .highlights { padding: 108px 0; }
@@ -1260,6 +1331,9 @@ footer {
   .free-list span { font-size: 11px; }
   .download-main, .install-card { padding: 29px; }
   .release-copy h2 { font-size: 32px; }
+  .brew-command { gap: 10px; }
+  .brew-copy-button { width: 34px; padding: 0; justify-content: center; }
+  .brew-copy-button span { display: none; }
   .footer-content { align-items: flex-start; flex-wrap: wrap; }
   .footer-content .brand { width: 100%; }
 }
