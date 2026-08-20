@@ -148,7 +148,7 @@ jobs:
 
       - name: Upload artifact (manual runs)
         if: "!startsWith(github.ref, 'refs/tags/v')"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.dmg.outputs.dmg_filename }}
           path: ${{ steps.dmg.outputs.dmg_path }}
