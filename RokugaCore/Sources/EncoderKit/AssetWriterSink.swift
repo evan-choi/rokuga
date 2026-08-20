@@ -28,6 +28,7 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     private var nextConstantFramePTS: CMTime?
     private var lastVideoPTS: CMTime?
     private var lastVideoUptimeNanoseconds: UInt64?
+    private var lastAudioEndPTS: CMTime?
     private var pauseUptimeNanoseconds: UInt64?
     private let collectsDetailedStatistics: Bool
 
@@ -167,7 +168,9 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
             queue.async { [self] in
                 stopConstantFrameOutput(clearFrame: false)
                 let endPTS: CMTime?
-                if let lastVideoPTS, let lastVideoUptimeNanoseconds {
+                if let lastAudioEndPTS {
+                    endPTS = lastAudioEndPTS
+                } else if let lastVideoPTS, let lastVideoUptimeNanoseconds {
                     let endUptimeNanoseconds = pauseUptimeNanoseconds ?? requestedAt
                     let elapsed = endUptimeNanoseconds > lastVideoUptimeNanoseconds
                         ? endUptimeNanoseconds - lastVideoUptimeNanoseconds
@@ -389,7 +392,17 @@ extension AssetWriterSink {
 
     private func appendAudio(_ sampleBuffer: CMSampleBuffer, to input: AVAssetWriterInput) {
         guard let writer else { return }
-        if !input.append(sampleBuffer) {
+        if input.append(sampleBuffer) {
+            let duration = CMSampleBufferGetDuration(sampleBuffer)
+            guard duration.isNumeric, CMTimeCompare(duration, .zero) > 0 else { return }
+            let endPTS = CMTimeAdd(
+                CMSampleBufferGetPresentationTimeStamp(sampleBuffer),
+                duration
+            )
+            if lastAudioEndPTS.map({ CMTimeCompare(endPTS, $0) > 0 }) ?? true {
+                lastAudioEndPTS = endPTS
+            }
+        } else {
             terminalError = RecordingSinkError.writerFailed(writer.error?.localizedDescription ?? "audio append")
         }
     }
@@ -402,10 +415,18 @@ extension AssetWriterSink {
         duration: CMTime? = nil
     ) -> CMSampleBuffer? {
         let originalPTS = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
-        let originalDuration = CMSampleBufferGetDuration(sampleBuffer)
+        var originalTiming = CMSampleTimingInfo()
+        let timingStatus = CMSampleBufferGetSampleTimingInfo(
+            sampleBuffer,
+            at: 0,
+            timingInfoOut: &originalTiming
+        )
+        let originalSampleDuration = timingStatus == noErr
+            ? originalTiming.duration
+            : CMSampleBufferGetDuration(sampleBuffer)
         if CMTimeCompare(originalPTS, pts) == 0 {
             if let duration {
-                if CMTimeCompare(originalDuration, duration) == 0 {
+                if CMTimeCompare(originalSampleDuration, duration) == 0 {
                     return sampleBuffer
                 }
             } else {
@@ -414,7 +435,7 @@ extension AssetWriterSink {
         }
 
         var timing = CMSampleTimingInfo(
-            duration: duration ?? originalDuration,
+            duration: duration ?? originalSampleDuration,
             presentationTimeStamp: pts,
             decodeTimeStamp: .invalid
         )

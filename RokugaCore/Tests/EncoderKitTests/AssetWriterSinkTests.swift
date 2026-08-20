@@ -301,30 +301,13 @@ final class AssetWriterSinkTests: XCTestCase {
             outputURL: outputURL,
             configuration: makeConfiguration(capturesSystemAudio: true, frameRateMode: .constant)
         )
-        let audioTemplate = try makeAudioSampleBuffer(pts: .zero)
         try await sink.start()
         try sink.append(makeVideoSampleBuffer(pts: .zero), of: .video)
-        let startedAt = DispatchTime.now().uptimeNanoseconds
         for chunk in 0 ..< 11 {
-            if chunk > 0 {
-                try await Task.sleep(nanoseconds: 33_000_000)
-            }
-            let elapsed = DispatchTime.now().uptimeNanoseconds - startedAt
-            var timing = CMSampleTimingInfo(
-                duration: CMSampleBufferGetDuration(audioTemplate),
-                presentationTimeStamp: CMTime(value: CMTimeValue(elapsed), timescale: 1_000_000_000),
-                decodeTimeStamp: .invalid
+            try sink.append(
+                makeAudioSampleBuffer(pts: CMTime(value: CMTimeValue(chunk * 1600), timescale: 48000)),
+                of: .systemAudio
             )
-            var audioSample: CMSampleBuffer?
-            let status = CMSampleBufferCreateCopyWithNewTiming(
-                allocator: kCFAllocatorDefault,
-                sampleBuffer: audioTemplate,
-                sampleTimingEntryCount: 1,
-                sampleTimingArray: &timing,
-                sampleBufferOut: &audioSample
-            )
-            XCTAssertEqual(status, noErr)
-            try sink.append(XCTUnwrap(audioSample), of: .systemAudio)
         }
 
         let url = try await sink.finish()
