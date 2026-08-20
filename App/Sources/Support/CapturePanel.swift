@@ -123,10 +123,18 @@ class CapturePanel: NSPanel {
         true
     }
 
+    override func cancelOperation(_ sender: Any?) {
+        if let onEscape {
+            onEscape()
+        } else {
+            super.cancelOperation(sender)
+        }
+    }
+
     override func keyDown(with event: NSEvent) {
         switch event.keyCode {
         case 53:
-            onEscape?()
+            cancelOperation(nil)
         case 36, 76:
             if let onReturn {
                 onReturn()
