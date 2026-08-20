@@ -32,7 +32,11 @@ struct TrimEditorView: View {
             "Export Failed",
             isPresented: Binding(
                 get: { model.exportError != nil },
-                set: { if !$0 { model.exportError = nil } }
+                set: {
+                    if !$0 {
+                        model.exportError = nil
+                    }
+                }
             )
         ) {
             Button("OK", role: .cancel) {}
@@ -70,7 +74,7 @@ struct TrimEditorView: View {
                     get: { log2(model.pointsPerSecond) },
                     set: { model.pointsPerSecond = pow(2, $0) }
                 ),
-                in: log2(TrimEditorModel.minPointsPerSecond)...log2(TrimEditorModel.maxPointsPerSecond)
+                in: log2(TrimEditorModel.minPointsPerSecond) ... log2(TrimEditorModel.maxPointsPerSecond)
             )
             .frame(width: 130)
             .controlSize(.small)

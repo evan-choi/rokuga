@@ -39,9 +39,11 @@ final class AppState: ObservableObject {
             guard let plan = box.take() else { throw RecordingError.captureSourceLost }
             return plan.makeSession()
         }
-#if ROKUGA_PERF
-        if CommandLine.arguments.contains("--perf-toolbar-latency") { return }
-#endif
+        #if ROKUGA_PERF
+            if CommandLine.arguments.contains("--perf-toolbar-latency") {
+                return
+            }
+        #endif
         if let path = settings.lastRecordingPath {
             lastRecordingURL = URL(fileURLWithPath: path)
         }
@@ -289,7 +291,7 @@ final class AppState: ObservableObject {
         let frameRate = settings.frameRate.resolved(displayRefreshRate: target.displayRefreshRate)
         let encoderConfiguration = makeEncoderConfiguration(for: target, frameRate: frameRate)
         let captureConfiguration = CaptureConfiguration.fromSettings(settings, frameRate: frameRate)
-        let coordinator = self.coordinator
+        let coordinator = coordinator
 
         targetBox.fill(
             SessionPlan {
@@ -365,15 +367,19 @@ final class AppState: ObservableObject {
     }
 
     func thumbnailDidClose(_ controller: ThumbnailPanelController) {
-        if thumbnailController === controller { thumbnailController = nil }
+        if thumbnailController === controller {
+            thumbnailController = nil
+        }
     }
 
     func previewDidClose(_ controller: PreviewPanelController) {
-        if previewController === controller { previewController = nil }
+        if previewController === controller {
+            previewController = nil
+        }
     }
 
     private func startDiskWatch(outputURL: URL) {
-        let coordinator = self.coordinator
+        let coordinator = coordinator
         diskMonitor.start(outputFolder: outputURL.deletingLastPathComponent()) { _ in
             Task { try? await coordinator.stop() }
         }
@@ -398,7 +404,9 @@ final class AppState: ObservableObject {
     }
 
     private func displayFor(_ target: CaptureTarget) -> DisplayTarget {
-        if case let .display(display, _) = target { return display }
+        if case let .display(display, _) = target {
+            return display
+        }
         return displayUnderMouse()
     }
 
@@ -424,8 +432,8 @@ final class AppState: ObservableObject {
         elapsedTimer?.invalidate()
         elapsedTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
-                guard let self, let startedAt = self.recordingStartedAt else { return }
-                self.elapsedSeconds = self.accumulatedSeconds + Int(Date().timeIntervalSince(startedAt))
+                guard let self, let startedAt = recordingStartedAt else { return }
+                elapsedSeconds = accumulatedSeconds + Int(Date().timeIntervalSince(startedAt))
             }
         }
     }

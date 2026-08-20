@@ -160,7 +160,9 @@ private final class TooltipTrackingNSView: NSView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { nil }
+    required init?(coder: NSCoder) {
+        nil
+    }
 
     override func updateTrackingAreas() {
         trackingAreas.forEach(removeTrackingArea)
@@ -181,7 +183,9 @@ private final class TooltipTrackingNSView: NSView {
         ToolbarTooltipPresenter.shared.hide()
     }
 
-    override func hitTest(_ point: NSPoint) -> NSView? { nil }
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        nil
+    }
 }
 
 @MainActor

@@ -34,8 +34,8 @@ enum L10nScreenshotRunner {
         exit(0)
     }
 
-    private static func snapshot<V: View>(
-        _ view: V,
+    private static func snapshot(
+        _ view: some View,
         size: NSSize,
         name: String,
         to directory: URL
@@ -104,12 +104,10 @@ enum DarkAppearanceVerificationRunner {
     private static func makeSurface(name: String, view: AnyView, isPanel: Bool) -> AppearanceSurface {
         let frame = NSRect(x: 0, y: 0, width: 760, height: 540)
         let hostingView = NSHostingView(rootView: view)
-        let window: NSWindow
-
-        if isPanel {
-            window = CapturePanel(contentRect: frame, showsWindowShadow: false)
+        let window: NSWindow = if isPanel {
+            CapturePanel(contentRect: frame, showsWindowShadow: false)
         } else {
-            window = NSWindow(
+            NSWindow(
                 contentRect: frame,
                 styleMask: [.titled, .closable],
                 backing: .buffered,

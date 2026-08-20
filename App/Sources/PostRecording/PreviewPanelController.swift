@@ -2,7 +2,8 @@ import AppKit
 import AVKit
 import SwiftUI
 
-/// Post-recording preview panel (task 7.3): expands in place from the thumbnail, AVPlayer + scrub bar, QuickTime-style two-finger horizontal scrub, Edit/Delete/Done.
+/// Post-recording preview panel (task 7.3): expands in place from the thumbnail, AVPlayer + scrub bar, QuickTime-style two-finger horizontal scrub,
+/// Edit/Delete/Done.
 @MainActor
 final class PreviewPanelController {
     private static let size = NSSize(width: 520, height: 380)
@@ -85,15 +86,15 @@ final class PreviewModel: ObservableObject {
         self.url = url
         player = AVPlayer(url: url)
         Task {
-            duration = (try? await player.currentItem?.asset.load(.duration).seconds) ?? 0
+            duration = await (try? player.currentItem?.asset.load(.duration).seconds) ?? 0
         }
         timeObserver = player.addPeriodicTimeObserver(
             forInterval: CMTime(value: 1, timescale: 30),
             queue: .main
         ) { [weak self] time in
             Task { @MainActor [weak self] in
-                guard let self, self.duration > 0 else { return }
-                self.progress = time.seconds / self.duration
+                guard let self, duration > 0 else { return }
+                progress = time.seconds / duration
             }
         }
     }
@@ -224,7 +225,9 @@ final class ScrubbablePlayerNSView: NSView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { nil }
+    required init?(coder: NSCoder) {
+        nil
+    }
 
     override func scrollWheel(with event: NSEvent) {
         guard abs(event.scrollingDeltaX) > abs(event.scrollingDeltaY) else {

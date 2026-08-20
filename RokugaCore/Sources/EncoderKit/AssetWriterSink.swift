@@ -99,13 +99,19 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
             }
             switch kind {
             case .video:
-                if collectsDetailedStatistics { statistics.videoFramesReceived += 1 }
+                if collectsDetailedStatistics {
+                    statistics.videoFramesReceived += 1
+                }
                 appendVideo(sampleBuffer)
             case .systemAudio:
-                if collectsDetailedStatistics { statistics.audioSamplesReceived += 1 }
+                if collectsDetailedStatistics {
+                    statistics.audioSamplesReceived += 1
+                }
                 appendSystemAudio(sampleBuffer)
             case .microphone:
-                if collectsDetailedStatistics { statistics.audioSamplesReceived += 1 }
+                if collectsDetailedStatistics {
+                    statistics.audioSamplesReceived += 1
+                }
                 appendMicrophone(sampleBuffer)
             }
         }
@@ -149,7 +155,9 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
             }
         }
         guard let writer else { throw RecordingSinkError.notStarted }
-        if let terminalError { throw terminalError }
+        if let terminalError {
+            throw terminalError
+        }
 
         guard writer.status == .writing else {
             throw RecordingSinkError.writerFailed(writer.error?.localizedDescription ?? "status \(writer.status.rawValue)")
@@ -318,7 +326,9 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
         let originalDuration = CMSampleBufferGetDuration(sampleBuffer)
         if CMTimeCompare(originalPTS, pts) == 0 {
             if let duration {
-                if CMTimeCompare(originalDuration, duration) == 0 { return sampleBuffer }
+                if CMTimeCompare(originalDuration, duration) == 0 {
+                    return sampleBuffer
+                }
             } else {
                 return sampleBuffer
             }
@@ -400,9 +410,9 @@ public final class AssetWriterSink: MediaSink, @unchecked Sendable {
     private func audioOutputSettings() -> [String: Any] {
         [
             AVFormatIDKey: kAudioFormatMPEG4AAC,
-            AVSampleRateKey: 48_000,
+            AVSampleRateKey: 48000,
             AVNumberOfChannelsKey: 2,
-            AVEncoderBitRateKey: configuration.audioBitrate.rawValue * 1_000
+            AVEncoderBitRateKey: configuration.audioBitrate.rawValue * 1000
         ]
     }
 }

@@ -13,7 +13,9 @@ enum OutputFolderStore {
                 bookmarkDataIsStale: &stale
             ) {
                 _ = url.startAccessingSecurityScopedResource()
-                if !stale { return url }
+                if !stale {
+                    return url
+                }
             }
         }
         let movies = FileManager.default.urls(for: .moviesDirectory, in: .userDomainMask)[0]
@@ -28,7 +30,9 @@ enum OutputFolderStore {
     static func displayPath(for url: URL = currentFolder()) -> String {
         let resolved = url.resolvingSymlinksInPath().path
         let home = realHomeDirectory()
-        if resolved == home { return "~" }
+        if resolved == home {
+            return "~"
+        }
         if resolved.hasPrefix(home + "/") {
             return "~" + resolved.dropFirst(home.count)
         }

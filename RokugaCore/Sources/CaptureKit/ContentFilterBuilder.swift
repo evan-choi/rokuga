@@ -45,9 +45,15 @@ public enum ContentFilterBuilder {
         let desktopIconLevel = Int(CGWindowLevelForKey(.desktopIconWindow))
 
         return content.windows.filter { window in
-            if overlayIDs.contains(window.windowID) { return true }
-            if window.owningApplication?.processID == ownPID { return true }
-            if exclusion.excludeDesktopIcons, window.windowLayer == desktopIconLevel { return true }
+            if overlayIDs.contains(window.windowID) {
+                return true
+            }
+            if window.owningApplication?.processID == ownPID {
+                return true
+            }
+            if exclusion.excludeDesktopIcons, window.windowLayer == desktopIconLevel {
+                return true
+            }
             return false
         }
     }
