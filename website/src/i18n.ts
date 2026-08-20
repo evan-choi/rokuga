@@ -27,7 +27,11 @@ type Copy = {
   }
   product: {
     label: string
+    toolbarLabel: string
     record: string
+    selectedArea: string
+    fullScreen: string
+    window: string
     file: string
     edit: string
     view: string
@@ -107,7 +111,11 @@ export const translations: Record<Language, Copy> = {
     },
     product: {
       label: 'Rokuga의 실제 영역 선택 화면과 녹화 toolbar',
+      toolbarLabel: '녹화 모드 선택',
       record: '녹화',
+      selectedArea: '선택 영역',
+      fullScreen: '전체 화면',
+      window: '창',
       file: '파일',
       edit: '편집',
       view: '보기',
@@ -182,7 +190,11 @@ export const translations: Record<Language, Copy> = {
     },
     product: {
       label: 'Rokuga area selection screen and recording toolbar',
+      toolbarLabel: 'Choose a recording mode',
       record: 'Record',
+      selectedArea: 'Selected Area',
+      fullScreen: 'Full Screen',
+      window: 'Window',
       file: 'File',
       edit: 'Edit',
       view: 'View',
@@ -257,7 +269,11 @@ export const translations: Record<Language, Copy> = {
     },
     product: {
       label: 'Rokugaの範囲選択画面と録画toolbar',
+      toolbarLabel: '録画モードを選択',
       record: '録画',
+      selectedArea: '選択範囲',
+      fullScreen: 'フルスクリーン',
+      window: 'ウインドウ',
       file: 'ファイル',
       edit: '編集',
       view: '表示',
@@ -332,7 +348,11 @@ export const translations: Record<Language, Copy> = {
     },
     product: {
       label: 'Rokuga 区域选择界面和录制工具栏',
+      toolbarLabel: '选择录制模式',
       record: '录制',
+      selectedArea: '所选区域',
+      fullScreen: '全屏',
+      window: '窗口',
       file: '文件',
       edit: '编辑',
       view: '显示',

@@ -3,12 +3,14 @@ import logoUrl from '../../docs/logo.png'
 import { isLanguage, languageLabels, languages, selectLanguage, translations } from './i18n'
 
 const LANGUAGE_STORAGE_KEY = 'rokuga-language'
+type CaptureMode = 'selectedArea' | 'fullScreen' | 'window'
 
 export default function App() {
   const [language, setLanguage] = useState(() => selectLanguage(
     localStorage.getItem(LANGUAGE_STORAGE_KEY),
     navigator.languages,
   ))
+  const [captureMode, setCaptureMode] = useState<CaptureMode>('selectedArea')
   const copy = translations[language]
 
   useEffect(() => {
@@ -76,7 +78,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="product-shell" role="img" aria-label={copy.product.label}>
+            <div className="product-shell" role="group" aria-label={copy.product.label}>
               <div className="product-stage">
                 <div className="mac-menu" aria-hidden="true">
                   <span className="apple-logo"></span>
@@ -88,22 +90,45 @@ export default function App() {
                   <i className="handle" /><i className="handle" /><i className="handle" /><i className="handle" />
                   <i className="handle" /><i className="handle" /><i className="handle" /><i className="handle" />
                 </div>
-                <div className="actual-toolbar" aria-hidden="true">
+                <div className="actual-toolbar" role="toolbar" aria-label={copy.product.toolbarLabel}>
                   <span className="toolbar-close">
-                    <svg viewBox="0 0 20 20"><path d="m7 7 6 6m0-6-6 6" /></svg>
+                    <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" /><path d="m7 7 6 6m0-6-6 6" /></svg>
                   </span>
-                  <span className="toolbar-action toolbar-action-active">
-                    <svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="2" /></svg>
-                  </span>
-                  <span className="toolbar-action toolbar-screen">
-                    <svg viewBox="0 0 20 20"><rect x="2.5" y="3" width="15" height="13" rx="1.5" /><path d="M5 17h10" /></svg>
-                  </span>
-                  <span className="toolbar-action toolbar-window">
-                    <svg viewBox="0 0 20 20"><rect x="2.5" y="3" width="15" height="14" rx="2" /><path d="M3 7h14" /><path d="M6 5h.01M8.5 5h.01" /></svg>
-                  </span>
-                  <span className="toolbar-divider" />
-                  <span className="toolbar-action toolbar-settings">
-                    <svg viewBox="0 0 20 20"><path d="M4 5h12M4 10h12M4 15h12" /><circle cx="8" cy="5" r="1.5" /><circle cx="13" cy="10" r="1.5" /><circle cx="7" cy="15" r="1.5" /></svg>
+                  <div className="toolbar-modes">
+                    <button
+                      className="toolbar-mode"
+                      type="button"
+                      aria-label={copy.product.selectedArea}
+                      aria-pressed={captureMode === 'selectedArea'}
+                      data-tooltip={copy.product.selectedArea}
+                      onClick={() => setCaptureMode('selectedArea')}
+                    >
+                      <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2" /></svg>
+                    </button>
+                    <button
+                      className="toolbar-mode"
+                      type="button"
+                      aria-label={copy.product.fullScreen}
+                      aria-pressed={captureMode === 'fullScreen'}
+                      data-tooltip={copy.product.fullScreen}
+                      onClick={() => setCaptureMode('fullScreen')}
+                    >
+                      <svg className="full-screen-icon" viewBox="0 0 20 20" aria-hidden="true"><rect x="2.5" y="3" width="15" height="14" rx="1.5" /><rect x="4.5" y="5" width="11" height="10" rx=".7" /></svg>
+                    </button>
+                    <button
+                      className="toolbar-mode"
+                      type="button"
+                      aria-label={copy.product.window}
+                      aria-pressed={captureMode === 'window'}
+                      data-tooltip={copy.product.window}
+                      onClick={() => setCaptureMode('window')}
+                    >
+                      <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2.5" y="3" width="15" height="14" rx="2" /><path d="M3 7h14" /><path d="M6 5h.01M8.5 5h.01" /></svg>
+                    </button>
+                  </div>
+                  <span className="toolbar-drag" />
+                  <span className="toolbar-options">
+                    <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 5h12M4 10h12M4 15h12" /><circle cx="8" cy="5" r="1.5" /><circle cx="13" cy="10" r="1.5" /><circle cx="7" cy="15" r="1.5" /></svg>
                   </span>
                   <span className="toolbar-record">{copy.product.record}</span>
                 </div>
