@@ -119,7 +119,7 @@ class CapturePanel: NSPanel {
         isMovableByWindowBackground = true
         hidesOnDeactivate = false
         becomesKeyOnlyIfNeeded = true
-        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient]
+        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
         self.level = level
         animationBehavior = .utilityWindow
     }
