@@ -29,6 +29,7 @@ jobs:
     permissions:
       actions: write
       contents: write
+      pull-requests: write
     steps:
       - name: Check out main
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -62,18 +63,47 @@ jobs:
           grep -q "MARKETING_VERSION: \"$VERSION\"" project.yml
           grep -q "MARKETING_VERSION = $VERSION;" Rokuga.xcodeproj/project.pbxproj
 
-      - name: Commit release
+      - name: Push release branch
+        id: branch
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
+          BRANCH="release/v$VERSION"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .changes CHANGELOG.md project.yml Rokuga.xcodeproj/project.pbxproj
           git commit -m "chore: release v$VERSION"
-          git push origin HEAD:main
+          git push origin HEAD:"$BRANCH"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
 
-      - name: Start deployment
+      - name: Create release pull request
         env:
+          BRANCH: ${{ steps.branch.outputs.branch }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.version.outputs.version }}
-        run: gh workflow run release.yml --ref main -f version="$VERSION" -f deploy=true
+        run: |
+          gh pr create \
+            --assignee evan-choi \
+            --base main \
+            --head "$BRANCH" \
+            --title "chore: v$VERSION 릴리스" \
+            --body-file - <<EOF
+          ## Background
+
+          Batch the approved Changie fragments for Rokuga $VERSION.
+
+          ## Changes
+
+          - Update CHANGELOG.md and the Xcode project version.
+          - Remove the batched fragments from the unreleased directory.
+
+          ## Verification
+
+          - actionlint
+          - XcodeGen project generation
+
+          ## Deployment
+
+          Merging this pull request starts the Release workflow.
+          EOF
+          gh workflow run ci.yml --ref "$BRANCH"

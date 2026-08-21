@@ -69,6 +69,8 @@ The default ad-hoc signature does not require an Apple account. For repeated loc
 
 ## Development
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the branch, commit, change fragment, and pull request workflow.
+
 Install the repository check tools and run the core test suite:
 
 ```bash
@@ -96,7 +98,7 @@ mise run change
 
 Run the **Cut Release** workflow and select `auto`, `patch`, `minor`, or `major`. `auto` derives the SemVer increment from the unreleased Changie fragments.
 
-The workflow batches the fragments, updates `CHANGELOG.md` and the Xcode project version, then pushes `chore: release vX.Y.Z` to `main`. It starts the **Release** workflow, which uploads the App Store build, publishes the GitHub release with the same notes, and updates the Homebrew cask.
+The workflow batches the fragments, updates `CHANGELOG.md` and the Xcode project version, then opens a release pull request. Merging that pull request starts the **Release** workflow, which uploads the App Store build, publishes the GitHub release with the same notes, and updates the Homebrew cask.
 
 To retry an existing version without creating another release commit, run the **Release** workflow with that version and enable `deploy`.
 

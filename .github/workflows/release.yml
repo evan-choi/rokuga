@@ -16,6 +16,9 @@ name: Release
 #   HOMEBREW_TAP_TOKEN                        - token with Contents write access to evan-choi/homebrew-tap
 
 on:
+  pull_request:
+    branches: [main]
+    types: [closed]
   workflow_dispatch:
     inputs:
       version:
@@ -32,7 +35,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release
   cancel-in-progress: false
 
 env:
@@ -43,6 +46,9 @@ env:
 jobs:
   release:
     name: App Store & Homebrew
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/v'))
     runs-on: macos-15
     environment: release
     outputs:
@@ -51,6 +57,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
 
       - name: Set up tools
         uses: jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518 # v4.2.5
@@ -70,7 +78,7 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Validate release notes
-        if: inputs.deploy
+        if: github.event_name == 'pull_request' || inputs.deploy
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -88,7 +96,7 @@ jobs:
           APP_STORE_INSTALLER_CERTIFICATE_BASE64: ${{ secrets.APP_STORE_INSTALLER_CERTIFICATE_BASE64 }}
           APP_STORE_CERTIFICATE_PASSWORD: ${{ secrets.APP_STORE_CERTIFICATE_PASSWORD }}
           APP_STORE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APP_STORE_PROVISIONING_PROFILE_BASE64 }}
-          DEPLOY: ${{ inputs.deploy }}
+          DEPLOY: ${{ github.event_name == 'pull_request' || inputs.deploy }}
         run: |
           KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
           KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
@@ -130,7 +138,7 @@ jobs:
           rm "$CERTIFICATE_PATH"
 
       - name: Archive for App Store
-        if: inputs.deploy
+        if: github.event_name == 'pull_request' || inputs.deploy
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           PROFILE_NAME: ${{ steps.signing.outputs.profile_name }}
@@ -149,7 +157,7 @@ jobs:
             ROKUGA_PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME"
 
       - name: Verify App Store archive signatures
-        if: inputs.deploy
+        if: github.event_name == 'pull_request' || inputs.deploy
         run: |
           APP_PATH="$RUNNER_TEMP/$APP_NAME-AppStore.xcarchive/Products/Applications/$APP_NAME.app"
           BUNDLE_PATH="$APP_PATH/Contents/Resources/KeyboardShortcuts_KeyboardShortcuts.bundle"
@@ -160,7 +168,7 @@ jobs:
           cmp "$RUNNER_TEMP/archive-app-cert0" "$RUNNER_TEMP/archive-bundle-cert0"
 
       - name: Create App Store package
-        if: inputs.deploy
+        if: github.event_name == 'pull_request' || inputs.deploy
         run: |
           APP_PATH="$RUNNER_TEMP/$APP_NAME-AppStore.xcarchive/Products/Applications/$APP_NAME.app"
           mkdir -p "$RUNNER_TEMP/app-store-export"
@@ -169,7 +177,7 @@ jobs:
             "$RUNNER_TEMP/app-store-export/$APP_NAME.pkg"
 
       - name: Verify exported App Store package
-        if: inputs.deploy
+        if: github.event_name == 'pull_request' || inputs.deploy
         id: app_store_package
         run: |
           PACKAGE_PATH=$(find "$RUNNER_TEMP/app-store-export" -maxdepth 1 -name '*.pkg' -print -quit)
@@ -186,7 +194,7 @@ jobs:
           echo "package_path=$PACKAGE_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Upload to App Store Connect
-        if: inputs.deploy
+        if: github.event_name == 'pull_request' || inputs.deploy
         env:
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
@@ -286,7 +294,7 @@ jobs:
           echo "zip_filename=$ZIP_FILENAME" >> "$GITHUB_OUTPUT"
 
       - name: Publish GitHub release
-        if: inputs.deploy
+        if: github.event_name == 'pull_request' || inputs.deploy
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -305,7 +313,7 @@ jobs:
           fi
 
       - name: Upload artifact (manual runs)
-        if: "!inputs.deploy"
+        if: github.event_name == 'workflow_dispatch' && !inputs.deploy
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ steps.zip.outputs.zip_filename }}
@@ -326,7 +334,9 @@ jobs:
 
   homebrew:
     name: Update Homebrew cask
-    if: inputs.deploy
+    if: >-
+      github.event_name == 'workflow_dispatch' && inputs.deploy ||
+      github.event_name == 'pull_request' && github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/v')
     needs: release
     runs-on: ubuntu-latest
     permissions:
