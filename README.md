@@ -86,6 +86,20 @@ python3 scripts/lint-localization.py
 ./scripts/audit-zero-copy.sh
 ```
 
+Record each user-facing change before committing it:
+
+```bash
+mise run change
+```
+
+## Release cycle
+
+Run the **Cut Release** workflow and select `auto`, `patch`, `minor`, or `major`. `auto` derives the SemVer increment from the unreleased Changie fragments.
+
+The workflow batches the fragments, updates `CHANGELOG.md` and the Xcode project version, then pushes `chore: release vX.Y.Z` to `main`. It starts the **Release** workflow, which uploads the App Store build, publishes the GitHub release with the same notes, and updates the Homebrew cask.
+
+To retry an existing version without creating another release commit, run the **Release** workflow with that version and enable `deploy`.
+
 ## Performance testing
 
 The `RokugaPerf` app in [`Perf`](Perf) exercises the production capture path against a deterministic Retina 4K workload. Run it through `./scripts/perf.sh`; it requires local code signing and Screen Recording permission, so performance measurements do not run in CI.

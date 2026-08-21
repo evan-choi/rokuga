@@ -1,0 +1,79 @@
+name: Cut Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: SemVer increment calculated from fragments or selected explicitly
+        required: true
+        type: choice
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+        default: auto
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cut-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Cut release
+    runs-on: macos-15
+    environment: release
+    permissions:
+      actions: write
+      contents: write
+    steps:
+      - name: Check out main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+
+      - name: Set up tools
+        uses: jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518 # v4.2.5
+        with:
+          install_args: actionlint changie xcodegen
+
+      - name: Prepare release
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          changie batch "$BUMP" --allow-no-changes=false
+          changie merge
+          xcodegen generate
+          VERSION=$(changie latest --remove-prefix)
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ -f ".changes/$VERSION.md" ]]
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Validate generated files
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          actionlint
+          git diff --check
+          grep -q "MARKETING_VERSION: \"$VERSION\"" project.yml
+          grep -q "MARKETING_VERSION = $VERSION;" Rokuga.xcodeproj/project.pbxproj
+
+      - name: Commit release
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .changes CHANGELOG.md project.yml Rokuga.xcodeproj/project.pbxproj
+          git commit -m "chore: release v$VERSION"
+          git push origin HEAD:main
+
+      - name: Start deployment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: gh workflow run release.yml --ref main -f version="$VERSION" -f deploy=true
