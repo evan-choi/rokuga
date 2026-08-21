@@ -69,4 +69,4 @@ jobs:
         run: swiftformat --lint .
 
       - name: Localization gates (no literals outside catalog, ko/ja/zh-Hans completeness)
-        run: bun scripts/lint-localization.ts
+        run: mise run lint:localization

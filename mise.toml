@@ -9,3 +9,11 @@ xcodegen = "2.46.0"
 [tasks.change]
 description = "Add a user-facing change fragment"
 run = "changie new"
+
+[tasks."lint:localization"]
+description = "Check localization keys and translations"
+run = "bun scripts/lint-localization.ts"
+
+[tasks."audit:zero-copy"]
+description = "Check the record path for CPU pixel readback"
+run = "bun scripts/audit-zero-copy.ts"
