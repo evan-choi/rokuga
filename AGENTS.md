@@ -3,7 +3,7 @@
 ## Trunk-based development
 
 - Keep `main` as the only long-lived branch and keep it releasable.
-- Create each change from the latest `main` in a short-lived `feature/<slug>` branch.
+- Create each change from the latest `main` in a short-lived `<type>/<slug>` branch. Use `feature`, `fix`, `perf`, `refactor`, `docs`, `test`, or `chore` as the type.
 - Merge completed work into `main` through a pull request. Do not create long-lived `develop` or `release` branches.
 - Do not commit directly to `main`.
 - Use English Conventional Commits: `<type>(<scope>): <subject>`. Omit the scope when none is established.

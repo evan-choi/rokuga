@@ -13,7 +13,7 @@ Edit `project.yml` instead of `Rokuga.xcodeproj`, then regenerate the project. R
 
 ## Workflow
 
-1. Create a short-lived `feature/short-description` branch from `main`.
+1. Create a short-lived `<type>/short-description` branch from `main`. Use `feature`, `fix`, `perf`, `refactor`, `docs`, `test`, or `chore`.
 2. Add tests with code changes.
 3. Run `mise run change` for user-facing changes.
 4. Use English Conventional Commits, for example `fix: correct recording duration`.
