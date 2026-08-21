@@ -84,8 +84,8 @@ Run the repository checks:
 actionlint
 swiftlint lint --strict
 swiftformat --lint .
-python3 scripts/lint-localization.py
-./scripts/audit-zero-copy.sh
+mise exec -- bun scripts/lint-localization.ts
+mise exec -- bun scripts/audit-zero-copy.ts
 ```
 
 Record each user-facing change before committing it:

@@ -26,8 +26,8 @@ Edit `project.yml` instead of `Rokuga.xcodeproj`, then regenerate the project. R
 mise exec -- actionlint
 mise exec -- swiftlint lint --strict
 mise exec -- swiftformat --lint .
-python3 scripts/lint-localization.py
-./scripts/audit-zero-copy.sh
+mise exec -- bun scripts/lint-localization.ts
+mise exec -- bun scripts/audit-zero-copy.ts
 ```
 
 For website changes, also run:
