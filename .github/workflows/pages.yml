@@ -32,21 +32,8 @@ jobs:
         with:
           install_args: bun
 
-      - name: Install dependencies
-        working-directory: website
-        run: bun install --frozen-lockfile
-
-      - name: Test
-        working-directory: website
-        run: bun test
-
-      - name: Lint
-        working-directory: website
-        run: bun run lint
-
-      - name: Build
-        working-directory: website
-        run: bun run build
+      - name: Test, lint, and build website
+        run: mise run --skip-tools website:test-lint-build
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0

@@ -29,11 +29,10 @@ jobs:
         run: sudo xcode-select -s "$(find /Applications -maxdepth 1 -type d -name 'Xcode_26*.app' | sort -V | tail -1)/Contents/Developer"
 
       - name: RokugaCore unit tests
-        working-directory: RokugaCore
-        run: swift test
+        run: mise run --skip-tools core:test
 
       - name: Generate project
-        run: xcodegen generate
+        run: mise run --skip-tools xcode-project:generate
 
       - name: Build app
         run: |
@@ -54,19 +53,5 @@ jobs:
         with:
           install_args: actionlint bun changie swiftformat swiftlint
 
-      - name: GitHub Actions
-        run: actionlint
-
-      - name: Changelog
-        run: |
-          changie batch patch --dry-run > /dev/null
-          changie merge --dry-run > /dev/null
-
-      - name: SwiftLint
-        run: swiftlint lint --strict
-
-      - name: SwiftFormat (check only)
-        run: swiftformat --lint .
-
-      - name: Localization gates (no literals outside catalog, ko/ja/zh-Hans completeness)
-        run: mise run lint:localization
+      - name: Repository lint checks
+        run: mise run --skip-tools repository:lint

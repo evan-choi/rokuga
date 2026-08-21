@@ -52,7 +52,7 @@ To build Rokuga:
 git clone https://github.com/evan-choi/rokuga.git
 cd rokuga
 mise install
-xcodegen generate
+mise run xcode-project:generate
 open Rokuga.xcodeproj
 ```
 
@@ -71,27 +71,17 @@ The default ad-hoc signature does not require an Apple account. For repeated loc
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the branch, commit, change fragment, and pull request workflow.
 
-Install the repository check tools and run the core test suite:
+Install the repository tools, then run the tests and linters:
 
 ```bash
 mise install
-(cd RokugaCore && swift test)
-```
-
-Run the repository checks:
-
-```bash
-actionlint
-swiftlint lint --strict
-swiftformat --lint .
-mise run lint:localization
-mise run audit:zero-copy
+mise run repository:test-and-lint
 ```
 
 Record each user-facing change before committing it:
 
 ```bash
-mise run change
+mise run changelog:add
 ```
 
 ## Release cycle

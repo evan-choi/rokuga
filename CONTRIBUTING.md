@@ -6,7 +6,7 @@ Rokuga requires macOS, Xcode 26, and [mise](https://mise.jdx.dev/).
 
 ```bash
 mise install
-mise exec -- xcodegen generate
+mise run xcode-project:generate
 ```
 
 Edit `project.yml` instead of `Rokuga.xcodeproj`, then regenerate the project. Run `./scripts/setup-dev-signing.sh` when manual testing requires persistent Screen Recording permission.
@@ -15,29 +15,20 @@ Edit `project.yml` instead of `Rokuga.xcodeproj`, then regenerate the project. R
 
 1. Create a short-lived `<type>/short-description` branch from `main`. Use `feature`, `fix`, `perf`, `refactor`, `docs`, `test`, or `chore`.
 2. Add tests with code changes.
-3. Run `mise run change` for user-facing changes.
+3. Run `mise run changelog:add` for user-facing changes.
 4. Use English Conventional Commits, for example `fix: correct recording duration`.
 5. Open a pull request against `main` and describe the change and verification performed.
 
-## Checks
+## Test and lint
 
 ```bash
-(cd RokugaCore && swift test)
-mise exec -- actionlint
-mise exec -- swiftlint lint --strict
-mise exec -- swiftformat --lint .
-mise run lint:localization
-mise run audit:zero-copy
+mise run repository:test-and-lint
 ```
 
 For website changes, also run:
 
 ```bash
-cd website
-mise exec -- bun install --frozen-lockfile
-mise exec -- bun test
-mise exec -- bun run lint
-mise exec -- bun run build
+mise run website:test-lint-build
 ```
 
 Test UI and recording changes in the app. Include screenshots for visible UI changes.

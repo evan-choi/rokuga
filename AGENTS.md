@@ -15,7 +15,7 @@
 - Add a Changie fragment for every user-facing change before committing:
 
   ```bash
-  mise run change
+  mise run changelog:add
   ```
 
 - Do not add fragments for internal refactoring, CI-only changes, or documentation changes that do not affect users.

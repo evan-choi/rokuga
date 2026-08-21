@@ -6,14 +6,47 @@ swiftformat = "0.62.1"
 swiftlint = "0.65.0"
 xcodegen = "2.46.0"
 
-[tasks.change]
+[tasks."changelog:add"]
 description = "Add a user-facing change fragment"
 run = "changie new"
 
-[tasks."lint:localization"]
-description = "Check localization keys and translations"
+[tasks."xcode-project:generate"]
+description = "Generate Rokuga.xcodeproj from project.yml"
+run = "xcodegen generate"
+
+[tasks."core:test"]
+description = "Run the RokugaCore test suite"
+run = "cd RokugaCore && swift test"
+
+[tasks."localization:lint"]
+description = "Lint localization keys and translations"
 run = "bun scripts/lint-localization.ts"
 
-[tasks."audit:zero-copy"]
+[tasks."zero-copy:audit"]
 description = "Check the record path for CPU pixel readback"
 run = "bun scripts/audit-zero-copy.ts"
+
+[tasks."repository:lint"]
+description = "Run workflow, changelog, Swift, localization, and zero-copy checks"
+depends = ["localization:lint", "zero-copy:audit"]
+run = """
+actionlint
+changie batch patch --dry-run > /dev/null
+changie merge --dry-run > /dev/null
+swiftlint lint --strict
+swiftformat --lint .
+"""
+
+[tasks."repository:test-and-lint"]
+description = "Run RokugaCore tests and all repository linters"
+depends = ["core:test", "repository:lint"]
+
+[tasks."website:test-lint-build"]
+description = "Install, test, lint, and build the website"
+run = """
+cd website
+bun install --frozen-lockfile
+bun test
+bun run lint
+bun run build
+"""

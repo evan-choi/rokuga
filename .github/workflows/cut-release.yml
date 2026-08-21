@@ -48,7 +48,7 @@ jobs:
         run: |
           changie batch "$BUMP" --allow-no-changes=false
           changie merge
-          xcodegen generate
+          mise run --skip-tools xcode-project:generate
           VERSION=$(changie latest --remove-prefix)
           [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
           [[ -f ".changes/$VERSION.md" ]]
