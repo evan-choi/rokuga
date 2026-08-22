@@ -77,6 +77,9 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.evan-choi.rokuga
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         COMBINE_HIDPI_IMAGES: YES
+      configs:
+        Release:
+          PROVISIONING_PROFILE_SPECIFIER: $(ROKUGA_PROVISIONING_PROFILE_SPECIFIER)
 
   RokugaPerf:
     type: application

@@ -44,15 +44,15 @@ To run Rokuga:
 To build Rokuga:
 
 - Xcode 26
-- XcodeGen
+- [mise](https://mise.jdx.dev/)
 
 ## Build from source
 
 ```bash
-brew install xcodegen
 git clone https://github.com/evan-choi/rokuga.git
 cd rokuga
-xcodegen generate
+mise install
+mise run xcode-project:generate
 open Rokuga.xcodeproj
 ```
 
@@ -69,21 +69,28 @@ The default ad-hoc signature does not require an Apple account. For repeated loc
 
 ## Development
 
-Install the repository check tools and run the core test suite:
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the branch, commit, change fragment, and pull request workflow.
+
+Install the repository tools, then run the tests and linters:
 
 ```bash
-brew install swiftlint swiftformat
-(cd RokugaCore && swift test)
+mise install
+mise run repository:test-and-lint
 ```
 
-Run the repository checks:
+Record each user-facing change before committing it:
 
 ```bash
-swiftlint lint --strict
-swiftformat --lint .
-python3 scripts/lint-localization.py
-./scripts/audit-zero-copy.sh
+mise run changelog:add
 ```
+
+## Release cycle
+
+Run the **Cut Release** workflow and select `auto`, `patch`, `minor`, or `major`. `auto` derives the SemVer increment from the unreleased Changie fragments.
+
+The workflow batches the fragments, updates `CHANGELOG.md` and the Xcode project version, then opens a release pull request. Merging that pull request starts the **Release** workflow, which uploads the App Store build, publishes the GitHub release with the same notes, and updates the Homebrew cask.
+
+To retry an existing version without creating another release commit, run the **Release** workflow with that version and enable `deploy`.
 
 ## Performance testing
 

@@ -7,8 +7,8 @@
 | macOS 15 (arm64) | CI `test` job (`macos-15`) | ✅ every push/PR |
 | Unit + integration suites | `swift test` (51 tests: capture, encoder, audio output, splice clock, mixer, rate control, settings, trim) | ✅ CI |
 | Performance measurements | `RokugaPerf` + `scripts/perf.sh` | Local, on demand |
-| Zero-copy record path | `scripts/audit-zero-copy.sh` + xctrace recipe | Local, on demand |
-| Localization (ko/ja/zh-Hans) | `scripts/lint-localization.py` + `scripts/l10n-screenshots.sh` | ✅ CI / artifacts |
+| Zero-copy record path | `mise run zero-copy:audit` + xctrace recipe | ✅ CI |
+| Localization (ko/ja/zh-Hans) | `mise run localization:lint` + `scripts/l10n-screenshots.sh` | ✅ CI / artifacts |
 | Accessibility fallbacks | Reduce Transparency (`GlassBackground`), Reduce Motion paths, VoiceOver labels | ✅ code-level |
 | Fixed Dark inheritance | Debug app `--verify-dark-appearance` | Pass on macOS 26.5.2 |
 | Dark glass contrast and accessibility palette | Debug app `--verify-dark-rendering` | Pass on macOS 26.5.2; text ≥ 4.5:1 and controls ≥ 3:1 |
