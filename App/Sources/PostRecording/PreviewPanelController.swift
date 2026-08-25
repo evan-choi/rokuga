@@ -37,12 +37,12 @@ final class PreviewPanelController {
         panel.clipContent(toRoundedRect: CaptureWindowChrome.panelCornerRadius)
         panel.onEscape = { [weak self] in self?.close() }
 
+        if originFrame != nil {
+            panel.setFrame(targetFrame, display: true)
+        }
         panel.orderFrontRegardless()
         panel.makeKey()
         panel.registerForCaptureExclusion()
-        if originFrame != nil {
-            panel.setFrame(targetFrame, display: true, animate: true)
-        }
     }
 
     private func openEditor() {
