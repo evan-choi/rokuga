@@ -375,6 +375,11 @@ jobs:
             depends_on macos: :sequoia
 
             app "Rokuga.app"
+
+            postflight do
+              system_command "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister",
+                             args: ["-f", "#{appdir}/Rokuga.app"]
+            end
           end
           EOF
 
