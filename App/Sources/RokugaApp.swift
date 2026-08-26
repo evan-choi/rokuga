@@ -22,6 +22,7 @@ struct RokugaApp: App {
         Settings {
             SettingsView()
                 .appLocale()
+                .background(SettingsWindowAccessor())
         }
     }
 }
@@ -111,10 +112,78 @@ struct SettingsMenuItem: View {
 
     var body: some View {
         Button("Settings…") {
+            SettingsWindowPlacement.prepareForOpen()
             NSApp.activate(ignoringOtherApps: true)
             openSettings()
         }
         .keyboardShortcut(",", modifiers: .command)
+    }
+}
+
+@MainActor
+private enum SettingsWindowPlacement {
+    private weak static var settingsWindow: NSWindow?
+    private static var targetDisplayID: NSNumber?
+    private static var hasPlacementRequest = false
+
+    static func prepareForOpen() {
+        hasPlacementRequest = true
+        let mouse = NSEvent.mouseLocation
+        let screen = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) } ?? NSScreen.main
+        targetDisplayID = screen.flatMap(displayID)
+        if let settingsWindow {
+            place(settingsWindow)
+        }
+    }
+
+    static func attach(_ window: NSWindow) {
+        settingsWindow = window
+        if hasPlacementRequest {
+            place(window)
+        }
+    }
+
+    private static func place(_ window: NSWindow) {
+        let screen = targetDisplayID.flatMap { targetID in
+            NSScreen.screens.first { displayID($0) == targetID }
+        } ?? NSScreen.main
+        guard let visibleFrame = screen?.visibleFrame else { return }
+
+        let size = window.frame.size
+        let x = min(
+            max(visibleFrame.midX - size.width / 2, visibleFrame.minX),
+            max(visibleFrame.minX, visibleFrame.maxX - size.width)
+        )
+        let y = min(
+            max(visibleFrame.midY - size.height / 2, visibleFrame.minY),
+            max(visibleFrame.minY, visibleFrame.maxY - size.height)
+        )
+        window.setFrameOrigin(NSPoint(x: x, y: y))
+    }
+
+    private static func displayID(_ screen: NSScreen) -> NSNumber? {
+        screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber
+    }
+}
+
+private struct SettingsWindowAccessor: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        SettingsWindowAccessorView()
+    }
+
+    func updateNSView(_ view: NSView, context: Context) {}
+}
+
+private final class SettingsWindowAccessorView: NSView {
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        if let window {
+            SettingsWindowPlacement.attach(window)
+        }
+    }
+
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        nil
     }
 }
 
